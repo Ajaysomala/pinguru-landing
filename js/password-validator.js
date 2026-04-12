@@ -1,7 +1,7 @@
 // Password validation rules for real-world security
 
 const PASSWORD_RULES = {
-  minLength: 12,
+  minLength: 8,
   requireUppercase: true,
   requireLowercase: true,
   requireNumbers: true,
@@ -41,7 +41,7 @@ function validatePassword(password) {
 
 function calculateStrength(password) {
   let score = 0;
-  if (password.length >= 12) score++;
+  if (password.length >= 8) score++;
   if (password.length >= 16) score++;
   if (/[A-Z]/.test(password)) score++;
   if (/[a-z]/.test(password)) score++;
