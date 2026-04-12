@@ -1,0 +1,130 @@
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 5% 40px;
+  background: linear-gradient(160deg, #faf9ff 0%, #fff 100%);
+}
+
+.auth-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-md);
+}
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.auth-logo .logo { font-size: 1.6rem; }
+
+.auth-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.auth-sub {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin-bottom: 28px;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.auth-footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-submit {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.auth-submit:hover { background: var(--accent2); }
+.auth-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.lockout-msg {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-bottom: 14px;
+  display: none;
+}
+
+.attempts-warning {
+  font-size: 0.78rem;
+  color: #dc2626;
+  text-align: center;
+  margin-top: 8px;
+  display: none;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.divider span {
+  margin: 0 12px;
+}
+
+/* Google Sign-In Button Styling */
+div[id*="g_id"] {
+  display: flex;
+  justify-content: center;
+}
+
+.g_id_signin {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 480px) {
+  .auth-card { padding: 28px 20px; }
+}

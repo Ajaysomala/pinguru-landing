@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard — PinGuru</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://api.pinguru.me; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;"
+    />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+  </head>
+  <body>
+    <nav>
+      <a href="/" class="logo">PinGuru</a>
+      <div class="nav-links">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/rules.html">Rules</a>
+        <a href="/connect.html">Instagram</a>
+        <a href="#" id="logout-btn" class="nav-cta">Logout</a>
+      </div>
+      <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/rules.html">Rules</a>
+      <a href="/connect.html">Instagram</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+
+    <div class="dashboard-page">
+      <div class="dashboard-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Your Instagram automation overview</p>
+        </div>
+        <a href="/rules.html" class="btn-primary">+ New Rule</a>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-label">DMs Sent</div>
+          <div class="stat-card-value purple" id="stat-dms">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Active Rules</div>
+          <div class="stat-card-value green" id="stat-rules">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Monthly Limit</div>
+          <div class="stat-card-value" id="stat-limit">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Current Plan</div>
+          <div class="stat-card-value" style="font-size: 1.4rem" id="plan-name">
+            —
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Left column -->
+        <div>
+          <!-- Instagram Status -->
+          <div class="section-card" style="margin-bottom: 20px">
+            <div class="section-card-header">
+              <h2>Instagram Account</h2>
+              <span id="ig-status" class="badge-red">Not Connected</span>
+            </div>
+            <div class="ig-status-row">
+              <div class="ig-icon">📸</div>
+              <div class="ig-status-info">
+                <strong>pinguru_ig</strong>
+                <span id="ig-status-text">Checking connection...</span>
+              </div>
+              <a
+                href="/connect.html"
+                class="btn-secondary"
+                style="padding: 7px 14px; font-size: 0.82rem"
+                >Manage</a
+              >
+            </div>
+          </div>
+
+          <!-- Recent Rules -->
+          <div class="section-card">
+            <div class="section-card-header">
+              <h2>Recent Rules</h2>
+              <a
+                href="/rules.html"
+                style="
+                  color: var(--accent);
+                  font-size: 0.82rem;
+                  text-decoration: none;
+                "
+                >View all →</a
+              >
+            </div>
+            <div id="recent-rules">
+              <p style="color: var(--muted); font-size: 0.86rem">Loading...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div>
+          <!-- Usage -->
+          <div class="section-card plan-card" style="margin-bottom: 20px">
+            <h3>Plan Usage</h3>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" id="usage-bar" style="width: 0%"></div>
+            </div>
+            <div class="usage-label" id="usage-label">Loading...</div>
+            <a
+              href="#"
+              style="
+                display: block;
+                text-align: center;
+                margin-top: 14px;
+                font-size: 0.82rem;
+                color: var(--accent);
+                text-decoration: none;
+              "
+              >Upgrade plan →</a
+            >
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="section-card">
+            <div class="section-card-header"><h2>Quick Actions</h2></div>
+            <div class="quick-actions">
+              <a href="/rules.html" class="quick-action-btn"
+                ><span class="icon">⚡</span> Create automation rule</a
+              >
+              <a href="/connect.html" class="quick-action-btn"
+                ><span class="icon">📸</span> Instagram settings</a
+              >
+              <a
+                href="https://api.pinguru.me/docs"
+                target="_blank"
+                rel="noopener"
+                class="quick-action-btn"
+                ><span class="icon">🔧</span> API docs</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2026 PinGuru</p>
+      <div class="footer-links">
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="mailto:jaydeveloper010@gmail.com">Support</a>
+      </div>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script>
+      function toggleMobileMenu() {
+        document.getElementById("mobile-menu").classList.toggle("open");
+      }
+    </script>
+  </body>
+</html>
