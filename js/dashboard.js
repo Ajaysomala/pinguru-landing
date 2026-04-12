@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  if (!requireAuth()) return;
+  if (!await requireAuth()) return;
 
   const user = JSON.parse(localStorage.getItem('pg_user') || '{}');
 
