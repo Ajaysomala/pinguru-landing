@@ -141,3 +141,18 @@ function requireAuth() {
   // Protected API calls handle 401 and redirect via logout().
   return true;
 }
+async function requireAuth() {
+  try {
+    const res = await fetch(`${API}/auth/me`, {
+      credentials: 'include'
+    });
+    if (!res.ok) {
+      window.location.href = '/login.html';
+      return false;
+    }
+    return true;
+  } catch {
+    window.location.href = '/login.html';
+    return false;
+  }
+}
