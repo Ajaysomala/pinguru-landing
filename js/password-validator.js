@@ -28,7 +28,7 @@ function validatePassword(password) {
     errors.push('One number (0-9)');
   }
   
-  if (PASSWORD_RULES.requireSpecial && !new RegExp(`[${PASSWORD_RULES.specialChars}]`).test(password)) {
+  if (PASSWORD_RULES.requireSpecial && !/[!@#$%^&*()\-_=+\[\]{}|;:,.<>?]/.test(password)) {
     errors.push('One special character (!@#$%^&*...)');
   }
   
