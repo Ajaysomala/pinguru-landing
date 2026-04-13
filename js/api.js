@@ -135,12 +135,6 @@ async function logout() {
   localStorage.removeItem('pg_lockout_until');
   window.location.href = '/login.html';
 }
-
-function requireAuth() {
-  // Cookie auth cannot be checked synchronously in JS.
-  // Protected API calls handle 401 and redirect via logout().
-  return true;
-}
 async function requireAuth() {
   try {
     const res = await fetch(`${API}/auth/me`, {
