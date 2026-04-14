@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pricing — PinGuru</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://api.pinguru.me; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta name="description" content="Simple flat-rate pricing for Instagram DM automation. Free forever plan available." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/base.css" />
+    <style>
+      .pricing-page {
+        min-height: 100vh;
+        padding: 100px 5% 60px;
+      }
+
+      .pricing-header {
+        text-align: center;
+        max-width: 620px;
+        margin: 0 auto 56px;
+      }
+
+      .pricing-header .section-label {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 14px;
+      }
+
+      .pricing-header h1 {
+        font-family: 'Syne', sans-serif;
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 800;
+        line-height: 1.15;
+        margin-bottom: 16px;
+        color: var(--text);
+      }
+
+      .pricing-header p {
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.7;
+      }
+
+      .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+        max-width: 960px;
+        margin: 0 auto 60px;
+        align-items: stretch;
+      }
+
+      .price-card {
+        background: #fff;
+        border: 1.5px solid var(--border);
+        border-radius: 18px;
+        padding: 32px 26px;
+        text-align: center;
+        position: relative;
+        box-shadow: var(--shadow);
+        transition: all 0.25s ease;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .price-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .price-card.popular {
+        border-color: var(--accent);
+        box-shadow: 0 20px 46px rgba(76, 29, 149, 0.14);
+      }
+
+      .popular-badge {
+        position: absolute;
+        top: -13px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--accent);
+        color: #fff;
+        font-size: 0.68rem;
+        font-weight: 700;
+        padding: 4px 14px;
+        border-radius: 999px;
+        white-space: nowrap;
+        letter-spacing: 0.5px;
+      }
+
+      .plan-name {
+        font-family: 'Syne', sans-serif;
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 12px;
+      }
+
+      .plan-price {
+        font-family: 'Syne', sans-serif;
+        font-size: 2.6rem;
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        color: var(--text);
+        margin-bottom: 2px;
+        line-height: 1;
+      }
+
+      .plan-period {
+        color: var(--muted);
+        font-size: 0.8rem;
+        margin-bottom: 24px;
+      }
+
+      .plan-features {
+        list-style: none;
+        margin-bottom: 28px;
+        text-align: left;
+        flex: 1;
+      }
+
+      .plan-features li {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        font-size: 0.875rem;
+        color: var(--muted);
+        padding: 7px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .plan-features li:last-child { border-bottom: none; }
+
+      .plan-features li::before {
+        content: '✓';
+        color: var(--green);
+        font-weight: 700;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .btn-plan {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1.5px solid var(--border);
+        background: transparent;
+        color: var(--text);
+        margin-top: auto;
+      }
+
+      .btn-plan:hover { background: var(--surface); }
+
+      .price-card.popular .btn-plan {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+
+      .price-card.popular .btn-plan:hover { background: var(--accent2); border-color: var(--accent2); }
+
+      /* Coming soon overlay */
+      .coming-soon-overlay {
+        position: absolute;
+        inset: 0;
+        border-radius: 18px;
+        background: rgba(255,255,255,0.6);
+        backdrop-filter: blur(2px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+      }
+
+      .coming-soon-tag {
+        background: var(--text);
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 6px 16px;
+        border-radius: 999px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+
+      /* Current plan banner */
+      .current-plan-note {
+        max-width: 960px;
+        margin: 0 auto 20px;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-size: 0.875rem;
+        color: #15803d;
+        display: none;
+      }
+
+      .current-plan-note.visible { display: flex; align-items: center; gap: 8px; }
+
+      /* FAQ */
+      .faq-section {
+        max-width: 700px;
+        margin: 0 auto 60px;
+      }
+
+      .faq-section h2 {
+        font-family: 'Syne', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 28px;
+      }
+
+      .faq-item {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin-bottom: 10px;
+        overflow: hidden;
+        background: #fff;
+      }
+
+      .faq-q {
+        width: 100%;
+        text-align: left;
+        background: #fff;
+        border: none;
+        padding: 16px 20px;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .faq-q::after {
+        content: '+';
+        font-size: 1.2rem;
+        color: var(--muted);
+        transition: transform 0.2s;
+      }
+
+      .faq-item.open .faq-q::after { transform: rotate(45deg); }
+
+      .faq-a {
+        display: none;
+        padding: 0 20px 16px;
+        font-size: 0.875rem;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .faq-item.open .faq-a { display: block; }
+
+      /* Footer note */
+      .pricing-footer-note {
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.82rem;
+        margin-bottom: 40px;
+      }
+
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 24px 5%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      footer a { color: var(--muted); text-decoration: none; }
+      footer a:hover { color: var(--text); }
+
+      @media (max-width: 900px) {
+        .pricing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+
+      @media (max-width: 600px) {
+        .pricing-grid { grid-template-columns: 1fr; }
+        .pricing-page { padding: 90px 4% 40px; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <nav>
+      <a href="/dashboard.html" class="logo">PinGuru</a>
+      <div class="nav-links">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/rules.html">Rules</a>
+        <a href="/connect.html">Instagram</a>
+        <a href="#" id="logout-btn" class="nav-cta">Logout</a>
+      </div>
+      <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/rules.html">Rules</a>
+      <a href="/connect.html">Instagram</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+
+    <div class="pricing-page">
+
+      <div class="pricing-header">
+        <span class="section-label">Pricing</span>
+        <h1>Flat-rate plans for every growth stage</h1>
+        <p>No contracts. No per-contact billing. Pick the plan that matches your DM volume. Upgrade or cancel anytime.</p>
+      </div>
+
+      <!-- Current plan notice (shown dynamically) -->
+      <div class="current-plan-note" id="current-plan-note">
+        <span>✓</span>
+        <span id="current-plan-text">You are on the Free plan.</span>
+      </div>
+
+      <div class="pricing-grid">
+
+        <!-- Free -->
+        <div class="price-card" id="card-free">
+          <div class="plan-name">Free</div>
+          <div class="plan-price">₹0</div>
+          <div class="plan-period">per month, forever</div>
+          <ul class="plan-features">
+            <li>200 DMs / month</li>
+            <li>1 automation rule</li>
+            <li>Keyword DM trigger</li>
+            <li>Comment reply trigger</li>
+            <li>Story reply trigger</li>
+          </ul>
+          <button class="btn-plan" id="btn-free" onclick="handlePlanClick('free')">Current Plan</button>
+        </div>
+
+        <!-- Starter -->
+        <div class="price-card" id="card-starter">
+          <div class="coming-soon-overlay">
+            <span class="coming-soon-tag">Coming Soon</span>
+          </div>
+          <div class="plan-name">Starter</div>
+          <div class="plan-price">₹199</div>
+          <div class="plan-period">per month</div>
+          <ul class="plan-features">
+            <li>3,000 DMs / month</li>
+            <li>5 automation rules</li>
+            <li>Keyword, comment, story reply</li>
+            <li>Basic analytics</li>
+            <li>Email support</li>
+          </ul>
+          <button class="btn-plan" disabled>Upgrade — ₹199/mo</button>
+        </div>
+
+        <!-- Pro -->
+        <div class="price-card popular" id="card-pro">
+          <div class="coming-soon-overlay">
+            <span class="coming-soon-tag">Coming Soon</span>
+          </div>
+          <div class="popular-badge">⚡ MOST POPULAR</div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">₹399</div>
+          <div class="plan-period">per month</div>
+          <ul class="plan-features">
+            <li>15,000 DMs / month</li>
+            <li>Unlimited rules</li>
+            <li>Everything in Starter</li>
+            <li>Smart Hinglish matching</li>
+            <li>Advanced analytics</li>
+            <li>Priority support</li>
+          </ul>
+          <button class="btn-plan" disabled>Upgrade — ₹399/mo</button>
+        </div>
+
+      </div>
+
+      <p class="pricing-footer-note">Paid plans launching soon. You'll be notified when available.</p>
+
+      <!-- FAQ -->
+      <div class="faq-section">
+        <h2>Common questions</h2>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">Will my automations stop if I exceed the limit?</button>
+          <div class="faq-a">Yes — once you hit your monthly DM limit, automations pause until the next billing cycle. You can upgrade anytime to increase your limit.</div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">Does PinGuru use the official Instagram API?</button>
+          <div class="faq-a">Yes. PinGuru is built on the official Meta Instagram Graph API. No third-party hacks, no scraping, no risk of account suspension.</div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">Can I cancel anytime?</button>
+          <div class="faq-a">Yes. No contracts, no lock-ins. Cancel from your dashboard at any time and you won't be charged again.</div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">What payment methods are accepted?</button>
+          <div class="faq-a">We accept UPI, debit/credit cards, and net banking via Stripe. All transactions are in INR.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer>
+      <span>© 2026 PinGuru</span>
+      <div style="display:flex;gap:20px;">
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="mailto:support@pinguru.me">Support</a>
+      </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+      // Auth guard
+      (async () => {
+        const user = await requireAuth();
+        if (!user) return;
+      })();
+
+      // Logout btn
+      document.getElementById('logout-btn').addEventListener('click', (e) => {
+        e.preventDefault();
+        logout();
+      });
+
+      // Mobile menu
+      function toggleMobileMenu() {
+        document.getElementById('mobile-menu').classList.toggle('open');
+      }
+
+      // Show current plan
+      async function loadCurrentPlan() {
+        try {
+          const profile = await getProfile();
+          if (!profile) return;
+          const plan = (profile.plan || 'free').toLowerCase();
+          const note = document.getElementById('current-plan-note');
+          const noteText = document.getElementById('current-plan-text');
+          noteText.textContent = `You are on the ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan.`;
+          note.classList.add('visible');
+
+          // Update button states
+          const btnFree = document.getElementById('btn-free');
+          if (plan === 'free') {
+            btnFree.textContent = '✓ Current Plan';
+            btnFree.disabled = true;
+            btnFree.style.opacity = '0.6';
+            btnFree.style.cursor = 'default';
+          }
+        } catch (_) {}
+      }
+
+      function handlePlanClick(plan) {
+        if (plan === 'free') return;
+        // Stripe integration placeholder
+        alert('Paid plans launching soon. You\'ll be notified!');
+      }
+
+      function toggleFaq(btn) {
+        btn.closest('.faq-item').classList.toggle('open');
+      }
+
+      loadCurrentPlan();
+    </script>
+
+  </body>
+</html>
