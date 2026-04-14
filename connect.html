@@ -15,278 +15,140 @@
       href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="css/base.css" />
-    <link rel="stylesheet" href="css/navigation.css" />
+    <link rel="stylesheet" href="css/app-shell.css" />
+    <link rel="stylesheet" href="css/connect.css" />
   </head>
   <body>
-    <nav>
-      <a href="/dashboard.html" class="logo">PinGuru</a>
-      <div class="nav-links">
-        <a href="/dashboard.html">Dashboard</a>
-        <a href="/rules.html">Rules</a>
-        <a href="/connect.html">Instagram</a>
-        <a href="#" onclick="logout()" class="nav-cta">Logout</a>
-      </div>
-      <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
-    </nav>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Dashboard navigation">
+        <a href="/dashboard.html" class="sidebar-logo">PinGuru</a>
+        <div class="sidebar-section-label">Main</div>
+        <nav class="sidebar-nav">
+          <a href="/dashboard.html" class="sidebar-link">
+            <span>🏠</span> Dashboard
+          </a>
+          <a href="/rules.html" class="sidebar-link">
+            <span>⚡</span> Automation Rules
+          </a>
+          <a href="/connect.html" class="sidebar-link active">
+            <span>📸</span> Instagram
+          </a>
+          <a href="/settings.html" class="sidebar-link">
+            <span>⚙️</span> Settings
+          </a>
+          <a href="/pricing.html" class="sidebar-link">
+            <span>💎</span> Billing & Plans
+          </a>
+        </nav>
 
-    <div class="mobile-menu" id="mobile-menu">
-      <a href="/dashboard.html">Dashboard</a>
-      <a href="/rules.html">Rules</a>
-      <a href="/connect.html">Instagram</a>
-      <a href="#" onclick="logout()">Logout</a>
-    </div>
+        <div class="sidebar-spacer"></div>
 
-    <div style="padding: 80px 5% 40px; max-width: 700px; margin: 0 auto">
-      <div style="margin-bottom: 28px">
-        <p class="section-label">Integration</p>
-        <h1 class="section-title">Instagram Connection</h1>
-        <p style="color: var(--muted); font-size: 0.9rem">
-          Manage your Instagram Business account connection for DM automation.
-        </p>
-      </div>
-
-      <!-- Status Card -->
-      <div class="card" style="margin-bottom: 20px">
-        <div
-          style="
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-          "
-        >
-          <h2
-            style="
-              font-family: &quot;Syne&quot;, sans-serif;
-              font-size: 1rem;
-              font-weight: 700;
-            "
-          >
-            Connection Status
-          </h2>
-          <span id="connection-badge" class="badge-red">Checking...</span>
-        </div>
-        <div
-          style="
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px;
-            background: var(--surface);
-            border-radius: 10px;
-          "
-        >
-          <div
-            style="
-              width: 44px;
-              height: 44px;
-              border-radius: 12px;
-              background: linear-gradient(
-                135deg,
-                #f09433,
-                #e6683c,
-                #dc2743,
-                #cc2366,
-                #bc1888
-              );
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 1.4rem;
-            "
-          >
-            📸
+        <div class="sidebar-account">
+          <div class="sidebar-user">
+            <div class="user-avatar" id="user-avatar">A</div>
+            <div>
+              <div class="user-name" id="sidebar-user-name">Loading...</div>
+              <div class="user-email" id="sidebar-user-email">Loading...</div>
+              <div class="user-plan" id="sidebar-user-plan">Free</div>
+            </div>
           </div>
+          <button class="logout-btn" id="sidebar-logout-btn" type="button">
+            Sign out
+          </button>
+        </div>
+      </aside>
+
+      <div class="main">
+        <div class="topbar">
           <div>
-            <div style="font-weight: 600; font-size: 0.92rem" id="ig-username">
-              —
-            </div>
-            <div
-              style="font-size: 0.78rem; color: var(--muted)"
-              id="ig-user-id"
-            >
-              Loading...
+            <div class="topbar-title">Instagram Connection</div>
+            <div class="topbar-subtitle">
+              Manage your Instagram Business account connection
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Requirements Card -->
-      <div class="card" style="margin-bottom: 20px">
-        <h2
-          style="
-            font-family: &quot;Syne&quot;, sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 14px;
-          "
-        >
-          Requirements Checklist
-        </h2>
-        <div style="display: flex; flex-direction: column; gap: 10px">
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              gap: 10px;
-              font-size: 0.88rem;
-            "
-          >
-            <span style="color: var(--green); font-size: 1.1rem">✅</span>
-            Instagram Business or Creator account
-          </div>
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              gap: 10px;
-              font-size: 0.88rem;
-            "
-          >
-            <span style="color: var(--green); font-size: 1.1rem">✅</span>
-            Connected to a Facebook Page
-          </div>
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              gap: 10px;
-              font-size: 0.88rem;
-            "
-          >
-            <span style="color: var(--green); font-size: 1.1rem">✅</span>
-            Webhook subscription active
-          </div>
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              gap: 10px;
-              font-size: 0.88rem;
-            "
-          >
-            <span
-              id="advanced-access-icon"
-              style="color: var(--muted); font-size: 1.1rem"
-              >⏳</span
-            >
-            Meta Advanced Access (App Review pending)
+          <div class="topbar-right">
+            <a href="/rules.html" class="btn-primary">+ New Rule</a>
           </div>
         </div>
-      </div>
 
-      <!-- Info Card -->
-      <div class="card" style="border-color: #c4b5fd; background: #faf9ff">
-        <h2
-          style="
-            font-family: &quot;Syne&quot;, sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-          "
-        >
-          📋 How It Works
-        </h2>
-        <ol
-          style="
-            color: var(--muted);
-            font-size: 0.87rem;
-            line-height: 1.9;
-            padding-left: 18px;
-          "
-        >
-          <li>
-            Your Instagram Business account is connected via Meta Graph API
-          </li>
-          <li>
-            When someone DMs or comments a keyword, Meta sends a webhook to
-            PinGuru
-          </li>
-          <li>PinGuru matches the trigger to your automation rules</li>
-          <li>An automated reply is sent back within seconds</li>
-        </ol>
-        <div
-          style="
-            margin-top: 14px;
-            padding: 10px 14px;
-            background: #ede9fe;
-            border-radius: 8px;
-            font-size: 0.82rem;
-            color: #7c3aed;
-          "
-        >
-          ⚠️ <strong>Note:</strong> During development mode, automated replies
-          only work for Instagram Tester accounts. Full access requires Meta App
-          Review approval.
+        <div class="connect-body">
+          <!-- Status Card -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Connection Status</h2>
+              <span id="connection-badge" class="badge-red">Checking...</span>
+            </div>
+            <div class="status-box">
+              <div class="status-avatar">📸</div>
+              <div class="status-info">
+                <div class="status-username" id="ig-username">—</div>
+                <div class="status-label" id="ig-user-id">Loading...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Requirements Card -->
+          <div class="card">
+            <h2 class="card-title">Requirements Checklist</h2>
+            <ul class="requirements-list">
+              <li>
+                <span class="req-icon">✅</span>
+                Instagram Business or Creator account
+              </li>
+              <li>
+                <span class="req-icon">✅</span>
+                Connected to a Facebook Page
+              </li>
+              <li>
+                <span class="req-icon">✅</span>
+                Webhook subscription active
+              </li>
+              <li>
+                <span class="req-icon" id="advanced-access-icon">⏳</span>
+                Meta Advanced Access (App Review pending)
+              </li>
+            </ul>
+          </div>
+
+          <!-- How It Works -->
+          <div class="card card-info">
+            <h2 class="card-title">📋 How It Works</h2>
+            <ol class="how-it-works">
+              <li>
+                Your Instagram Business account is connected via Meta Graph API
+              </li>
+              <li>
+                When someone DMs or comments a keyword, Meta sends a webhook to
+                PinGuru
+              </li>
+              <li>PinGuru matches the trigger to your automation rules</li>
+              <li>An automated reply is sent back within seconds</li>
+            </ol>
+            <div class="info-note">
+              ⚠️ <strong>Note:</strong> During development mode, automated
+              replies only work for Instagram Tester accounts. Full access
+              requires Meta App Review approval.
+            </div>
+          </div>
+
+          <button
+            id="connect-ig-btn"
+            class="btn-primary"
+            style="display: none; margin-top: 20px"
+          >
+            Connect Instagram →
+          </button>
+
+          <div class="card-actions">
+            <a href="/dashboard.html" class="btn-secondary">← Dashboard</a>
+            <a href="/rules.html" class="btn-primary">Manage Rules →</a>
+          </div>
         </div>
-      </div>
-
-      <button
-        id="connect-ig-btn"
-        class="btn-primary"
-        onclick="connectInstagram()"
-        style="display: none; margin-top: 20px"
-      >
-        Connect Instagram →
-      </button>
-
-      <div style="margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap">
-        <a href="/dashboard.html" class="btn-secondary">← Dashboard</a>
-        <a href="/rules.html" class="btn-primary">Manage Rules →</a>
       </div>
     </div>
-
-    <footer>
-      <p>© 2026 PinGuru</p>
-      <div class="footer-links">
-        <a href="/privacy.html">Privacy</a>
-        <a href="/terms.html">Terms</a>
-      </div>
-    </footer>
 
     <script src="js/api.js"></script>
-    <script src="js/navigation.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", async () => {
-        await requireAuth();
-        const profile = await getProfile();
-        if (!profile) return;
-        const badge = document.getElementById("connection-badge");
-        const igUsername = document.getElementById("ig-username");
-        const igUserId = document.getElementById("ig-user-id");
-        const connectBtn = document.getElementById("connect-ig-btn");
-
-        if (profile.instagram_connected) {
-          badge.className = "badge-green";
-          badge.textContent = "Connected";
-          if (igUsername) igUsername.textContent = "Connected";
-          if (igUserId) igUserId.textContent = "Instagram Business Account";
-        } else {
-          badge.className = "badge-red";
-          badge.textContent = "Not Connected";
-          if (igUsername) igUsername.textContent = "No account connected";
-          if (igUserId)
-            igUserId.textContent = "Click Connect Instagram to get started";
-          if (connectBtn) connectBtn.style.display = "inline-block";
-        }
-      });
-
-      async function connectInstagram() {
-        try {
-          const res = await authFetch("/auth/instagram/initiate");
-          const data = await res.json();
-          if (data.auth_url) {
-            window.location.href = data.auth_url;
-          } else {
-            alert("Failed to start Instagram connection. Try again.");
-          }
-        } catch (e) {
-          alert("Error connecting Instagram. Please try again.");
-        }
-      }
-    </script>
+    <script src="js/app-shell.js"></script>
+    <script src="js/connect.js"></script>
   </body>
 </html>

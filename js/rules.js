@@ -1,204 +1,232 @@
-let keywords = [];
+let currentKeywords = [];
 
-document.addEventListener('DOMContentLoaded', async () => {
-  if (!requireAuth()) return;
-  await loadRules();
-
-  // Add keyword
-  const addKwBtn = document.getElementById('add-keyword-btn');
-  const kwInput = document.getElementById('keyword-input');
-  if (addKwBtn && kwInput) {
-    addKwBtn.addEventListener('click', () => addKeyword(kwInput.value.trim()));
-    kwInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); addKeyword(kwInput.value.trim()); }
-    });
-  }
-
-  // Create rule form
-  const ruleForm = document.getElementById('create-rule-form');
-  if (ruleForm) {
-    ruleForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const errorMsg = document.getElementById('rule-error');
-      const submitBtn = document.getElementById('create-btn');
-
-      if (keywords.length === 0) {
-        if (errorMsg) { errorMsg.style.display = 'block'; errorMsg.textContent = 'Add at least one keyword'; }
-        return;
-      }
-
-      const ruleData = {
-        name: document.getElementById('rule-name').value.trim(),
-        trigger_type: document.getElementById('trigger-type').value,
-        keywords: keywords,
-        match_mode: document.getElementById('match-mode').value,
-        reply_message: document.getElementById('reply-message').value.trim()
-      };
-
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span class="spinner"></span> Creating...';
-      if (errorMsg) errorMsg.style.display = 'none';
-
-      try {
-        await createRule(ruleData);
-        keywords = [];
-        renderKeywords();
-        ruleForm.reset();
-        await loadRules();
-        const successMsg = document.getElementById('rule-success');
-        if (successMsg) { successMsg.style.display = 'block'; setTimeout(() => successMsg.style.display = 'none', 3000); }
-      } catch (err) {
-        if (errorMsg) { errorMsg.style.display = 'block'; errorMsg.textContent = err.message; }
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Create Rule';
-      }
-    });
-  }
-
-  // Logout
-  const logoutBtn = document.getElementById('logout-btn');
-  if (logoutBtn) logoutBtn.addEventListener('click', logout);
-});
-
-async function loadRules() {
-  const container = document.getElementById('rules-list');
-  if (!container) return;
-
-  container.innerHTML = '<p style="color:var(--muted);font-size:0.86rem;padding:16px 0">Loading rules...</p>';
-
-  try {
-    const data = await getRules();
-    const rules = data?.rules || [];
-
-    if (rules.length === 0) {
-      container.innerHTML = `
-        <div class="empty-rules">
-          <div class="icon">⚡</div>
-          <h3>No automation rules yet</h3>
-          <p>Create your first rule below to start automating DMs</p>
-        </div>`;
-      return;
-    }
-
-    // Safe DOM building without innerHTML injection
-    container.innerHTML = '';
-    rules.forEach(r => {
-      const card = document.createElement('div');
-      card.className = 'rule-card';
-      card.id = `rule-${sanitizeHTML(r._id)}`;
-      
-      const info = document.createElement('div');
-      info.className = 'rule-info';
-      
-      const name = document.createElement('div');
-      name.className = 'rule-name';
-      name.textContent = r.name;
-      
-      const meta = document.createElement('div');
-      meta.className = 'rule-meta';
-      meta.textContent = `${r.trigger_type} · ${r.match_mode} match · ${r.sent_count || 0} DMs sent`;
-      
-      const keywords = document.createElement('div');
-      keywords.className = 'rule-keywords';
-      (r.keywords || []).forEach(k => {
-        const tag = document.createElement('span');
-        tag.className = 'keyword-tag';
-        tag.textContent = k;
-        keywords.appendChild(tag);
-      });
-      
-      info.appendChild(name);
-      info.appendChild(meta);
-      info.appendChild(keywords);
-      
-      const reply = document.createElement('div');
-      reply.className = 'rule-reply';
-      reply.textContent = r.reply_message;
-      
-      const actions = document.createElement('div');
-      actions.className = 'rule-actions';
-      
-      const toggle = document.createElement('label');
-      toggle.className = 'toggle';
-      toggle.title = r.is_active ? 'Pause rule' : 'Activate rule';
-      
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.checked = r.is_active;
-      checkbox.addEventListener('change', () => handleToggle(r._id, checkbox));
-      
-      const slider = document.createElement('span');
-      slider.className = 'toggle-slider';
-      
-      toggle.appendChild(checkbox);
-      toggle.appendChild(slider);
-      
-      const deleteBtn = document.createElement('button');
-      deleteBtn.className = 'btn-danger';
-      deleteBtn.textContent = 'Delete';
-      deleteBtn.addEventListener('click', () => handleDelete(r._id));
-      
-      actions.appendChild(toggle);
-      actions.appendChild(deleteBtn);
-      
-      card.appendChild(info);
-      card.appendChild(reply);
-      card.appendChild(actions);
-      container.appendChild(card);
-    });
-  } catch (err) {
-    const errMsg = document.createElement('p');
-    errMsg.style.cssText = 'color:var(--red);font-size:0.86rem';
-    errMsg.textContent = err.message || 'Failed to load rules';
-    container.innerHTML = '';
-    container.appendChild(errMsg);
-  }
-}
-
-async function handleToggle(ruleId, checkbox) {
-  try {
-    await toggleRule(ruleId);
-  } catch (err) {
-    checkbox.checked = !checkbox.checked;
-    alert('Failed to toggle rule: ' + err.message);
-  }
-}
-
-async function handleDelete(ruleId) {
-  if (!confirm('Delete this rule? This cannot be undone.')) return;
-  try {
-    await deleteRule(ruleId);
-    await loadRules();
-  } catch (err) {
-    alert('Failed to delete: ' + err.message);
-  }
-}
-
-function addKeyword(kw) {
-  if (!kw || keywords.includes(kw)) return;
-  keywords.push(kw);
-  const kwInput = document.getElementById('keyword-input');
-  if (kwInput) kwInput.value = '';
-  renderKeywords();
-}
-
-function removeKeyword(kw) {
-  keywords = keywords.filter(k => k !== kw);
-  renderKeywords();
-}
-
-function renderKeywords() {
-  const container = document.getElementById('keywords-tags');
-  if (!container) return;
-  container.innerHTML = keywords.map(kw => `
-    <span class="tag">
-      ${escHtml(kw)}
-      <button onclick="removeKeyword('${escHtml(kw)}')" type="button">×</button>
-    </span>
-  `).join('');
+function setEl(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
 }
 
 function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
 }
+
+function toTitleCase(str) {
+  if (!str) return '';
+  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function getDisplayName(profile) {
+  if (!profile) return 'User';
+  if (profile.instagram_username) {
+    return toTitleCase(profile.instagram_username.split('_').join(' '));
+  }
+  if (profile.email) {
+    return toTitleCase(profile.email.split('@')[0].split('.').join(' '));
+  }
+  return 'User';
+}
+
+function renderProfile(profile) {
+  const name = getDisplayName(profile);
+  setEl('sidebar-user-name', name);
+  setEl('sidebar-user-email', profile.email || '');
+  setEl('sidebar-user-plan', toTitleCase(profile.plan || 'Free'));
+  const avatar = document.getElementById('user-avatar');
+  if (avatar) {
+    avatar.textContent = name.charAt(0).toUpperCase();
+  }
+}
+
+function renderRules(rules) {
+  const rulesList = document.getElementById('rules-list');
+  if (!rulesList) return;
+
+  if (!rules || rules.length === 0) {
+    rulesList.innerHTML = '<p class="loading-text">No rules yet. Create one below to get started.</p>';
+    return;
+  }
+
+  let html = '';
+  rules.forEach((rule) => {
+    const statusClass = rule.is_active ? 'badge-active' : 'badge-inactive';
+    const statusText = rule.is_active ? 'Active' : 'Paused';
+    const triggerType = toTitleCase(rule.trigger_type);
+
+    html += `
+      <div class="rule-item">
+        <div>
+          <div class="rule-name">${escHtml(rule.name)}</div>
+          <div class="rule-trigger">${triggerType}</div>
+        </div>
+        <span class="rule-badge ${statusClass}">${statusText}</span>
+      </div>
+    `;
+  });
+
+  rulesList.innerHTML = html;
+}
+
+function renderKeywordsTags() {
+  const tagsContainer = document.getElementById('keywords-tags');
+  if (!tagsContainer) return;
+
+  let html = '';
+  currentKeywords.forEach((keyword, index) => {
+    html += `
+      <div class="keyword-tag">
+        ${escHtml(keyword)}
+        <button type="button" onclick="removeKeyword(${index})" aria-label="Remove keyword">
+          ×
+        </button>
+      </div>
+    `;
+  });
+
+  tagsContainer.innerHTML = html;
+}
+
+function addKeyword() {
+  const input = document.getElementById('keyword-input');
+  if (!input) return;
+
+  const keyword = input.value.trim();
+  if (keyword && !currentKeywords.includes(keyword)) {
+    currentKeywords.push(keyword);
+    input.value = '';
+    renderKeywordsTags();
+  }
+}
+
+function removeKeyword(index) {
+  currentKeywords.splice(index, 1);
+  renderKeywordsTags();
+}
+
+async function checkInstagramConnection() {
+  try {
+    const profile = await getProfile();
+    if (!profile || !profile.instagram_connected) {
+      const rulesBody = document.querySelector('.rules-body');
+      if (rulesBody) {
+        rulesBody.innerHTML = `
+          <div style="text-align:center;padding:80px 20px">
+            <div style="font-size:2.5rem;margin-bottom:16px">📸</div>
+            <h2 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:10px">Connect Instagram First</h2>
+            <p style="color:var(--muted);margin-bottom:24px;font-size:0.9rem">You need to connect your Instagram account before creating automation rules.</p>
+            <a href="/connect.html" class="btn-primary">Connect Instagram →</a>
+          </div>
+        `;
+      }
+    }
+  } catch (e) {
+    console.error('Error checking Instagram connection:', e);
+  }
+}
+
+async function handleFormSubmit(e) {
+  e.preventDefault();
+
+  const errorEl = document.getElementById('rule-error');
+  const successEl = document.getElementById('rule-success');
+
+  if (errorEl) errorEl.style.display = 'none';
+  if (successEl) successEl.style.display = 'none';
+
+  const name = document.getElementById('rule-name')?.value.trim();
+  const triggerType = document.getElementById('trigger-type')?.value;
+  const matchMode = document.getElementById('match-mode')?.value;
+  const replyMessage = document.getElementById('reply-message')?.value.trim();
+
+  if (!name || !triggerType || currentKeywords.length === 0 || !replyMessage) {
+    if (errorEl) {
+      errorEl.textContent = 'Please fill in all fields and add at least one keyword.';
+      errorEl.style.display = 'block';
+    }
+    return;
+  }
+
+  try {
+    const res = await authFetch('/api/rules', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        trigger_type: triggerType,
+        keywords: currentKeywords,
+        match_mode: matchMode,
+        reply_message: replyMessage,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to create rule');
+    }
+
+    if (successEl) {
+      successEl.style.display = 'block';
+      setTimeout(() => {
+        successEl.style.display = 'none';
+      }, 3000);
+    }
+
+    document.getElementById('create-rule-form')?.reset();
+    currentKeywords = [];
+    renderKeywordsTags();
+
+    const profile = await getProfile();
+    const rules = await getRules();
+    renderRules(rules);
+  } catch (e) {
+    if (errorEl) {
+      errorEl.textContent = e.message || 'Error creating rule. Please try again.';
+      errorEl.style.display = 'block';
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await requireAuth();
+
+  try {
+    const profile = await getProfile();
+    if (!profile) return;
+
+    renderProfile(profile);
+    await checkInstagramConnection();
+
+    const rules = await getRules();
+    renderRules(rules);
+
+    const logoutBtn = document.getElementById('sidebar-logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => logout());
+    }
+
+    const addKeywordBtn = document.getElementById('add-keyword-btn');
+    if (addKeywordBtn) {
+      addKeywordBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        addKeyword();
+      });
+    }
+
+    const keywordInput = document.getElementById('keyword-input');
+    if (keywordInput) {
+      keywordInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addKeyword();
+        }
+      });
+    }
+
+    const form = document.getElementById('create-rule-form');
+    if (form) {
+      form.addEventListener('submit', handleFormSubmit);
+    }
+  } catch (e) {
+    console.error('Error loading rules page:', e);
+  }
+});
+
