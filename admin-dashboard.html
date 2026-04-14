@@ -46,6 +46,7 @@
         min-height: 100vh;
         display: flex;
         flex-direction: column;
+        overflow-x: hidden;
       }
 
       /* ── Top bar ── */
@@ -137,6 +138,9 @@
         border-right: 1px solid var(--border);
         padding: 24px 0;
         flex-shrink: 0;
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease;
       }
 
       .nav-section {
@@ -192,6 +196,9 @@
         flex: 1;
         padding: 28px;
         overflow-y: auto;
+        width: 100%;
+        max-width: 1600px;
+        margin: 0 auto;
       }
 
       .page {
@@ -508,6 +515,119 @@
         text-align: center;
         padding: 32px;
       }
+
+      .sidebar-bottom-mobile {
+        display: none;
+        margin-top: auto;
+        padding: 16px 16px 0;
+        border-top: 1px solid var(--border);
+        gap: 10px;
+        flex-direction: column;
+      }
+
+      .sidebar-bottom-mobile .btn-logout,
+      .sidebar-bottom-mobile .refresh-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 10px 12px;
+      }
+
+      .sidebar-toggle {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--surface2);
+        color: var(--text);
+        cursor: pointer;
+        font-size: 1.1rem;
+      }
+
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.42);
+        z-index: 60;
+      }
+
+      .sidebar-overlay.open {
+        display: block;
+      }
+
+      .sidebar-close {
+        display: none;
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--surface2);
+        color: var(--text);
+        cursor: pointer;
+        font-size: 1rem;
+      }
+
+      @media (max-width: 900px) {
+        .sidebar-bottom-mobile {
+          display: flex;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .sidebar {
+          width: min(84vw, 300px);
+          position: fixed;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          z-index: 80;
+          transform: translateX(-104%);
+          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
+        }
+
+        .sidebar.open {
+          transform: translateX(0);
+        }
+
+        .main {
+          margin-left: 0;
+          max-width: none;
+          padding: 16px;
+        }
+
+        .topbar {
+          padding: 0 16px;
+        }
+
+        .topbar-right .refresh-btn,
+        .topbar-right .btn-logout {
+          display: none;
+        }
+
+        .sidebar-toggle {
+          display: inline-flex;
+        }
+
+        .sidebar-close {
+          display: inline-flex;
+        }
+
+        .layout {
+          overflow-x: hidden;
+        }
+      }
+
+      @media (min-width: 1400px) {
+        .main {
+          margin: 0 auto;
+        }
+      }
     </style>
   </head>
   <body>
@@ -547,6 +667,16 @@
         <span class="admin-badge">Admin</span>
       </div>
       <div class="topbar-right">
+        <button
+          class="sidebar-toggle"
+          id="sidebar-toggle"
+          type="button"
+          aria-label="Open sidebar"
+          aria-expanded="false"
+          onclick="toggleSidebar()"
+        >
+          ☰
+        </button>
         <button class="refresh-btn" onclick="loadCurrentPage()">
           ↻ Refresh
         </button>
@@ -557,7 +687,15 @@
     <!-- Layout -->
     <div class="layout">
       <!-- Sidebar -->
-      <nav class="sidebar">
+      <nav class="sidebar" id="sidebar">
+        <button
+          class="sidebar-close"
+          type="button"
+          onclick="toggleSidebar()"
+          aria-label="Close sidebar"
+        >
+          ✕
+        </button>
         <div class="nav-section">
           <div class="nav-label">Overview</div>
           <button class="nav-item active" onclick="showPage('overview', this)">
@@ -572,6 +710,13 @@
           <button class="nav-item" onclick="showPage('health', this)">
             <span class="nav-icon">🟢</span> Health
           </button>
+        </div>
+
+        <div class="sidebar-bottom-mobile">
+          <button class="refresh-btn" onclick="loadCurrentPage()">
+            ↻ Refresh
+          </button>
+          <button class="btn-logout" onclick="adminLogout()">Sign Out</button>
         </div>
       </nav>
 
@@ -650,6 +795,39 @@
       let adminToken = localStorage.getItem("pg_admin_token") || "";
       let currentPage = "overview";
 
+      function syncSidebarState() {
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("sidebar-overlay");
+        const toggleBtn = document.getElementById("sidebar-toggle");
+        if (window.innerWidth > 760) {
+          sidebar.classList.remove("open");
+          overlay.classList.remove("open");
+          document.body.style.overflow = "";
+          if (toggleBtn) {
+            toggleBtn.textContent = "☰";
+            toggleBtn.setAttribute("aria-label", "Open sidebar");
+            toggleBtn.setAttribute("aria-expanded", "false");
+          }
+        }
+      }
+
+      function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("sidebar-overlay");
+        const toggleBtn = document.getElementById("sidebar-toggle");
+        const isOpen = sidebar.classList.toggle("open");
+        overlay.classList.toggle("open", isOpen);
+        document.body.style.overflow = isOpen ? "hidden" : "";
+        if (toggleBtn) {
+          toggleBtn.textContent = isOpen ? "✕" : "☰";
+          toggleBtn.setAttribute(
+            "aria-label",
+            isOpen ? "Close sidebar" : "Open sidebar",
+          );
+          toggleBtn.setAttribute("aria-expanded", String(isOpen));
+        }
+      }
+
       // ── Auth ──────────────────────────────────────────────────────────
       function checkAuth() {
         if (!adminToken) {
@@ -698,6 +876,8 @@
 
       // Enter key on password
       document.addEventListener("DOMContentLoaded", () => {
+        syncSidebarState();
+        window.addEventListener("resize", syncSidebarState);
         document
           .getElementById("auth-password")
           .addEventListener("keydown", (e) => {
@@ -718,6 +898,12 @@
         btn.classList.add("active");
         currentPage = name;
         loadPage(name);
+        if (
+          window.innerWidth <= 760 &&
+          document.getElementById("sidebar").classList.contains("open")
+        ) {
+          toggleSidebar();
+        }
       }
 
       function loadCurrentPage() {
@@ -891,5 +1077,10 @@
         }
       }
     </script>
+    <div
+      class="sidebar-overlay"
+      id="sidebar-overlay"
+      onclick="toggleSidebar()"
+    ></div>
   </body>
 </html>

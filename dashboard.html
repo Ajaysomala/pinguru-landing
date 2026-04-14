@@ -44,6 +44,7 @@
         color: var(--text);
         min-height: 100vh;
         display: flex;
+        overflow-x: hidden;
       }
 
       /* ── SIDEBAR ── */
@@ -59,6 +60,9 @@
         bottom: 0;
         z-index: 50;
         padding: 0 0 20px;
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease;
       }
 
       .sidebar-logo {
@@ -257,6 +261,8 @@
       .content {
         padding: 28px;
         flex: 1;
+        width: 100%;
+        max-width: 1600px;
       }
 
       /* Stats grid */
@@ -467,21 +473,21 @@
       .mob-topbar {
         display: none;
       }
-      .hamburger {
+      .sidebar-toggle {
         display: none;
         flex-direction: column;
-        gap: 5px;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        font-size: 1.25rem;
         cursor: pointer;
         background: none;
         border: none;
         padding: 4px;
-      }
-      .hamburger span {
-        display: block;
-        width: 22px;
-        height: 2px;
-        background: var(--text);
-        border-radius: 2px;
+        color: var(--text);
       }
 
       /* Footer */
@@ -517,8 +523,10 @@
 
       @media (max-width: 680px) {
         .sidebar {
-          transform: translateX(-100%);
+          width: min(84vw, 300px);
+          transform: translateX(-104%);
           transition: transform 0.25s;
+          box-shadow: 0 24px 60px rgba(15, 15, 26, 0.18);
         }
         .sidebar.open {
           transform: translateX(0);
@@ -557,7 +565,7 @@
           -webkit-text-fill-color: transparent;
           text-decoration: none;
         }
-        .hamburger {
+        .sidebar-toggle {
           display: flex;
         }
         .topbar {
@@ -565,10 +573,21 @@
         }
         .content {
           padding: 16px;
+          max-width: none;
         }
         .stats-grid {
           grid-template-columns: repeat(2, 1fr);
           gap: 10px;
+        }
+        .grid-3,
+        .grid-2 {
+          gap: 14px;
+        }
+      }
+
+      @media (min-width: 1400px) {
+        .content {
+          margin: 0 auto;
         }
       }
     </style>
@@ -580,16 +599,20 @@
       <button
         onclick="toggleSidebar()"
         id="sidebar-close"
+        aria-label="Close sidebar"
         style="
           display: none;
           position: absolute;
-          top: 18px;
+          top: 14px;
           right: 14px;
-          background: none;
-          border: none;
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
+          background: var(--bg);
+          border: 1px solid var(--border);
           cursor: pointer;
-          font-size: 1.2rem;
-          color: var(--muted);
+          font-size: 1.05rem;
+          color: var(--text);
         "
       >
         ✕
@@ -625,8 +648,15 @@
     <!-- MOBILE TOPBAR -->
     <div class="mob-topbar">
       <a href="/dashboard.html" class="mob-logo">PinGuru</a>
-      <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
-        <span></span><span></span><span></span>
+      <button
+        class="sidebar-toggle"
+        id="sidebar-toggle"
+        onclick="toggleSidebar()"
+        aria-label="Open sidebar"
+        aria-expanded="false"
+        type="button"
+      >
+        ☰
       </button>
     </div>
 
@@ -749,12 +779,47 @@
         const sidebar = document.getElementById("sidebar");
         const overlay = document.getElementById("sidebar-overlay");
         const closeBtn = document.getElementById("sidebar-close");
+        const toggleBtn = document.getElementById("sidebar-toggle");
         const isOpen = sidebar.classList.toggle("open");
         overlay.classList.toggle("open", isOpen);
+        document.body.style.overflow = isOpen ? "hidden" : "";
         if (closeBtn) closeBtn.style.display = isOpen ? "block" : "none";
+        if (toggleBtn) {
+          toggleBtn.textContent = isOpen ? "✕" : "☰";
+          toggleBtn.setAttribute(
+            "aria-label",
+            isOpen ? "Close sidebar" : "Open sidebar",
+          );
+          toggleBtn.setAttribute("aria-expanded", String(isOpen));
+        }
+      }
+
+      function syncSidebarState() {
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("sidebar-overlay");
+        const closeBtn = document.getElementById("sidebar-close");
+        const toggleBtn = document.getElementById("sidebar-toggle");
+        if (window.innerWidth > 680) {
+          sidebar.classList.remove("open");
+          overlay.classList.remove("open");
+          document.body.style.overflow = "";
+          if (closeBtn) closeBtn.style.display = "none";
+          if (toggleBtn) {
+            toggleBtn.textContent = "☰";
+            toggleBtn.setAttribute("aria-label", "Open sidebar");
+            toggleBtn.setAttribute("aria-expanded", "false");
+          }
+        }
       }
 
       document.addEventListener("DOMContentLoaded", async () => {
+        syncSidebarState();
+        window.addEventListener("resize", syncSidebarState);
+        document.querySelectorAll("#sidebar a").forEach((link) => {
+          link.addEventListener("click", () => {
+            if (window.innerWidth <= 680) toggleSidebar();
+          });
+        });
         await requireAuth();
         const profile = await getProfile();
         if (!profile) return;
