@@ -19,89 +19,126 @@
     <link rel="stylesheet" href="css/settings.css" />
   </head>
   <body>
-    <div class="settings-shell">
-      <aside class="settings-sidebar">
-        <a href="/dashboard.html" class="logo">PinGuru</a>
-        <a href="/dashboard.html" class="nav-link">Dashboard</a>
-        <a href="/rules.html" class="nav-link">Automation Rules</a>
-        <a href="/connect.html" class="nav-link">Instagram</a>
-        <a href="/settings.html" class="nav-link active">Settings</a>
-        <a href="/pricing.html" class="nav-link">Billing & Plans</a>
-      </aside>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Settings navigation">
+        <a href="/dashboard.html" class="sidebar-logo">PinGuru</a>
+        <div class="sidebar-section-label">Main</div>
+        <nav class="sidebar-nav">
+          <a href="/dashboard.html" class="sidebar-link">
+            <span>🏠</span> Dashboard
+          </a>
+          <a href="/rules.html" class="sidebar-link">
+            <span>⚡</span> Automation Rules
+          </a>
+          <a href="/connect.html" class="sidebar-link">
+            <span>📸</span> Instagram
+          </a>
+          <a href="/settings.html" class="sidebar-link active">
+            <span>⚙️</span> Settings
+          </a>
+          <a href="/pricing.html" class="sidebar-link">
+            <span>💎</span> Billing & Plans
+          </a>
+        </nav>
 
-      <main class="settings-main">
-        <header class="page-header">
-          <div>
-            <h1>Settings</h1>
-            <p>Manage account, security, and automation preferences.</p>
+        <div class="sidebar-spacer"></div>
+
+        <div class="sidebar-account">
+          <div class="sidebar-user">
+            <div class="user-avatar" id="user-avatar">A</div>
+            <div>
+              <div class="user-name" id="sidebar-user-name">Loading...</div>
+              <div class="user-email" id="sidebar-user-email">Loading...</div>
+              <div class="user-plan" id="sidebar-user-plan">Free</div>
+            </div>
           </div>
-          <button id="logout-btn" class="btn-secondary" type="button">
+          <button id="logout-sidebar" class="logout-btn" type="button">
             Sign out
           </button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <div class="topbar-title">Settings</div>
+            <div class="topbar-subtitle">
+              Manage account, security, and automation preferences.
+            </div>
+          </div>
+          <div class="topbar-right">
+            <button id="logout-btn" class="btn-secondary" type="button">
+              Sign out
+            </button>
+          </div>
         </header>
 
-        <section class="grid">
-          <article class="card">
-            <h2>Account Profile</h2>
-            <div class="field">
-              <span class="label">Display Name</span>
-              <span id="display-name">Loading...</span>
-            </div>
-            <div class="field">
-              <span class="label">Email</span>
-              <span id="user-email">Loading...</span>
-            </div>
-            <div class="field">
-              <span class="label">Instagram</span>
-              <span id="ig-state">Checking...</span>
-            </div>
-          </article>
+        <div class="main-content">
+          <div class="grid">
+            <article class="card">
+              <h2>Account Profile</h2>
+              <div class="field">
+                <span class="label">Display Name</span>
+                <span id="display-name">Loading...</span>
+              </div>
+              <div class="field">
+                <span class="label">Email</span>
+                <span id="user-email">Loading...</span>
+              </div>
+              <div class="field">
+                <span class="label">Instagram</span>
+                <span id="ig-state">Checking...</span>
+              </div>
+            </article>
 
-          <article class="card">
-            <h2>Plan & Usage</h2>
-            <div class="field">
-              <span class="label">Tier</span>
-              <span id="plan-tier">Loading...</span>
-            </div>
-            <div class="field">
-              <span class="label">Monthly DMs</span>
-              <span id="usage-text">Loading...</span>
-            </div>
-            <div class="progress-wrap">
-              <div class="progress-fill" id="usage-fill"></div>
-            </div>
-            <a href="/pricing.html" class="btn-primary">Upgrade Plan</a>
-          </article>
+            <article class="card">
+              <h2>Plan & Usage</h2>
+              <div class="field">
+                <span class="label">Tier</span>
+                <span id="plan-tier">Loading...</span>
+              </div>
+              <div class="field">
+                <span class="label">Monthly DMs</span>
+                <span id="usage-text">Loading...</span>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-fill" id="usage-fill"></div>
+              </div>
+              <a href="/pricing.html" class="btn-primary">Upgrade Plan</a>
+            </article>
 
-          <article class="card">
-            <h2>Automation Preferences</h2>
-            <label class="toggle-row">
-              <input id="pref-pause" type="checkbox" />
-              <span>Pause automations outside working hours</span>
-            </label>
-            <label class="toggle-row">
-              <input id="pref-notify" type="checkbox" />
-              <span>Email me at 80% usage</span>
-            </label>
-            <p class="helper">These preferences are stored locally for now.</p>
-            <button id="save-pref-btn" class="btn-secondary" type="button">
-              Save Preferences
-            </button>
-          </article>
+            <article class="card">
+              <h2>Automation Preferences</h2>
+              <label class="toggle-row">
+                <input id="pref-pause" type="checkbox" />
+                <span>Pause automations outside working hours</span>
+              </label>
+              <label class="toggle-row">
+                <input id="pref-notify" type="checkbox" />
+                <span>Email me at 80% usage</span>
+              </label>
+              <p class="helper">
+                These preferences are stored locally for now.
+              </p>
+              <button id="save-pref-btn" class="btn-secondary" type="button">
+                Save Preferences
+              </button>
+            </article>
 
-          <article class="card">
-            <h2>Security & Access</h2>
-            <p class="helper">
-              Password and login security are managed from your auth flow.
-            </p>
-            <div class="actions">
-              <a href="/login.html" class="btn-secondary">Re-authenticate</a>
-              <a href="mailto:support@pinguru.me" class="btn-secondary"
-                >Contact Support</a
-              >
-            </div>
-          </article>
-        </section>
+            <article class="card">
+              <h2>Security & Access</h2>
+              <p class="helper">
+                Password and login security are managed from your auth flow.
+              </p>
+              <div class="actions">
+                <a href="/login.html" class="btn-secondary">Re-authenticate</a>
+                <a href="mailto:support@pinguru.me" class="btn-secondary"
+                  >Contact Support</a
+                >
+              </div>
+            </article>
+          </div>
+        </div>
       </main>
     </div>
 

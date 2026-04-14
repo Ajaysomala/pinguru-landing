@@ -45,10 +45,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 240px;
   height: 100vh;
   overflow-y: auto;
   z-index: 100;

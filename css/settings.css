@@ -1,7 +1,15 @@
 /* Settings-specific styles (app-shell.css handles common layout/buttons/cards) */
 
 .main {
-  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.main-content {
+  padding: 20px 22px 28px;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .page-header {
@@ -95,8 +103,12 @@
   }
 }
 
+@media (max-width: 860px) {
+  /* app-shell.css handles responsive layout */
+}
+
 @media (max-width: 520px) {
-  .main {
+  .main-content {
     padding: 14px;
   }
 }
