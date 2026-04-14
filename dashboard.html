@@ -342,6 +342,8 @@
       @media (max-width: 680px) {
         .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
         .sidebar.open { transform: translateX(0); }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 49; }
+        .sidebar-overlay.open { display: block; }
         .main { margin-left: 0; }
         .mob-topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 40; }
         .mob-logo { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800; background: linear-gradient(135deg, #7c3aed, #4f46e5); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
@@ -357,6 +359,7 @@
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
       <a href="/dashboard.html" class="sidebar-logo">PinGuru</a>
+      <button onclick="toggleSidebar()" id="sidebar-close" style="display:none;position:absolute;top:18px;right:14px;background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--muted)">✕</button>
       <nav class="sidebar-nav">
         <a href="/dashboard.html" class="sidebar-link active">
           <span class="nav-icon">🏠</span> Dashboard
@@ -386,12 +389,12 @@
     </aside>
 
     <!-- MOBILE TOPBAR -->
-    <div class="mob-topbar">
-      <a href="/dashboard.html" class="mob-logo">PinGuru</a>
-      <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
+      <div class="mob-topbar">
+        <a href="/dashboard.html" class="mob-logo">PinGuru</a>
+        <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
 
     <!-- MAIN -->
     <div class="main">
@@ -497,7 +500,12 @@
     <script src="js/api.js"></script>
     <script>
       function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('open');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const closeBtn = document.getElementById('sidebar-close');
+        const isOpen = sidebar.classList.toggle('open');
+        overlay.classList.toggle('open', isOpen);
+        if (closeBtn) closeBtn.style.display = isOpen ? 'block' : 'none';
       }
 
       document.addEventListener('DOMContentLoaded', async () => {
@@ -579,5 +587,6 @@
         return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
       }
     </script>
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
   </body>
 </html>
