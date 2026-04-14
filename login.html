@@ -53,13 +53,17 @@
           </div>
           <div class="form-group">
             <label for="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              placeholder="••••••••"
-              required
-              autocomplete="current-password"
-            />
+            <div style="position:relative">
+              <input
+                type="password"
+                id="password"
+                placeholder="••••••••"
+                required
+                autocomplete="current-password"
+                style="width:100%;padding-right:42px"
+              />
+              <button type="button" onclick="togglePw('password','eye-login')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem" id="eye-login">👁</button>
+            </div>
           </div>
           <p class="attempts-warning" id="attempts-warning"></p>
           <button type="submit" class="auth-submit" id="login-btn">
