@@ -33,11 +33,7 @@
         <h1 class="auth-title">Create account</h1>
         <p class="auth-sub">Start automating your Instagram DMs for free</p>
 
-        <div
-          class="alert alert-error"
-          id="error-msg"
-          style="display: none"
-        ></div>
+        <div class="alert alert-error" id="error-msg" style="display: none"></div>
         <div class="alert alert-success" id="success-msg" style="display: none">
           Account created! Redirecting to login...
         </div>
@@ -55,25 +51,33 @@
           </div>
           <div class="form-group">
             <label for="password">Password (minimum 8 characters)</label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Min. 8 characters with uppercase, lowercase, number & symbol"
-              required
-              autocomplete="new-password"
-              oninput="renderPasswordRules('password-requirements', this.value)"
-            />
+            <div style="position:relative">
+              <input
+                type="password"
+                id="password"
+                placeholder="Min. 8 characters with uppercase, lowercase, number & symbol"
+                required
+                autocomplete="new-password"
+                oninput="renderPasswordRules('password-requirements', this.value)"
+                style="width:100%;padding-right:42px"
+              />
+              <button type="button" onclick="togglePw('password','eye-pw')" style="position:absolute;right:12px;top:30%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem" id="eye-pw">👁</button>
+            </div>
             <div id="password-requirements"></div>
           </div>
           <div class="form-group">
             <label for="confirm-password">Confirm password</label>
-            <input
-              type="password"
-              id="confirm-password"
-              placeholder="Repeat password"
-              required
-              autocomplete="new-password"
-            />
+            <div style="position:relative">
+              <input
+                type="password"
+                id="confirm-password"
+                placeholder="Repeat password"
+                required
+                autocomplete="new-password"
+                style="width:100%;padding-right:42px"
+              />
+              <button type="button" onclick="togglePw('confirm-password','eye-confirm')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem" id="eye-confirm">👁</button>
+            </div>
           </div>
           <button type="submit" class="auth-submit" id="register-btn">
             Create Account
@@ -84,7 +88,6 @@
           <span>or</span>
         </div>
 
-        <!-- Google Sign-In Button -->
         <div
           id="g_id_onload"
           data-client_id="YOUR_GOOGLE_CLIENT_ID"
@@ -96,7 +99,7 @@
         <div class="auth-footer">
           Already have an account? <a href="/login.html">Sign in</a>
         </div>
-        <div class="auth-footer" style="margin-top: 10px; font-size: 0.75rem">
+        <div class="auth-footer" style="margin-top:10px;font-size:0.75rem">
           By creating an account you agree to our
           <a href="/terms.html">Terms</a> and
           <a href="/privacy.html">Privacy Policy</a>
@@ -110,5 +113,13 @@
     <script src="js/password-validator.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/oauth.js"></script>
+    <script>
+      function togglePw(id, btnId) {
+        const input = document.getElementById(id);
+        const btn = document.getElementById(btnId);
+        if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+        else { input.type = 'password'; btn.textContent = '👁'; }
+      }
+    </script>
   </body>
 </html>
