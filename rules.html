@@ -144,6 +144,24 @@
       function toggleMobileMenu() {
         document.getElementById("mobile-menu").classList.toggle("open");
       }
+
+      (async () => {
+        await requireAuth();
+        const profile = await getProfile();
+        if (!profile) return;
+        if (!profile.instagram_connected) {
+          const rulesPage = document.querySelector('.rules-page');
+          if (rulesPage) {
+            rulesPage.innerHTML = `
+              <div style="text-align:center;padding:80px 20px">
+                <div style="font-size:2.5rem;margin-bottom:16px">📸</div>
+                <h2 style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:10px">Connect Instagram First</h2>
+                <p style="color:var(--muted);margin-bottom:24px;font-size:0.9rem">You need to connect your Instagram account before creating automation rules.</p>
+                <a href="/connect.html" class="btn-primary">Connect Instagram →</a>
+              </div>`;
+          }
+        }
+      })();
     </script>
   </body>
 </html>
