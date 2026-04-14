@@ -6,11 +6,10 @@
     <title>Sign In — PinGuru</title>
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://accounts.google.com https://apis.google.com https://api.pinguru.me; script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;"
+      content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://accounts.google.com https://apis.google.com https://api.pinguru.me; script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;"
     />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <meta http-equiv="X-Frame-Options" content="DENY" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap"
@@ -32,7 +31,11 @@
         <h1 class="auth-title">Welcome back</h1>
         <p class="auth-sub">Sign in to manage your Instagram automation</p>
         <div class="lockout-msg" id="lockout-msg"></div>
-        <div class="alert alert-error" id="error-msg" style="display: none"></div>
+        <div
+          class="alert alert-error"
+          id="error-msg"
+          style="display: none"
+        ></div>
         <form id="login-form">
           <div class="form-group">
             <label for="email">Email address</label>
@@ -46,16 +49,33 @@
           </div>
           <div class="form-group">
             <label for="password">Password</label>
-            <div style="position:relative">
+            <div style="position: relative">
               <input
                 type="password"
                 id="password"
                 placeholder="••••••••"
                 required
                 autocomplete="current-password"
-                style="width:100%;padding-right:42px"
+                style="width: 100%; padding-right: 42px"
               />
-              <button type="button" onclick="togglePw('password','eye-login')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem" id="eye-login">👁</button>
+              <button
+                type="button"
+                onclick="togglePw('password', 'eye-login')"
+                style="
+                  position: absolute;
+                  right: 12px;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  background: none;
+                  border: none;
+                  cursor: pointer;
+                  color: var(--muted);
+                  font-size: 1rem;
+                "
+                id="eye-login"
+              >
+                👁
+              </button>
             </div>
           </div>
           <p class="attempts-warning" id="attempts-warning"></p>
@@ -76,7 +96,7 @@
         <div class="auth-footer">
           Don't have an account? <a href="/register.html">Create one free</a>
         </div>
-        <div class="auth-footer" style="margin-top:10px;font-size:0.75rem">
+        <div class="auth-footer" style="margin-top: 10px; font-size: 0.75rem">
           By signing in you agree to our
           <a href="/terms.html">Terms</a> and
           <a href="/privacy.html">Privacy Policy</a>
@@ -93,8 +113,13 @@
       function togglePw(id, btnId) {
         const input = document.getElementById(id);
         const btn = document.getElementById(btnId);
-        if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
-        else { input.type = 'password'; btn.textContent = '👁'; }
+        if (input.type === "password") {
+          input.type = "text";
+          btn.textContent = "🙈";
+        } else {
+          input.type = "password";
+          btn.textContent = "👁";
+        }
       }
     </script>
   </body>

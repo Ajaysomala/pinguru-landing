@@ -4,14 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard — PinGuru</title>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://api.pinguru.me; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://api.pinguru.me; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;"
+    />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <meta http-equiv="X-Frame-Options" content="DENY" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
       :root {
         --bg: #f7f7fb;
@@ -27,7 +38,7 @@
       }
 
       body {
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
         font-size: 14px;
         background: var(--bg);
         color: var(--text);
@@ -43,13 +54,15 @@
         display: flex;
         flex-direction: column;
         position: fixed;
-        top: 0; left: 0; bottom: 0;
+        top: 0;
+        left: 0;
+        bottom: 0;
         z-index: 50;
         padding: 0 0 20px;
       }
 
       .sidebar-logo {
-        font-family: 'Syne', sans-serif;
+        font-family: "Syne", sans-serif;
         font-size: 1.3rem;
         font-weight: 800;
         background: linear-gradient(135deg, #7c3aed, #4f46e5);
@@ -84,10 +97,21 @@
         transition: all 0.15s;
       }
 
-      .sidebar-link:hover { background: var(--bg); color: var(--text); }
-      .sidebar-link.active { background: #ede9fe; color: var(--accent); font-weight: 600; }
+      .sidebar-link:hover {
+        background: var(--bg);
+        color: var(--text);
+      }
+      .sidebar-link.active {
+        background: #ede9fe;
+        color: var(--accent);
+        font-weight: 600;
+      }
 
-      .sidebar-link .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+      .sidebar-link .nav-icon {
+        font-size: 1rem;
+        width: 20px;
+        text-align: center;
+      }
 
       .sidebar-bottom {
         padding: 10px;
@@ -105,17 +129,35 @@
       }
 
       .user-avatar {
-        width: 32px; height: 32px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
         background: linear-gradient(135deg, #7c3aed, #4f46e5);
-        display: flex; align-items: center; justify-content: center;
-        color: #fff; font-size: 0.75rem; font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 700;
         flex-shrink: 0;
       }
 
-      .user-info { overflow: hidden; }
-      .user-email { font-size: 0.75rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
-      .user-plan { font-size: 0.7rem; color: var(--accent); font-weight: 600; }
+      .user-info {
+        overflow: hidden;
+      }
+      .user-email {
+        font-size: 0.75rem;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px;
+      }
+      .user-plan {
+        font-size: 0.7rem;
+        color: var(--accent);
+        font-weight: 600;
+      }
 
       .logout-btn {
         width: 100%;
@@ -130,10 +172,13 @@
         color: var(--muted);
         font-size: 0.875rem;
         font-weight: 500;
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
         transition: all 0.15s;
       }
-      .logout-btn:hover { background: #fee2e2; color: var(--red); }
+      .logout-btn:hover {
+        background: #fee2e2;
+        color: var(--red);
+      }
 
       /* ── MAIN ── */
       .main {
@@ -157,12 +202,16 @@
       }
 
       .topbar-title {
-        font-family: 'Syne', sans-serif;
+        font-family: "Syne", sans-serif;
         font-size: 1.1rem;
         font-weight: 800;
       }
 
-      .topbar-right { display: flex; align-items: center; gap: 10px; }
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
 
       .btn-primary {
         background: var(--accent);
@@ -170,7 +219,7 @@
         border: none;
         padding: 8px 16px;
         border-radius: 8px;
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
         font-weight: 600;
         font-size: 0.85rem;
         cursor: pointer;
@@ -180,7 +229,9 @@
         gap: 6px;
         transition: background 0.15s;
       }
-      .btn-primary:hover { background: var(--accent2); }
+      .btn-primary:hover {
+        background: var(--accent2);
+      }
 
       .btn-secondary {
         background: var(--bg);
@@ -188,7 +239,7 @@
         border: 1px solid var(--border);
         padding: 8px 16px;
         border-radius: 8px;
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
         font-weight: 500;
         font-size: 0.85rem;
         cursor: pointer;
@@ -197,10 +248,16 @@
         align-items: center;
         transition: all 0.15s;
       }
-      .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+      .btn-secondary:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
 
       /* ── CONTENT ── */
-      .content { padding: 28px; flex: 1; }
+      .content {
+        padding: 28px;
+        flex: 1;
+      }
 
       /* Stats grid */
       .stats-grid {
@@ -217,14 +274,39 @@
         padding: 20px;
       }
 
-      .stat-label { font-size: 0.75rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-      .stat-value { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; line-height: 1; }
-      .stat-value.purple { color: var(--accent); }
-      .stat-value.green { color: var(--green); }
+      .stat-label {
+        font-size: 0.75rem;
+        color: var(--muted);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+      }
+      .stat-value {
+        font-family: "Syne", sans-serif;
+        font-size: 1.8rem;
+        font-weight: 800;
+        line-height: 1;
+      }
+      .stat-value.purple {
+        color: var(--accent);
+      }
+      .stat-value.green {
+        color: var(--green);
+      }
 
       /* Cards */
-      .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-      .grid-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+      }
 
       .card {
         background: var(--surface);
@@ -241,19 +323,39 @@
       }
 
       .card-title {
-        font-family: 'Syne', sans-serif;
+        font-family: "Syne", sans-serif;
         font-size: 0.9rem;
         font-weight: 700;
       }
 
-      .card-link { font-size: 0.8rem; color: var(--accent); text-decoration: none; }
-      .card-link:hover { text-decoration: underline; }
+      .card-link {
+        font-size: 0.8rem;
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .card-link:hover {
+        text-decoration: underline;
+      }
 
       /* Badge */
-      .badge { font-size: 0.7rem; font-weight: 600; padding: 3px 8px; border-radius: 999px; }
-      .badge-green { background: #dcfce7; color: #15803d; }
-      .badge-red { background: #fee2e2; color: #dc2626; }
-      .badge-purple { background: #ede9fe; color: #7c3aed; }
+      .badge {
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 999px;
+      }
+      .badge-green {
+        background: #dcfce7;
+        color: #15803d;
+      }
+      .badge-red {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+      .badge-purple {
+        background: #ede9fe;
+        color: #7c3aed;
+      }
 
       /* IG status row */
       .ig-row {
@@ -266,22 +368,54 @@
       }
 
       .ig-avatar {
-        width: 40px; height: 40px;
+        width: 40px;
+        height: 40px;
         border-radius: 10px;
-        background: linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);
-        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(
+          135deg,
+          #f09433,
+          #e6683c,
+          #dc2743,
+          #cc2366,
+          #bc1888
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
         font-size: 1.2rem;
         flex-shrink: 0;
       }
 
-      .ig-info { flex: 1; }
-      .ig-name { font-weight: 600; font-size: 0.88rem; }
-      .ig-sub { font-size: 0.75rem; color: var(--muted); }
+      .ig-info {
+        flex: 1;
+      }
+      .ig-name {
+        font-weight: 600;
+        font-size: 0.88rem;
+      }
+      .ig-sub {
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
 
       /* Usage bar */
-      .usage-wrap { background: var(--bg); border-radius: 999px; height: 6px; margin: 10px 0 6px; overflow: hidden; }
-      .usage-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #4f46e5); border-radius: 999px; transition: width 0.6s ease; }
-      .usage-text { font-size: 0.78rem; color: var(--muted); }
+      .usage-wrap {
+        background: var(--bg);
+        border-radius: 999px;
+        height: 6px;
+        margin: 10px 0 6px;
+        overflow: hidden;
+      }
+      .usage-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #4f46e5);
+        border-radius: 999px;
+        transition: width 0.6s ease;
+      }
+      .usage-text {
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
 
       /* Quick actions */
       .quick-action {
@@ -299,8 +433,14 @@
         transition: all 0.15s;
         background: var(--surface);
       }
-      .quick-action:hover { border-color: var(--accent); color: var(--accent); background: #faf9ff; }
-      .quick-action:last-child { margin-bottom: 0; }
+      .quick-action:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: #faf9ff;
+      }
+      .quick-action:last-child {
+        margin-bottom: 0;
+      }
 
       /* Rules list */
       .rule-row {
@@ -310,14 +450,39 @@
         padding: 10px 0;
         border-bottom: 1px solid var(--border);
       }
-      .rule-row:last-child { border-bottom: none; }
-      .rule-name { font-weight: 600; font-size: 0.86rem; }
-      .rule-meta { font-size: 0.74rem; color: var(--muted); margin-top: 2px; }
+      .rule-row:last-child {
+        border-bottom: none;
+      }
+      .rule-name {
+        font-weight: 600;
+        font-size: 0.86rem;
+      }
+      .rule-meta {
+        font-size: 0.74rem;
+        color: var(--muted);
+        margin-top: 2px;
+      }
 
       /* Mobile hamburger */
-      .mob-topbar { display: none; }
-      .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
-      .hamburger span { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 2px; }
+      .mob-topbar {
+        display: none;
+      }
+      .hamburger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 4px;
+      }
+      .hamburger span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        background: var(--text);
+        border-radius: 2px;
+      }
 
       /* Footer */
       footer {
@@ -329,37 +494,106 @@
         color: var(--muted);
         background: var(--surface);
       }
-      footer a { color: var(--muted); text-decoration: none; }
-      footer a:hover { color: var(--text); }
+      footer a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+      footer a:hover {
+        color: var(--text);
+      }
 
       /* Responsive */
       @media (max-width: 900px) {
-        .stats-grid { grid-template-columns: repeat(2, 1fr); }
-        .grid-2 { grid-template-columns: 1fr; }
-        .grid-3 { grid-template-columns: 1fr; }
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .grid-2 {
+          grid-template-columns: 1fr;
+        }
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
       }
 
       @media (max-width: 680px) {
-        .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
-        .sidebar.open { transform: translateX(0); }
-        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 49; }
-        .sidebar-overlay.open { display: block; }
-        .main { margin-left: 0; }
-        .mob-topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 40; }
-        .mob-logo { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800; background: linear-gradient(135deg, #7c3aed, #4f46e5); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
-        .hamburger { display: flex; }
-        .topbar { display: none; }
-        .content { padding: 16px; }
-        .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.25s;
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-overlay {
+          display: none;
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.35);
+          z-index: 49;
+        }
+        .sidebar-overlay.open {
+          display: block;
+        }
+        .main {
+          margin-left: 0;
+        }
+        .mob-topbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 14px 20px;
+          background: var(--surface);
+          border-bottom: 1px solid var(--border);
+          position: sticky;
+          top: 0;
+          z-index: 40;
+        }
+        .mob-logo {
+          font-family: "Syne", sans-serif;
+          font-size: 1.1rem;
+          font-weight: 800;
+          background: linear-gradient(135deg, #7c3aed, #4f46e5);
+          background-clip: text;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          text-decoration: none;
+        }
+        .hamburger {
+          display: flex;
+        }
+        .topbar {
+          display: none;
+        }
+        .content {
+          padding: 16px;
+        }
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+        }
       }
     </style>
   </head>
   <body>
-
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
       <a href="/dashboard.html" class="sidebar-logo">PinGuru</a>
-      <button onclick="toggleSidebar()" id="sidebar-close" style="display:none;position:absolute;top:18px;right:14px;background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--muted)">✕</button>
+      <button
+        onclick="toggleSidebar()"
+        id="sidebar-close"
+        style="
+          display: none;
+          position: absolute;
+          top: 18px;
+          right: 14px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-size: 1.2rem;
+          color: var(--muted);
+        "
+      >
+        ✕
+      </button>
       <nav class="sidebar-nav">
         <a href="/dashboard.html" class="sidebar-link active">
           <span class="nav-icon">🏠</span> Dashboard
@@ -389,12 +623,12 @@
     </aside>
 
     <!-- MOBILE TOPBAR -->
-      <div class="mob-topbar">
-        <a href="/dashboard.html" class="mob-logo">PinGuru</a>
-        <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
+    <div class="mob-topbar">
+      <a href="/dashboard.html" class="mob-logo">PinGuru</a>
+      <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
 
     <!-- MAIN -->
     <div class="main">
@@ -407,7 +641,6 @@
       </div>
 
       <div class="content">
-
         <!-- Stats -->
         <div class="stats-grid">
           <div class="stat-card">
@@ -424,13 +657,14 @@
           </div>
           <div class="stat-card">
             <div class="stat-label">Current Plan</div>
-            <div class="stat-value" style="font-size:1.3rem" id="plan-name">—</div>
+            <div class="stat-value" style="font-size: 1.3rem" id="plan-name">
+              —
+            </div>
           </div>
         </div>
 
         <!-- Row 1: IG + Recent Rules -->
-        <div class="grid-3" style="margin-bottom:20px">
-
+        <div class="grid-3" style="margin-bottom: 20px">
           <!-- Recent Rules -->
           <div class="card">
             <div class="card-header">
@@ -438,18 +672,19 @@
               <a href="/rules.html" class="card-link">View all →</a>
             </div>
             <div id="recent-rules">
-              <p style="color:var(--muted);font-size:0.85rem">Loading...</p>
+              <p style="color: var(--muted); font-size: 0.85rem">Loading...</p>
             </div>
           </div>
 
           <!-- Right col -->
-          <div style="display:flex;flex-direction:column;gap:16px">
-
+          <div style="display: flex; flex-direction: column; gap: 16px">
             <!-- IG Status -->
             <div class="card">
               <div class="card-header">
                 <span class="card-title">Instagram</span>
-                <span class="badge badge-red" id="ig-status">Not Connected</span>
+                <span class="badge badge-red" id="ig-status"
+                  >Not Connected</span
+                >
               </div>
               <div class="ig-row">
                 <div class="ig-avatar">📸</div>
@@ -457,7 +692,12 @@
                   <div class="ig-name" id="ig-username">—</div>
                   <div class="ig-sub" id="ig-status-text">Checking...</div>
                 </div>
-                <a href="/connect.html" class="btn-secondary" style="font-size:0.78rem;padding:6px 12px">Manage</a>
+                <a
+                  href="/connect.html"
+                  class="btn-secondary"
+                  style="font-size: 0.78rem; padding: 6px 12px"
+                  >Manage</a
+                >
               </div>
             </div>
 
@@ -468,27 +708,33 @@
                 <a href="/pricing.html" class="card-link">Upgrade →</a>
               </div>
               <div class="usage-wrap">
-                <div class="usage-fill" id="usage-bar" style="width:0%"></div>
+                <div class="usage-fill" id="usage-bar" style="width: 0%"></div>
               </div>
               <div class="usage-text" id="usage-label">Loading...</div>
             </div>
 
             <!-- Quick Actions -->
             <div class="card">
-              <div class="card-header"><span class="card-title">Quick Actions</span></div>
-              <a href="/rules.html" class="quick-action"><span>⚡</span> Create automation rule</a>
-              <a href="/connect.html" class="quick-action"><span>📸</span> Instagram settings</a>
-              <a href="/pricing.html" class="quick-action"><span>💎</span> View plans</a>
+              <div class="card-header">
+                <span class="card-title">Quick Actions</span>
+              </div>
+              <a href="/rules.html" class="quick-action"
+                ><span>⚡</span> Create automation rule</a
+              >
+              <a href="/connect.html" class="quick-action"
+                ><span>📸</span> Instagram settings</a
+              >
+              <a href="/pricing.html" class="quick-action"
+                ><span>💎</span> View plans</a
+              >
             </div>
-
           </div>
         </div>
-
       </div>
 
       <footer>
         <span>© 2026 PinGuru</span>
-        <div style="display:flex;gap:16px">
+        <div style="display: flex; gap: 16px">
           <a href="/privacy.html">Privacy</a>
           <a href="/terms.html">Terms</a>
           <a href="mailto:support@pinguru.me">Support</a>
@@ -500,55 +746,80 @@
     <script src="js/api.js"></script>
     <script>
       function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        const closeBtn = document.getElementById('sidebar-close');
-        const isOpen = sidebar.classList.toggle('open');
-        overlay.classList.toggle('open', isOpen);
-        if (closeBtn) closeBtn.style.display = isOpen ? 'block' : 'none';
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("sidebar-overlay");
+        const closeBtn = document.getElementById("sidebar-close");
+        const isOpen = sidebar.classList.toggle("open");
+        overlay.classList.toggle("open", isOpen);
+        if (closeBtn) closeBtn.style.display = isOpen ? "block" : "none";
       }
 
-      document.addEventListener('DOMContentLoaded', async () => {
+      document.addEventListener("DOMContentLoaded", async () => {
         await requireAuth();
         const profile = await getProfile();
         if (!profile) return;
 
         // User info in sidebar
-        const email = profile.email || '';
-        const avatarEl = document.getElementById('user-avatar');
+        const email = profile.email || "";
+        const avatarEl = document.getElementById("user-avatar");
         if (avatarEl) avatarEl.textContent = email.charAt(0).toUpperCase();
-        const emailEl = document.getElementById('user-email');
+        const emailEl = document.getElementById("user-email");
         if (emailEl) emailEl.textContent = email;
-        const planEl = document.getElementById('user-plan');
-        if (planEl) planEl.textContent = (profile.plan || 'Free').charAt(0).toUpperCase() + (profile.plan || 'free').slice(1);
-        const planNameEl = document.getElementById('plan-name');
-        if (planNameEl) planNameEl.textContent = (profile.plan || 'Free').charAt(0).toUpperCase() + (profile.plan || 'free').slice(1);
+        const planEl = document.getElementById("user-plan");
+        if (planEl)
+          planEl.textContent =
+            (profile.plan || "Free").charAt(0).toUpperCase() +
+            (profile.plan || "free").slice(1);
+        const planNameEl = document.getElementById("plan-name");
+        if (planNameEl)
+          planNameEl.textContent =
+            (profile.plan || "Free").charAt(0).toUpperCase() +
+            (profile.plan || "free").slice(1);
 
         // Instagram status — dynamic from API
-        const igStatus = document.getElementById('ig-status');
-        const igUsername = document.getElementById('ig-username');
-        const igStatusText = document.getElementById('ig-status-text');
+        const igStatus = document.getElementById("ig-status");
+        const igUsername = document.getElementById("ig-username");
+        const igStatusText = document.getElementById("ig-status-text");
         if (profile.instagram_connected) {
-          if (igStatus) { igStatus.className = 'badge badge-green'; igStatus.textContent = 'Connected'; }
-          if (igUsername) igUsername.textContent = profile.instagram_username || 'Connected';
-          if (igStatusText) igStatusText.textContent = 'Instagram Business Account';
+          if (igStatus) {
+            igStatus.className = "badge badge-green";
+            igStatus.textContent = "Connected";
+          }
+          if (igUsername)
+            igUsername.textContent = profile.instagram_username || "Connected";
+          if (igStatusText)
+            igStatusText.textContent = "Instagram Business Account";
         } else {
-          if (igStatus) { igStatus.className = 'badge badge-red'; igStatus.textContent = 'Not Connected'; }
-          if (igUsername) igUsername.textContent = 'No account connected';
-          if (igStatusText) igStatusText.textContent = 'Connect your Instagram to enable automation';
+          if (igStatus) {
+            igStatus.className = "badge badge-red";
+            igStatus.textContent = "Not Connected";
+          }
+          if (igUsername) igUsername.textContent = "No account connected";
+          if (igStatusText)
+            igStatusText.textContent =
+              "Connect your Instagram to enable automation";
         }
 
         // Stats
         try {
           const stats = await getDashboardStats();
           if (stats) {
-            setEl('stat-dms', stats.dms_sent_this_month ?? 0);
-            setEl('stat-rules', stats.active_rules ?? 0);
-            setEl('stat-limit', stats.dm_limit ?? 200);
-            const pct = Math.min(100, Math.round(((stats.dms_sent_this_month || 0) / (stats.dm_limit || 200)) * 100));
-            const bar = document.getElementById('usage-bar');
-            if (bar) bar.style.width = pct + '%';
-            setEl('usage-label', `${stats.dms_sent_this_month || 0} / ${stats.dm_limit || 200} DMs used`);
+            setEl("stat-dms", stats.dms_sent_this_month ?? 0);
+            setEl("stat-rules", stats.active_rules ?? 0);
+            setEl("stat-limit", stats.dm_limit ?? 200);
+            const pct = Math.min(
+              100,
+              Math.round(
+                ((stats.dms_sent_this_month || 0) / (stats.dm_limit || 200)) *
+                  100,
+              ),
+            );
+            const bar = document.getElementById("usage-bar");
+            if (bar) bar.style.width = pct + "%";
+            setEl(
+              "usage-label",
+              `${stats.dms_sent_this_month || 0} / ${stats.dm_limit || 200} DMs used`,
+            );
           }
         } catch (e) {}
 
@@ -556,21 +827,21 @@
         try {
           const data = await getRules();
           const rules = data?.rules || [];
-          const container = document.getElementById('recent-rules');
+          const container = document.getElementById("recent-rules");
           if (container) {
             if (rules.length === 0) {
               container.innerHTML = `<p style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px 0">No rules yet. <a href="/rules.html" style="color:var(--accent)">Create your first rule →</a></p>`;
             } else {
-              container.innerHTML = '';
-              rules.slice(0, 4).forEach(r => {
-                const row = document.createElement('div');
-                row.className = 'rule-row';
+              container.innerHTML = "";
+              rules.slice(0, 4).forEach((r) => {
+                const row = document.createElement("div");
+                row.className = "rule-row";
                 row.innerHTML = `
                   <div>
                     <div class="rule-name">${escHtml(r.name)}</div>
-                    <div class="rule-meta">${escHtml(r.trigger_type)} · ${(r.keywords || []).map(escHtml).join(', ')}</div>
+                    <div class="rule-meta">${escHtml(r.trigger_type)} · ${(r.keywords || []).map(escHtml).join(", ")}</div>
                   </div>
-                  <span class="badge ${r.is_active ? 'badge-green' : 'badge-red'}">${r.is_active ? 'Active' : 'Paused'}</span>`;
+                  <span class="badge ${r.is_active ? "badge-green" : "badge-red"}">${r.is_active ? "Active" : "Paused"}</span>`;
                 container.appendChild(row);
               });
             }
@@ -584,9 +855,17 @@
       }
 
       function escHtml(str) {
-        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
       }
     </script>
-    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div
+      class="sidebar-overlay"
+      id="sidebar-overlay"
+      onclick="toggleSidebar()"
+    ></div>
   </body>
 </html>

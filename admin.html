@@ -6,11 +6,12 @@
     <title>Admin Portal — PinGuru</title>
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://api.pinguru.me; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;"
+      content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://api.pinguru.me; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;"
     />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta name="robots" content="noindex, nofollow" />
+    <!-- Frontend restrictions are UX-only; enforce admin access on the server. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap"

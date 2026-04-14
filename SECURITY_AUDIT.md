@@ -14,15 +14,14 @@
    - Replaced all `innerHTML` with `textContent` and proper element creation
    - Removed inline event handlers (`onclick=`) → EventListener pattern
 
-2. **DevTools/Inspector Prevention**
-   - Blocks F12, Ctrl+Shift+I/J/C, and Shift+F12
-   - Blocks right-click context menu
-   - Detects DevTools window size manipulation
-   - Silent fallback (doesn't show alert which could be bypassed)
+2. **Frontend Security Utilities**
+   - Added safe sanitization and DOM helper utilities in `/js/utils.js`
+   - Removed anti-debug and input blocking behavior (F12/right-click/key combos)
+   - Keeps legitimate UX behavior intact for debugging and accessibility
 
 3. **Password Security**
    - Created `/js/password-validator.js` with real-world rules
-   - Minimum 12 characters (increased from 8)
+   - Minimum 8 characters
    - Requires: uppercase, lowercase, numbers, special characters (!@#$%^&\*...)
    - Real-time strength indicator (weak/fair/good/strong)
    - Live validation UI on registration page
@@ -73,7 +72,7 @@
 
    ```python
    # In app/models/models.py - update UserCreate validation
-   PASSWORD_MIN_LENGTH = 12
+   PASSWORD_MIN_LENGTH = 8
    PASSWORD_REQUIRES = {
        'uppercase': True,
        'lowercase': True,
@@ -110,10 +109,10 @@
 ### High Priority
 
 1. **Google OAuth Integration**
-   - Backend: Add `/auth/google/initiate` and `/auth/google/callback` routes
+   - Frontend Google Sign-In UI is already integrated in `login.html` and `register.html`
+   - Frontend callback handler exists in `/js/oauth.js`
+   - Backend must expose `/auth/google/callback` and validate Google ID token
    - Requires: `"GOOGLE_OAUTH_CLIENT_ID"` and `"GOOGLE_OAUTH_CLIENT_SECRET"` in `.env`
-   - Frontend: Add Google Sign-In button to `login.html` and `register.html`
-   - Third-party library: Use `google-auth-oauthlib`
 
 2. **Rate Limiting Per IP + Email**
    - Current limiter uses IP only
@@ -169,7 +168,7 @@
 - ✅ `privacy.html` — No changes needed
 - ✅ `terms.html` — No changes needed
 
-- ✅ `js/utils.js` — NEW: Sanitization + DevTools prevention
+- ✅ `js/utils.js` — NEW: Sanitization + safe DOM helpers
 - ✅ `js/password-validator.js` — NEW: Password strength rules
 - ✅ `js/api.js` — No changes (backend auth needed)
 - ✅ `js/auth.js` — Updated password validation logic
@@ -188,7 +187,7 @@
 
 ## 🔒 SECURITY CHECKLIST FOR REAL-WORLD LAUNCH
 
-- ✅ DevTools/Inspect prevention
+- ✅ No anti-debug/input blocking in frontend UX
 - ✅ XSS mitigation (DOM sanitization)
 - ✅ Password policy enforced (UI)
 - ⚠️ Password policy enforced (backend) — **NEEDS IMPLEMENTATION**
@@ -198,7 +197,7 @@
 - ✅ Admin login page created
 - ✅ Rate limiting middleware exists
 - ⚠️ Instagram token not exposed in URLs — **NEEDS FIX**
-- ⚠️ Google OAuth — **NOT IMPLEMENTED**
+- ⚠️ Google OAuth backend verification — **NEEDS IMPLEMENTATION/VALIDATION**
 - ❌ HSTS header — **RECOMMEND ADDING** (`Strict-Transport-Security: max-age=31536000`)
 - ⚠️ Database encryption at rest — **CHECK MONGODB SETTINGS**
 - ✅ CSP headers implemented
@@ -209,7 +208,7 @@
 ## 🚀 NEXT STEPS (Before Going Live)
 
 1. **Backend Fixes** (Required)
-   - [ ] Enforce password policy: 12 chars, uppercase, lowercase, numbers, special
+   - [ ] Enforce password policy: 8 chars, uppercase, lowercase, numbers, special
    - [ ] Fix Instagram token security: move from URL to POST body
    - [ ] Implement per-email brute force tracking (Redis-backed)
    - [ ] Add httpOnly cookie support for JWT
@@ -217,8 +216,8 @@
 
 2. **Google OAuth** (High Priority)
    - [ ] Register app at Google Cloud Console
-   - [ ] Add backend routes
-   - [ ] Add frontend buttons
+   - [ ] Confirm backend callback route and token verification
+   - [x] Frontend buttons/callback wiring in place
    - [ ] Test end-to-end flow
 
 3. **Testing** (Critical)
@@ -250,19 +249,19 @@
 
 ## 📊 What Was Changed Why
 
-| Component    | Old                                             | New                                                      | Why                                           |
-| ------------ | ----------------------------------------------- | -------------------------------------------------------- | --------------------------------------------- |
-| Headline     | "Automate Instagram DMs for Real Buyer Signals" | "Turn Every Message Into a Sale"                         | More attractive, less begging-tone            |
-| Badge        | "MVP Live - Keyword, Comment, Story Reply"      | "Live Since April 2026"                                  | Cleaner, not "MVP" anymore                    |
-| Social Proof | "87 creators on waitlist" with avatars          | Honest message "Join creators..."                        | Removes fake data                             |
-| Testimonials | Fake 5-star reviews                             | Removed entirely                                         | Waiting for real user feedback                |
-| Layout       | Centered text, centered columns                 | Asymmetric left-aligned hero                             | Real-world SaaS design                        |
-| Font         | Syne + DM Sans                                  | Syne + Inter                                             | More professional, Inter = better readability |
-| Animations   | None                                            | Staggered entrance (slideInUp, etc)                      | Better UX, modern feel                        |
-| Footer       | "Built for creators, by creators"               | "© 2026 PinGuru. Built by AJ."                           | Professional, proper copyright                |
-| Password     | Min 8 chars                                     | Min 12 chars + uppercase + lowercase + numbers + special | Industry standard                             |
-| Admin Page   | None                                            | `/admin.html` with login                                 | Secure admin interface                        |
-| DevTools     | Open                                            | Blocked                                                  | Security hardening                            |
+| Component    | Old                                             | New                                                     | Why                                           |
+| ------------ | ----------------------------------------------- | ------------------------------------------------------- | --------------------------------------------- |
+| Headline     | "Automate Instagram DMs for Real Buyer Signals" | "Turn Every Message Into a Sale"                        | More attractive, less begging-tone            |
+| Badge        | "MVP Live - Keyword, Comment, Story Reply"      | "Live Since April 2026"                                 | Cleaner, not "MVP" anymore                    |
+| Social Proof | "87 creators on waitlist" with avatars          | Honest message "Join creators..."                       | Removes fake data                             |
+| Testimonials | Fake 5-star reviews                             | Removed entirely                                        | Waiting for real user feedback                |
+| Layout       | Centered text, centered columns                 | Asymmetric left-aligned hero                            | Real-world SaaS design                        |
+| Font         | Syne + DM Sans                                  | Syne + Inter                                            | More professional, Inter = better readability |
+| Animations   | None                                            | Staggered entrance (slideInUp, etc)                     | Better UX, modern feel                        |
+| Footer       | "Built for creators, by creators"               | "© 2026 PinGuru. Built by AJ."                          | Professional, proper copyright                |
+| Password     | Min 8 chars                                     | Min 8 chars + uppercase + lowercase + numbers + special | Matches backend policy                        |
+| Admin Page   | None                                            | `/admin.html` with login                                | Secure admin interface                        |
+| DevTools     | Open                                            | Open (no blocking)                                      | Better DX and accessibility                   |
 
 ---
 
@@ -281,7 +280,7 @@ A: No. All changes are additive (new JS files) or replacements (same DOM structu
 A: **No** — User requested review first. Changes are ready to view locally.
 
 **Q: What about Google Sign-In?**  
-A: Frontend button ready, backend needs OAuth routes. Guide provided above.
+A: Frontend button and callback are implemented. Backend token validation/callback must be configured correctly.
 
 **Q: Is password validation enforced on backend?**  
 A: Not yet. Frontend shows rules, but backend must validate. Use `pydantic` validators.

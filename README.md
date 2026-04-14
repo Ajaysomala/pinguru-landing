@@ -24,7 +24,7 @@ pinguru-landing/
 │   ├── dashboard.css     # Dashboard page styles
 │   └── rules.css         # Rules page styles
 ├── js/
-│   ├── utils.js          # Security: XSS prevention, DevTools blocking
+│   ├── utils.js          # Security helpers (sanitization + safe DOM utilities)
 │   ├── api.js            # API client with secure cookie handling
 │   ├── auth.js           # Login/register form handlers
 │   ├── security.js       # Brute force protection tracking
@@ -45,8 +45,7 @@ pinguru-landing/
 ### Security Hardening ✅
 
 - **XSS Prevention**: All user-rendered data uses safe DOM API (textContent, createElement)
-- **DevTools Blocking**: Comprehensive F12, Ctrl+I, Ctrl+J, Ctrl+C blocking with console restrictions
-- **Password Validation**: Frontend enforces 12+ characters with uppercase, lowercase, numbers, special chars
+- **Password Validation**: Frontend enforces 8+ characters with uppercase, lowercase, numbers, special chars
 - **HttpOnly Cookies**: JWT tokens stored in secure httpOnly cookies (JavaScript cannot access)
 
 ### Authentication ✅
@@ -104,7 +103,7 @@ VITE_GOOGLE_CLIENT_ID=your_client_id.apps.googleusercontent.com
 
 - ✅ No localStorage tokens (httpOnly cookies instead)
 - ✅ No innerHTML injection (safe DOM API, textContent only)
-- ✅ DevTools completely blocked
+- ✅ No anti-debug or right-click blocking in frontend UX
 - ✅ Password strength enforced (frontend + backend)
 - ✅ CSP headers configured
 - ✅ HTTPS-only cookies in production
@@ -158,10 +157,9 @@ VITE_GOOGLE_CLIENT_ID=your_client_id.apps.googleusercontent.com
 - Ensure `js/password-validator.js` is loaded
 - Check if password input has `oninput="renderPasswordRules(...)"` handler
 
-**DevTools blocking too aggressive**
+**Password validation mismatch with backend**
 
-- Some debugging tools deliberately bypass blocking—this is expected
-- Casual inspection attempts are blocked
+- Ensure backend policy matches frontend: 8+ chars, uppercase, lowercase, number, and special character
 
 ---
 
