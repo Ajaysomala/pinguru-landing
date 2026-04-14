@@ -8,7 +8,7 @@
 }
 
 .hero-inner {
-  max-width: 1160px;
+  max-width: 1080px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
@@ -244,7 +244,7 @@ section {
 }
 
 .section-shell {
-  max-width: 1160px;
+  max-width: 1080px;
   margin: 0 auto;
 }
 
