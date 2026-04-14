@@ -26,20 +26,13 @@
         <a href="/register.html">Create account</a>
       </div>
     </nav>
-
     <div class="auth-page">
       <div class="auth-card">
         <div class="auth-logo"><div class="logo">PinGuru</div></div>
         <h1 class="auth-title">Welcome back</h1>
         <p class="auth-sub">Sign in to manage your Instagram automation</p>
-
         <div class="lockout-msg" id="lockout-msg"></div>
-        <div
-          class="alert alert-error"
-          id="error-msg"
-          style="display: none"
-        ></div>
-
+        <div class="alert alert-error" id="error-msg" style="display: none"></div>
         <form id="login-form">
           <div class="form-group">
             <label for="email">Email address</label>
@@ -70,12 +63,9 @@
             Sign In
           </button>
         </form>
-
         <div class="divider">
           <span>or</span>
         </div>
-
-        <!-- Google Sign-In Button -->
         <div
           id="g_id_onload"
           data-client_id="YOUR_GOOGLE_CLIENT_ID"
@@ -83,18 +73,29 @@
           data-auto_prompt="false"
         ></div>
         <div class="g_id_signin" data-type="standard"></div>
-
         <div class="auth-footer">
           Don't have an account? <a href="/register.html">Create one free</a>
         </div>
+        <div class="auth-footer" style="margin-top:10px;font-size:0.75rem">
+          By signing in you agree to our
+          <a href="/terms.html">Terms</a> and
+          <a href="/privacy.html">Privacy Policy</a>
+        </div>
       </div>
     </div>
-
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="js/utils.js"></script>
     <script src="js/api.js"></script>
     <script src="js/security.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/oauth.js"></script>
+    <script>
+      function togglePw(id, btnId) {
+        const input = document.getElementById(id);
+        const btn = document.getElementById(btnId);
+        if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+        else { input.type = 'password'; btn.textContent = '👁'; }
+      }
+    </script>
   </body>
 </html>
