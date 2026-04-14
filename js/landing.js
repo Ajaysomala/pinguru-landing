@@ -31,12 +31,6 @@ async function handleSubmit(e) {
   }
 }
 
-// Hamburger menu
-function toggleMobileMenu() {
-  const menu = document.getElementById('mobile-menu');
-  if (menu) menu.classList.toggle('open');
-}
-
 // Entrance animations
 document.addEventListener('DOMContentLoaded', () => {
   const observer = new IntersectionObserver((entries) => {

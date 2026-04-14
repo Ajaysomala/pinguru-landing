@@ -15,6 +15,7 @@
       href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="css/navigation.css" />
     <style>
       *,
       *::before,
@@ -39,69 +40,6 @@
         --blue: #3b82f6;
       }
 
-      body {
-        font-family: "Inter", sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        overflow-x: hidden;
-      }
-
-      /* ── Top bar ── */
-      .topbar {
-        background: var(--surface);
-        border-bottom: 1px solid var(--border);
-        padding: 0 28px;
-        height: 56px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-      }
-
-      .topbar-left {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-      }
-
-      .admin-badge {
-        background: linear-gradient(135deg, #7c3aed, #4f46e5);
-        color: #fff;
-        font-size: 0.65rem;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        padding: 3px 8px;
-        border-radius: 4px;
-      }
-
-      .logo {
-        font-family: "Syne", sans-serif;
-        font-size: 1.2rem;
-        font-weight: 800;
-        color: var(--accent2);
-        text-decoration: none;
-      }
-
-      .topbar-right {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .btn-logout {
-        background: rgba(239, 68, 68, 0.12);
-        color: var(--red);
-        border: 1px solid rgba(239, 68, 68, 0.25);
-        border-radius: 6px;
-        padding: 6px 14px;
-        font-size: 0.82rem;
-        font-weight: 600;
         cursor: pointer;
         font-family: "Inter", sans-serif;
         transition: background 0.2s;
@@ -795,39 +733,6 @@
       let adminToken = localStorage.getItem("pg_admin_token") || "";
       let currentPage = "overview";
 
-      function syncSidebarState() {
-        const sidebar = document.getElementById("sidebar");
-        const overlay = document.getElementById("sidebar-overlay");
-        const toggleBtn = document.getElementById("sidebar-toggle");
-        if (window.innerWidth > 760) {
-          sidebar.classList.remove("open");
-          overlay.classList.remove("open");
-          document.body.style.overflow = "";
-          if (toggleBtn) {
-            toggleBtn.textContent = "☰";
-            toggleBtn.setAttribute("aria-label", "Open sidebar");
-            toggleBtn.setAttribute("aria-expanded", "false");
-          }
-        }
-      }
-
-      function toggleSidebar() {
-        const sidebar = document.getElementById("sidebar");
-        const overlay = document.getElementById("sidebar-overlay");
-        const toggleBtn = document.getElementById("sidebar-toggle");
-        const isOpen = sidebar.classList.toggle("open");
-        overlay.classList.toggle("open", isOpen);
-        document.body.style.overflow = isOpen ? "hidden" : "";
-        if (toggleBtn) {
-          toggleBtn.textContent = isOpen ? "✕" : "☰";
-          toggleBtn.setAttribute(
-            "aria-label",
-            isOpen ? "Close sidebar" : "Open sidebar",
-          );
-          toggleBtn.setAttribute("aria-expanded", String(isOpen));
-        }
-      }
-
       // ── Auth ──────────────────────────────────────────────────────────
       function checkAuth() {
         if (!adminToken) {
@@ -876,8 +781,6 @@
 
       // Enter key on password
       document.addEventListener("DOMContentLoaded", () => {
-        syncSidebarState();
-        window.addEventListener("resize", syncSidebarState);
         document
           .getElementById("auth-password")
           .addEventListener("keydown", (e) => {
@@ -898,12 +801,6 @@
         btn.classList.add("active");
         currentPage = name;
         loadPage(name);
-        if (
-          window.innerWidth <= 760 &&
-          document.getElementById("sidebar").classList.contains("open")
-        ) {
-          toggleSidebar();
-        }
       }
 
       function loadCurrentPage() {
@@ -1077,6 +974,7 @@
         }
       }
     </script>
+    <script src="js/navigation.js"></script>
     <div
       class="sidebar-overlay"
       id="sidebar-overlay"

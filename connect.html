@@ -16,6 +16,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/navigation.css" />
   </head>
   <body>
     <nav>
@@ -247,11 +248,8 @@
     </footer>
 
     <script src="js/api.js"></script>
+    <script src="js/navigation.js"></script>
     <script>
-      function toggleMobileMenu() {
-        document.getElementById("mobile-menu").classList.toggle("open");
-      }
-
       document.addEventListener("DOMContentLoaded", async () => {
         await requireAuth();
         const profile = await getProfile();

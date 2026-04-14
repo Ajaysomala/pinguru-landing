@@ -19,6 +19,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/navigation.css" />
     <style>
       .pricing-page {
         min-height: 100vh;
@@ -494,6 +495,7 @@
 
     <script src="js/api.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/navigation.js"></script>
     <script>
       // Auth guard
       (async () => {
@@ -506,11 +508,6 @@
         e.preventDefault();
         logout();
       });
-
-      // Mobile menu
-      function toggleMobileMenu() {
-        document.getElementById("mobile-menu").classList.toggle("open");
-      }
 
       // Show current plan
       async function loadCurrentPlan() {
