@@ -92,6 +92,8 @@
       </div>
     </div>
 
+    <button id="connect-ig-btn" class="btn-primary" onclick="connectInstagram()" style="display:none;margin-top:20px">Connect Instagram →</button>
+
     <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap">
       <a href="/dashboard.html" class="btn-secondary">← Dashboard</a>
       <a href="/rules.html" class="btn-primary">Manage Rules →</a>
@@ -111,24 +113,41 @@
     function toggleMobileMenu(){document.getElementById('mobile-menu').classList.toggle('open');}
 
     document.addEventListener('DOMContentLoaded', async () => {
-      if (!requireAuth()) return;
-      const user = JSON.parse(localStorage.getItem('pg_user') || '{}');
+      await requireAuth();
+      const profile = await getProfile();
+      if (!profile) return;
       const badge = document.getElementById('connection-badge');
       const igUsername = document.getElementById('ig-username');
       const igUserId = document.getElementById('ig-user-id');
+      const connectBtn = document.getElementById('connect-ig-btn');
 
-      if (user.instagram_connected) {
+      if (profile.instagram_connected) {
         badge.className = 'badge-green';
         badge.textContent = 'Connected';
-        if (igUsername) igUsername.textContent = 'pinguru_ig';
+        if (igUsername) igUsername.textContent = 'Connected';
         if (igUserId) igUserId.textContent = 'Instagram Business Account';
       } else {
         badge.className = 'badge-red';
         badge.textContent = 'Not Connected';
         if (igUsername) igUsername.textContent = 'No account connected';
-        if (igUserId) igUserId.textContent = 'Contact support to connect your account';
+        if (igUserId) igUserId.textContent = 'Click Connect Instagram to get started';
+        if (connectBtn) connectBtn.style.display = 'inline-block';
       }
     });
+
+    async function connectInstagram() {
+      try {
+        const res = await authFetch('/auth/instagram/initiate');
+        const data = await res.json();
+        if (data.auth_url) {
+          window.location.href = data.auth_url;
+        } else {
+          alert('Failed to start Instagram connection. Try again.');
+        }
+      } catch (e) {
+        alert('Error connecting Instagram. Please try again.');
+      }
+    }
   </script>
 </body>
 </html>
