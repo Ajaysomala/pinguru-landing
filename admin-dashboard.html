@@ -40,6 +40,61 @@
         --blue: #3b82f6;
       }
 
+      body {
+        font-family: "Inter", sans-serif;
+        font-size: 14px;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      .topbar {
+        height: 64px;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        position: sticky;
+        top: 0;
+        z-index: 70;
+      }
+
+      .topbar-left,
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logo {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 1.15rem;
+        letter-spacing: 0.2px;
+        text-decoration: none;
+        color: var(--text);
+      }
+
+      .admin-badge {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--accent2);
+        background: rgba(124, 58, 237, 0.2);
+        border: 1px solid rgba(124, 58, 237, 0.3);
+        border-radius: 6px;
+        padding: 4px 8px;
+      }
+
+      .btn-logout {
+        background: rgba(239, 68, 68, 0.12);
+        border: 1px solid rgba(239, 68, 68, 0.25);
+        color: #fca5a5;
+        border-radius: 6px;
+        padding: 6px 12px;
         cursor: pointer;
         font-family: "Inter", sans-serif;
         transition: background 0.2s;
@@ -63,12 +118,6 @@
         color: var(--text);
       }
 
-      /* ── Layout ── */
-      .layout {
-        display: flex;
-        flex: 1;
-      }
-
       /* ── Sidebar ── */
       .sidebar {
         width: 220px;
@@ -76,9 +125,6 @@
         border-right: 1px solid var(--border);
         padding: 24px 0;
         flex-shrink: 0;
-        transition:
-          transform 0.25s ease,
-          box-shadow 0.25s ease;
       }
 
       .nav-section {
@@ -129,7 +175,6 @@
         text-align: center;
       }
 
-      /* ── Main content ── */
       .main {
         flex: 1;
         padding: 28px;
@@ -454,88 +499,8 @@
         padding: 32px;
       }
 
-      .sidebar-bottom-mobile {
-        display: none;
-        margin-top: auto;
-        padding: 16px 16px 0;
-        border-top: 1px solid var(--border);
-        gap: 10px;
-        flex-direction: column;
-      }
-
-      .sidebar-bottom-mobile .btn-logout,
-      .sidebar-bottom-mobile .refresh-btn {
-        width: 100%;
-        justify-content: center;
-        padding: 10px 12px;
-      }
-
-      .sidebar-toggle {
-        display: none;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        border: 1px solid var(--border);
-        background: var(--surface2);
-        color: var(--text);
-        cursor: pointer;
-        font-size: 1.1rem;
-      }
-
-      .sidebar-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.42);
-        z-index: 60;
-      }
-
-      .sidebar-overlay.open {
-        display: block;
-      }
-
-      .sidebar-close {
-        display: none;
-        position: absolute;
-        top: 14px;
-        right: 14px;
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        border: 1px solid var(--border);
-        background: var(--surface2);
-        color: var(--text);
-        cursor: pointer;
-        font-size: 1rem;
-      }
-
-      @media (max-width: 900px) {
-        .sidebar-bottom-mobile {
-          display: flex;
-        }
-      }
-
       @media (max-width: 760px) {
-        .sidebar {
-          width: min(84vw, 300px);
-          position: fixed;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          z-index: 80;
-          transform: translateX(-104%);
-          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
-        }
-
-        .sidebar.open {
-          transform: translateX(0);
-        }
-
         .main {
-          margin-left: 0;
-          max-width: none;
           padding: 16px;
         }
 
@@ -546,18 +511,6 @@
         .topbar-right .refresh-btn,
         .topbar-right .btn-logout {
           display: none;
-        }
-
-        .sidebar-toggle {
-          display: inline-flex;
-        }
-
-        .sidebar-close {
-          display: inline-flex;
-        }
-
-        .layout {
-          overflow-x: hidden;
         }
       }
 
@@ -623,7 +576,7 @@
     </div>
 
     <!-- Layout -->
-    <div class="layout">
+    <div class="layout has-sidebar">
       <!-- Sidebar -->
       <nav class="sidebar" id="sidebar">
         <button

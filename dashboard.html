@@ -44,7 +44,6 @@
         background: var(--bg);
         color: var(--text);
         min-height: 100vh;
-        display: flex;
         overflow-x: hidden;
       }
 
@@ -55,15 +54,7 @@
         border-right: 1px solid var(--border);
         display: flex;
         flex-direction: column;
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        z-index: 50;
         padding: 0 0 20px;
-        transition:
-          transform 0.25s ease,
-          box-shadow 0.25s ease;
       }
 
       .sidebar-logo {
@@ -187,7 +178,6 @@
 
       /* ── MAIN ── */
       .main {
-        margin-left: var(--sidebar-w);
         flex: 1;
         min-height: 100vh;
         display: flex;
@@ -475,19 +465,13 @@
         display: none;
       }
       .sidebar-toggle {
-        display: none;
-        flex-direction: column;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 0;
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
         font-size: 1.25rem;
         cursor: pointer;
         background: none;
         border: none;
-        padding: 4px;
         color: var(--text);
       }
 
@@ -522,29 +506,7 @@
         }
       }
 
-      @media (max-width: 680px) {
-        .sidebar {
-          width: min(84vw, 300px);
-          transform: translateX(-104%);
-          transition: transform 0.25s;
-          box-shadow: 0 24px 60px rgba(15, 15, 26, 0.18);
-        }
-        .sidebar.open {
-          transform: translateX(0);
-        }
-        .sidebar-overlay {
-          display: none;
-          position: fixed;
-          inset: 0;
-          background: rgba(0, 0, 0, 0.35);
-          z-index: 49;
-        }
-        .sidebar-overlay.open {
-          display: block;
-        }
-        .main {
-          margin-left: 0;
-        }
+      @media (max-width: 760px) {
         .mob-topbar {
           display: flex;
           align-items: center;
@@ -594,183 +556,189 @@
     </style>
   </head>
   <body>
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-      <a href="/dashboard.html" class="sidebar-logo">PinGuru</a>
-      <button
-        onclick="toggleSidebar()"
-        id="sidebar-close"
-        aria-label="Close sidebar"
-        style="
-          display: none;
-          position: absolute;
-          top: 14px;
-          right: 14px;
-          width: 36px;
-          height: 36px;
-          border-radius: 10px;
-          background: var(--bg);
-          border: 1px solid var(--border);
-          cursor: pointer;
-          font-size: 1.05rem;
-          color: var(--text);
-        "
-      >
-        ✕
-      </button>
-      <nav class="sidebar-nav">
-        <a href="/dashboard.html" class="sidebar-link active">
-          <span class="nav-icon">🏠</span> Dashboard
-        </a>
-        <a href="/rules.html" class="sidebar-link">
-          <span class="nav-icon">⚡</span> Automation Rules
-        </a>
-        <a href="/connect.html" class="sidebar-link">
-          <span class="nav-icon">📸</span> Instagram
-        </a>
-        <a href="/pricing.html" class="sidebar-link">
-          <span class="nav-icon">💎</span> Plans & Pricing
-        </a>
-      </nav>
-      <div class="sidebar-bottom">
-        <div class="sidebar-user">
-          <div class="user-avatar" id="user-avatar">A</div>
-          <div class="user-info">
-            <div class="user-email" id="user-email">Loading...</div>
-            <div class="user-plan" id="user-plan">Free</div>
+    <div class="layout has-sidebar">
+      <!-- SIDEBAR -->
+      <aside class="sidebar" id="sidebar">
+        <a href="/dashboard.html" class="sidebar-logo">PinGuru</a>
+        <button
+          class="sidebar-close"
+          onclick="toggleSidebar()"
+          id="sidebar-close"
+          aria-label="Close sidebar"
+        >
+          ✕
+        </button>
+        <nav class="sidebar-nav">
+          <a href="/dashboard.html" class="sidebar-link active">
+            <span class="nav-icon">🏠</span> Dashboard
+          </a>
+          <a href="/rules.html" class="sidebar-link">
+            <span class="nav-icon">⚡</span> Automation Rules
+          </a>
+          <a href="/connect.html" class="sidebar-link">
+            <span class="nav-icon">📸</span> Instagram
+          </a>
+          <a href="/pricing.html" class="sidebar-link">
+            <span class="nav-icon">💎</span> Plans & Pricing
+          </a>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="sidebar-user">
+            <div class="user-avatar" id="user-avatar">A</div>
+            <div class="user-info">
+              <div class="user-email" id="user-email">Loading...</div>
+              <div class="user-plan" id="user-plan">Free</div>
+            </div>
           </div>
+          <button class="logout-btn" onclick="logout()">
+            <span>🚪</span> Sign out
+          </button>
         </div>
-        <button class="logout-btn" onclick="logout()">
-          <span>🚪</span> Sign out
+      </aside>
+
+      <!-- MOBILE TOPBAR -->
+      <div class="mob-topbar">
+        <a href="/dashboard.html" class="mob-logo">PinGuru</a>
+        <button
+          class="sidebar-toggle"
+          id="sidebar-toggle"
+          onclick="toggleSidebar()"
+          aria-label="Open sidebar"
+          aria-expanded="false"
+          type="button"
+        >
+          ☰
         </button>
       </div>
-    </aside>
 
-    <!-- MOBILE TOPBAR -->
-    <div class="mob-topbar">
-      <a href="/dashboard.html" class="mob-logo">PinGuru</a>
-      <button
-        class="sidebar-toggle"
-        id="sidebar-toggle"
-        onclick="toggleSidebar()"
-        aria-label="Open sidebar"
-        aria-expanded="false"
-        type="button"
-      >
-        ☰
-      </button>
-    </div>
-
-    <!-- MAIN -->
-    <div class="main">
-      <div class="topbar">
-        <div class="topbar-title">Dashboard</div>
-        <div class="topbar-right">
-          <a href="/pricing.html" class="btn-secondary">⬆ Upgrade</a>
-          <a href="/rules.html" class="btn-primary">+ New Rule</a>
-        </div>
-      </div>
-
-      <div class="content">
-        <!-- Stats -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-label">DMs Sent</div>
-            <div class="stat-value purple" id="stat-dms">—</div>
+      <!-- MAIN -->
+      <div class="main">
+        <div class="topbar">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <button
+              class="sidebar-toggle"
+              onclick="toggleSidebar()"
+              aria-label="Open sidebar"
+              aria-expanded="false"
+              type="button"
+            >
+              ☰
+            </button>
+            <div class="topbar-title">Dashboard</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-label">Active Rules</div>
-            <div class="stat-value green" id="stat-rules">—</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Monthly Limit</div>
-            <div class="stat-value" id="stat-limit">—</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Current Plan</div>
-            <div class="stat-value" style="font-size: 1.3rem" id="plan-name">
-              —
-            </div>
+          <div class="topbar-right">
+            <a href="/pricing.html" class="btn-secondary">⬆ Upgrade</a>
+            <a href="/rules.html" class="btn-primary">+ New Rule</a>
           </div>
         </div>
 
-        <!-- Row 1: IG + Recent Rules -->
-        <div class="grid-3" style="margin-bottom: 20px">
-          <!-- Recent Rules -->
-          <div class="card">
-            <div class="card-header">
-              <span class="card-title">Recent Rules</span>
-              <a href="/rules.html" class="card-link">View all →</a>
+        <div class="content">
+          <!-- Stats -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">DMs Sent</div>
+              <div class="stat-value purple" id="stat-dms">—</div>
             </div>
-            <div id="recent-rules">
-              <p style="color: var(--muted); font-size: 0.85rem">Loading...</p>
+            <div class="stat-card">
+              <div class="stat-label">Active Rules</div>
+              <div class="stat-value green" id="stat-rules">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Monthly Limit</div>
+              <div class="stat-value" id="stat-limit">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Current Plan</div>
+              <div class="stat-value" style="font-size: 1.3rem" id="plan-name">
+                —
+              </div>
             </div>
           </div>
 
-          <!-- Right col -->
-          <div style="display: flex; flex-direction: column; gap: 16px">
-            <!-- IG Status -->
+          <!-- Row 1: IG + Recent Rules -->
+          <div class="grid-3" style="margin-bottom: 20px">
+            <!-- Recent Rules -->
             <div class="card">
               <div class="card-header">
-                <span class="card-title">Instagram</span>
-                <span class="badge badge-red" id="ig-status"
-                  >Not Connected</span
-                >
+                <span class="card-title">Recent Rules</span>
+                <a href="/rules.html" class="card-link">View all →</a>
               </div>
-              <div class="ig-row">
-                <div class="ig-avatar">📸</div>
-                <div class="ig-info">
-                  <div class="ig-name" id="ig-username">—</div>
-                  <div class="ig-sub" id="ig-status-text">Checking...</div>
+              <div id="recent-rules">
+                <p style="color: var(--muted); font-size: 0.85rem">
+                  Loading...
+                </p>
+              </div>
+            </div>
+
+            <!-- Right col -->
+            <div style="display: flex; flex-direction: column; gap: 16px">
+              <!-- IG Status -->
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Instagram</span>
+                  <span class="badge badge-red" id="ig-status"
+                    >Not Connected</span
+                  >
                 </div>
-                <a
-                  href="/connect.html"
-                  class="btn-secondary"
-                  style="font-size: 0.78rem; padding: 6px 12px"
-                  >Manage</a
+                <div class="ig-row">
+                  <div class="ig-avatar">📸</div>
+                  <div class="ig-info">
+                    <div class="ig-name" id="ig-username">—</div>
+                    <div class="ig-sub" id="ig-status-text">Checking...</div>
+                  </div>
+                  <a
+                    href="/connect.html"
+                    class="btn-secondary"
+                    style="font-size: 0.78rem; padding: 6px 12px"
+                    >Manage</a
+                  >
+                </div>
+              </div>
+
+              <!-- Plan Usage -->
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Plan Usage</span>
+                  <a href="/pricing.html" class="card-link">Upgrade →</a>
+                </div>
+                <div class="usage-wrap">
+                  <div
+                    class="usage-fill"
+                    id="usage-bar"
+                    style="width: 0%"
+                  ></div>
+                </div>
+                <div class="usage-text" id="usage-label">Loading...</div>
+              </div>
+
+              <!-- Quick Actions -->
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">Quick Actions</span>
+                </div>
+                <a href="/rules.html" class="quick-action"
+                  ><span>⚡</span> Create automation rule</a
+                >
+                <a href="/connect.html" class="quick-action"
+                  ><span>📸</span> Instagram settings</a
+                >
+                <a href="/pricing.html" class="quick-action"
+                  ><span>💎</span> View plans</a
                 >
               </div>
             </div>
-
-            <!-- Plan Usage -->
-            <div class="card">
-              <div class="card-header">
-                <span class="card-title">Plan Usage</span>
-                <a href="/pricing.html" class="card-link">Upgrade →</a>
-              </div>
-              <div class="usage-wrap">
-                <div class="usage-fill" id="usage-bar" style="width: 0%"></div>
-              </div>
-              <div class="usage-text" id="usage-label">Loading...</div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="card">
-              <div class="card-header">
-                <span class="card-title">Quick Actions</span>
-              </div>
-              <a href="/rules.html" class="quick-action"
-                ><span>⚡</span> Create automation rule</a
-              >
-              <a href="/connect.html" class="quick-action"
-                ><span>📸</span> Instagram settings</a
-              >
-              <a href="/pricing.html" class="quick-action"
-                ><span>💎</span> View plans</a
-              >
-            </div>
           </div>
         </div>
-      </div>
 
-      <footer>
-        <span>© 2026 PinGuru</span>
-        <div style="display: flex; gap: 16px">
-          <a href="/privacy.html">Privacy</a>
-          <a href="/terms.html">Terms</a>
-          <a href="mailto:support@pinguru.me">Support</a>
-        </div>
-      </footer>
+        <footer>
+          <span>© 2026 PinGuru</span>
+          <div style="display: flex; gap: 16px">
+            <a href="/privacy.html">Privacy</a>
+            <a href="/terms.html">Terms</a>
+            <a href="mailto:support@pinguru.me">Support</a>
+          </div>
+        </footer>
+      </div>
     </div>
 
     <script src="js/utils.js"></script>

@@ -1,46 +1,63 @@
+const SIDEBAR_BREAKPOINT = 760;
+
 function toggleMobileMenu() {
   const menu = document.getElementById('mobile-menu');
   if (menu) menu.classList.toggle('open');
 }
 
-function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  if (!sidebar) return;
-
-  const overlay = document.getElementById('sidebar-overlay');
-  const closeBtn = document.getElementById('sidebar-close');
-  const toggleBtn = document.getElementById('sidebar-toggle');
-  const isOpen = sidebar.classList.toggle('open');
-
-  if (overlay) overlay.classList.toggle('open', isOpen);
-  document.body.style.overflow = isOpen ? 'hidden' : '';
-
-  if (closeBtn) closeBtn.style.display = isOpen ? 'block' : 'none';
-  if (toggleBtn) {
-    toggleBtn.textContent = isOpen ? '✕' : '☰';
-    toggleBtn.setAttribute('aria-label', isOpen ? 'Close sidebar' : 'Open sidebar');
-    toggleBtn.setAttribute('aria-expanded', String(isOpen));
-  }
+function getSidebarContext() {
+  const layout = document.querySelector('.layout.has-sidebar');
+  if (!layout) return null;
+  return {
+    layout,
+    sidebar: layout.querySelector('.sidebar'),
+    overlay: document.getElementById('sidebar-overlay'),
+    closeBtn: layout.querySelector('.sidebar-close'),
+    toggleBtns: Array.from(document.querySelectorAll('.sidebar-toggle')),
+  };
 }
 
-function syncSidebarState(breakpoint = 760) {
-  const sidebar = document.getElementById('sidebar');
-  if (!sidebar) return;
+function updateToggleButtons(isHidden) {
+  const ctx = getSidebarContext();
+  if (!ctx) return;
+  const label = isHidden ? 'Open sidebar' : 'Close sidebar';
+  const icon = isHidden ? '☰' : '✕';
+  ctx.toggleBtns.forEach((btn) => {
+    btn.textContent = icon;
+    btn.setAttribute('aria-label', label);
+    btn.setAttribute('aria-expanded', String(!isHidden));
+  });
+}
 
-  const overlay = document.getElementById('sidebar-overlay');
-  const closeBtn = document.getElementById('sidebar-close');
-  const toggleBtn = document.getElementById('sidebar-toggle');
+function setSidebarHidden(hidden) {
+  const ctx = getSidebarContext();
+  if (!ctx) return;
 
-  if (window.innerWidth > breakpoint) {
-    sidebar.classList.remove('open');
-    if (overlay) overlay.classList.remove('open');
-    document.body.style.overflow = '';
-    if (closeBtn) closeBtn.style.display = 'none';
-    if (toggleBtn) {
-      toggleBtn.textContent = '☰';
-      toggleBtn.setAttribute('aria-label', 'Open sidebar');
-      toggleBtn.setAttribute('aria-expanded', 'false');
-    }
+  ctx.layout.classList.toggle('sidebar-hidden', hidden);
+
+  const isMobile = window.innerWidth <= SIDEBAR_BREAKPOINT;
+  if (ctx.overlay) ctx.overlay.classList.toggle('open', isMobile && !hidden);
+  if (ctx.sidebar) ctx.sidebar.classList.toggle('open', isMobile && !hidden);
+  document.body.style.overflow = isMobile && !hidden ? 'hidden' : '';
+
+  updateToggleButtons(hidden);
+}
+
+function toggleSidebar() {
+  const ctx = getSidebarContext();
+  if (!ctx) return;
+  const isHidden = ctx.layout.classList.contains('sidebar-hidden');
+  setSidebarHidden(!isHidden);
+}
+
+function syncSidebarState() {
+  const ctx = getSidebarContext();
+  if (!ctx) return;
+
+  if (window.innerWidth <= SIDEBAR_BREAKPOINT) {
+    setSidebarHidden(true);
+  } else {
+    setSidebarHidden(false);
   }
 }
 
@@ -55,17 +72,22 @@ function initMobileMenu() {
   });
 }
 
-function initSidebarDrawer(breakpoint = 760) {
-  const sidebar = document.getElementById('sidebar');
-  if (!sidebar) return;
+function initSidebarDrawer() {
+  const ctx = getSidebarContext();
+  if (!ctx) return;
 
-  syncSidebarState(breakpoint);
-  window.addEventListener('resize', () => syncSidebarState(breakpoint));
+  if (window.innerWidth <= SIDEBAR_BREAKPOINT) {
+    ctx.layout.classList.add('sidebar-hidden');
+  } else {
+    ctx.layout.classList.remove('sidebar-hidden');
+  }
+  syncSidebarState();
+  window.addEventListener('resize', syncSidebarState);
 
-  document.querySelectorAll('#sidebar a, #sidebar .nav-item').forEach((item) => {
+  ctx.layout.querySelectorAll('#sidebar a, #sidebar .nav-item').forEach((item) => {
     item.addEventListener('click', () => {
-      if (window.innerWidth <= breakpoint && sidebar.classList.contains('open')) {
-        toggleSidebar();
+      if (window.innerWidth <= SIDEBAR_BREAKPOINT) {
+        setSidebarHidden(true);
       }
     });
   });
