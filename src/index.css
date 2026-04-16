@@ -1,0 +1,29 @@
+/* ============================================================
+   index.css — Tailwind directives + import all section styles
+   ============================================================ */
+/* Section CSS imports must come before other at-rules */
+@import './styles/base.css';
+@import './styles/dashboard.css';
+@import './styles/auth.css';
+@import './styles/rules.css';
+@import './styles/analytics.css';
+@import './styles/billing.css';
+@import './styles/settings.css';
+@import './styles/landing.css';
+@import './styles/legal.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tailwind custom utilities */
+@layer utilities {
+  .font-display { font-family: 'Sora', system-ui, sans-serif; }
+  .font-mono    { font-family: 'JetBrains Mono', monospace; }
+  .bg-canvas    { background-color: #F8FAFC; }
+  .bg-sidebar   { background-color: #0F172A; }
+  .bg-primary   { background-color: #4F46E5; }
+  .text-primary { color: #4F46E5; }
+  .bg-success   { background-color: #10B981; }
+  .bg-danger    { background-color: #F43F5E; }
+}

@@ -1,0 +1,130 @@
+/* ============================================================
+   legal.css — Privacy & Terms pages
+   ============================================================ */
+
+.legal-page {
+  max-width: 920px;
+  margin: 24px auto 56px;
+  padding: 0 20px;
+}
+
+.legal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.legal-header-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #eef2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.legal-title {
+  font-family: var(--font-display, 'Sora', system-ui, sans-serif);
+  font-size: 1.75rem;
+  line-height: 1.2;
+  color: var(--color-text, #1e293b);
+  margin: 0;
+}
+
+.legal-meta {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--color-muted, #64748b);
+}
+
+.legal-intro {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  color: #334155;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin-bottom: 18px;
+}
+
+.legal-body {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 22px;
+}
+
+.legal-section + .legal-section {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.legal-section h2 {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+.legal-section h3 {
+  margin: 12px 0 6px;
+  font-size: 0.95rem;
+  color: #1e293b;
+}
+
+.legal-section p {
+  margin: 0;
+  color: #334155;
+  line-height: 1.7;
+  font-size: 0.92rem;
+}
+
+.legal-section p + p {
+  margin-top: 8px;
+}
+
+.legal-section ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: #334155;
+}
+
+.legal-section li {
+  margin: 6px 0;
+  line-height: 1.55;
+  font-size: 0.92rem;
+}
+
+.legal-section a {
+  color: #4f46e5;
+  text-decoration: none;
+}
+
+.legal-section a:hover {
+  text-decoration: underline;
+}
+
+.legal-footer-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+@media (max-width: 767px) {
+  .legal-page {
+    margin: 12px auto 36px;
+    padding: 0 14px;
+  }
+
+  .legal-body {
+    padding: 16px;
+  }
+
+  .legal-title {
+    font-size: 1.45rem;
+  }
+}

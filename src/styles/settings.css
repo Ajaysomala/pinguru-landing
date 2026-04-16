@@ -1,0 +1,110 @@
+/* ============================================================
+   settings.css — Profile, preferences, data control
+   ============================================================ */
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 1023px) { .settings-grid { grid-template-columns: 1fr; } }
+
+.settings-section {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.settings-section-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.settings-section-title {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.settings-section-desc {
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+  margin-top: 2px;
+}
+
+.settings-section-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Profile row */
+.profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.profile-row:last-child { border-bottom: none; }
+
+.profile-row-label {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+  min-width: 120px;
+}
+
+.profile-row-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+  text-align: right;
+}
+
+/* Checkbox preference */
+.pref-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.pref-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-border);
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+}
+
+.pref-label {
+  font-size: 0.875rem;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.pref-desc {
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+/* Danger zone */
+.danger-zone {
+  border-color: #FECDD3;
+}
+
+.danger-zone .settings-section-header {
+  background: var(--color-danger-light);
+  border-bottom-color: #FECDD3;
+}
+
+.danger-zone .settings-section-title { color: #9F1239; }

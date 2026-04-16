@@ -1,0 +1,214 @@
+/* ============================================================
+   base.css — Global resets, CSS tokens, typography
+   PinGuru Frontend v2.0
+   ============================================================ */
+
+/* --- Google Fonts are loaded via index.html --- */
+
+/* --- CSS Design Tokens --- */
+:root {
+  /* Brand Colors */
+  --color-primary:        #4F46E5;
+  --color-primary-hover:  #4338CA;
+  --color-primary-light:  #EEF2FF;
+  --color-primary-ring:   rgba(79, 70, 229, 0.3);
+
+  /* Layout Colors */
+  --color-sidebar:        #0F172A;
+  --color-sidebar-hover:  #1E293B;
+  --color-sidebar-active: #312E81;
+  --color-canvas:         #F8FAFC;
+
+  /* Semantic Colors */
+  --color-success:        #10B981;
+  --color-success-light:  #ECFDF5;
+  --color-danger:         #F43F5E;
+  --color-danger-light:   #FFF1F2;
+  --color-warning:        #F59E0B;
+  --color-warning-light:  #FFFBEB;
+  --color-info:           #3B82F6;
+  --color-info-light:     #EFF6FF;
+
+  /* Text */
+  --color-text:           #1E293B;
+  --color-text-secondary: #475569;
+  --color-muted:          #94A3B8;
+  --color-border:         #E2E8F0;
+  --color-border-focus:   #4F46E5;
+
+  /* Chart */
+  --chart-indigo:         #4F46E5;
+  --chart-teal:           #14B8A6;
+  --chart-amber:          #F59E0B;
+
+  /* Typography */
+  --font-sans:            'DM Sans', system-ui, sans-serif;
+  --font-display:         'Sora', system-ui, sans-serif;
+  --font-mono:            'JetBrains Mono', monospace;
+
+  /* Spacing */
+  --sidebar-width:        240px;
+  --sidebar-collapsed:    64px;
+  --topbar-height:        60px;
+
+  /* Radius */
+  --radius-sm:            6px;
+  --radius-md:            10px;
+  --radius-card:          12px;
+  --radius-lg:            16px;
+  --radius-xl:            20px;
+  --radius-full:          9999px;
+
+  /* Shadows */
+  --shadow-xs:  0 1px 2px rgba(0,0,0,0.05);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:  0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg:  0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.04);
+  --shadow-modal: 0 20px 60px rgba(0,0,0,0.15);
+
+  /* Transitions */
+  --transition-fast:   150ms ease;
+  --transition-base:   200ms ease;
+  --transition-slow:   300ms ease;
+}
+
+/* --- Reset --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-canvas);
+  color: var(--color-text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Global Typography --- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--color-text);
+}
+
+h1 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
+h2 { font-size: clamp(1.4rem, 3vw, 2rem); }
+h3 { font-size: clamp(1.1rem, 2vw, 1.375rem); }
+h4 { font-size: 1.125rem; }
+h5 { font-size: 1rem; }
+
+p {
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover { color: var(--color-primary-hover); }
+
+code, pre {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+img, svg { display: block; max-width: 100%; }
+
+button {
+  font-family: var(--font-sans);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input, textarea, select {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+}
+
+/* --- Scrollbar Styling --- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
+
+/* --- Focus Styles (Accessibility) --- */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* --- Selection --- */
+::selection {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+/* --- Global Animations --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* --- Utility Classes --- */
+.animate-fade-in    { animation: fadeIn 0.2s ease-out both; }
+.animate-scale-in   { animation: scaleIn 0.2s ease-out both; }
+.animate-slide-left { animation: slideInLeft 0.25s ease-out both; }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
