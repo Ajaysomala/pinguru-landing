@@ -2,7 +2,7 @@
 
 import type { User, DashboardStats, Rule, RuleCreatePayload, AnalyticsData } from './types';
 
-const API = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
+const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://api.pinguru.me' : '/api')).replace(/\/$/, '');
 
 type BackendRule = {
   _id?: string;
