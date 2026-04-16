@@ -33,6 +33,18 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Verify built entrypoints
+        run: |
+          if grep -q '/src/main.tsx' dist/index.html; then
+            echo "ERROR: dist/index.html still references /src/main.tsx"
+            exit 1
+          fi
+          if ! grep -Eq '/assets/index-[^"]+\.js' dist/index.html; then
+            echo "ERROR: dist/index.html is missing hashed JS bundle reference"
+            sed -n '1,120p' dist/index.html
+            exit 1
+          fi
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
