@@ -38,11 +38,7 @@ const LoginPage: React.FC = () => {
       const data = await loginUser(email, password);
       resetLoginAttempts();
       localStorage.setItem('pg_user', JSON.stringify({ plan: data.plan, instagram_connected: data.instagram_connected }));
-      if (data.instagram_connected) {
-        navigate('/dashboard');
-      } else {
-        navigate('/connect?autostart=1');
-      }
+      navigate('/dashboard');
     } catch (err: any) {
       const result = recordLoginAttempt();
       if (result.locked) {

@@ -33,7 +33,7 @@ const OnboardingPage: React.FC = () => {
     try {
       await updateOnboarding({ first_name: firstName.trim(), last_name: lastName.trim(), business_category: category });
       setStep(2);
-      setTimeout(() => navigate('/connect?autostart=1'), 1800);
+      setTimeout(() => navigate('/dashboard'), 1800);
     } catch (err: any) {
       setError(err.message || 'Setup failed. Please try again.');
     } finally { setLoading(false); }
