@@ -40,6 +40,28 @@ const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <AppShell>{children}</AppShell>;
 };
 
+// ─── Public-only route wrapper (redirect logged-in users) ───────────────────
+const PublicOnly: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [status, setStatus] = useState<'checking' | 'authed' | 'guest'>('checking');
+
+  useEffect(() => {
+    requireAuth().then(ok => setStatus(ok ? 'authed' : 'guest'));
+  }, []);
+
+  if (status === 'checking') return (
+    <div className="min-h-screen flex items-center justify-center bg-canvas">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm text-slate-500">Loading...</p>
+      </div>
+    </div>
+  );
+
+  if (status === 'authed') return <Navigate to="/dashboard" replace />;
+
+  return <>{children}</>;
+};
+
 // ─── Page suspense wrapper ────────────────────────────────────────────────────
 const Page: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <React.Suspense fallback={
@@ -56,10 +78,10 @@ const App: React.FC = () => (
   <BrowserRouter>
     <Routes>
       {/* Public */}
-      <Route path="/"        element={<Page><LandingPage /></Page>} />
-      <Route path="/login"   element={<Page><LoginPage /></Page>} />
-      <Route path="/register" element={<Page><RegisterPage /></Page>} />
-      <Route path="/verify"  element={<Page><VerifyPage /></Page>} />
+      <Route path="/"        element={<PublicOnly><Page><LandingPage /></Page></PublicOnly>} />
+      <Route path="/login"   element={<PublicOnly><Page><LoginPage /></Page></PublicOnly>} />
+      <Route path="/register" element={<PublicOnly><Page><RegisterPage /></Page></PublicOnly>} />
+      <Route path="/verify"  element={<PublicOnly><Page><VerifyPage /></Page></PublicOnly>} />
       <Route path="/privacy" element={<Page><PrivacyPage /></Page>} />
       <Route path="/terms"   element={<Page><TermsPage /></Page>} />
 
