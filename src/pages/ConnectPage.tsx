@@ -65,10 +65,14 @@ const ConnectPage: React.FC = () => {
 
     if (igConnected === 'true') {
       setSuccessMsg('Instagram connected successfully!');
+      setError(''); // clear any stale error
       // Optimistic update prevents contradictory UI while backend status settles.
       setStatus(prev => ({ ...(prev ?? {}), connected: true }));
       fetchStatusWithRetry(5, 1200).then((s) => {
-        if (!s?.connected) {
+        if (s?.connected) {
+          setError(''); // confirmed — ensure no leftover error shown
+        } else {
+          setSuccessMsg(''); // retract optimistic success
           setError('Instagram authorization completed, but this logged-in Pinguru account is not linked yet. Please sign in with the same Pinguru email used for Connect and retry once.');
         }
       });
