@@ -32,11 +32,24 @@ const ConnectPage: React.FC = () => {
   const [successMsg, setSuccessMsg]   = useState('');
   const [oauthStarted, setOauthStarted] = useState(false);
 
+  const fetchStatusWithRetry = async (attempts = 1, waitMs = 800): Promise<InstagramStatus | null> => {
+    let last: InstagramStatus | null = null;
+    for (let i = 0; i < attempts; i += 1) {
+      const next = await getInstagramStatus();
+      last = next;
+      setStatus(next);
+      if (next?.connected) return next;
+      if (i < attempts - 1) {
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+      }
+    }
+    return last;
+  };
+
   // Load IG status on mount
   useEffect(() => {
     requireAuth().then(ok => { if (!ok) navigate('/login'); });
-    getInstagramStatus()
-      .then(s => setStatus(s))
+    fetchStatusWithRetry(1)
       .finally(() => setLoading(false));
   }, [navigate]);
 
@@ -52,7 +65,13 @@ const ConnectPage: React.FC = () => {
 
     if (igConnected === 'true') {
       setSuccessMsg('Instagram connected successfully!');
-      getInstagramStatus().then(s => setStatus(s));
+      // Optimistic update prevents contradictory UI while backend status settles.
+      setStatus(prev => ({ ...(prev ?? {}), connected: true }));
+      fetchStatusWithRetry(5, 1200).then((s) => {
+        if (!s?.connected) {
+          setError('Instagram authorization completed, but this logged-in Pinguru account is not linked yet. Please sign in with the same Pinguru email used for Connect and retry once.');
+        }
+      });
       window.history.replaceState({}, '', '/connect');
       return;
     }

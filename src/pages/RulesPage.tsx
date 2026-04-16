@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Zap } from 'lucide-react';
+import { Plus, Zap, Circle } from 'lucide-react';
 import { getRules, toggleRule, deleteRule, requireAuth, getInstagramStatus } from '../lib/api';
-import type { Rule } from '../lib/types';
+import type { Rule, InstagramStatus } from '../lib/types';
 import { RuleCard } from '../components/rules/RuleCard';
 import { RuleBuilderModal } from '../components/rules/RuleBuilderModal';
 import '../styles/dashboard.css';
@@ -17,17 +17,17 @@ const RulesPage: React.FC = () => {
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
-  const [instagramConnected, setInstagramConnected] = useState(false);
+  const [igStatus, setIgStatus] = useState<InstagramStatus | null>(null);
   const [connectHint, setConnectHint] = useState('');
 
   useEffect(() => {
     requireAuth().then(ok => { if (!ok) navigate('/login'); });
     getRules().then(r => setRules(r?.rules ?? [])).finally(() => setLoading(false));
-    getInstagramStatus().then(s => setInstagramConnected(Boolean(s?.connected)));
+    getInstagramStatus().then(s => setIgStatus(s));
   }, [navigate]);
 
   const openBuilder = () => {
-    if (!instagramConnected) {
+    if (!igStatus?.connected) {
       setConnectHint('Connect Instagram first to create automation rules.');
       navigate('/connect');
       return;
@@ -70,12 +70,23 @@ const RulesPage: React.FC = () => {
             {loading ? 'Loading…' : `${rules.length} rule${rules.length !== 1 ? 's' : ''} · ${activeCount} active`}
           </p>
         </div>
-        <button
-          onClick={openBuilder}
-          className="inline-flex items-center gap-2 bg-primary text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-sm shadow-indigo-200"
-        >
-          <Plus size={16}/> New Rule
-        </button>
+        <div className="rules-header-actions">
+          <button
+            type="button"
+            className={`ig-live-pill ${igStatus?.connected ? 'connected' : 'disconnected'}`}
+            onClick={() => getInstagramStatus().then(s => setIgStatus(s))}
+            title="Refresh Instagram connection status"
+          >
+            <Circle size={10} className="ig-live-dot" />
+            {igStatus?.connected ? 'Instagram Connected' : 'Instagram Not Connected'}
+          </button>
+          <button
+            onClick={openBuilder}
+            className="inline-flex items-center gap-2 bg-primary text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-sm shadow-indigo-200"
+          >
+            <Plus size={16}/> New Rule
+          </button>
+        </div>
       </div>
 
       {connectHint && (
