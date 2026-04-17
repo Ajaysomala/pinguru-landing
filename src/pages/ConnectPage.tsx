@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Camera, CheckCircle, RefreshCw, AlertTriangle,
   Link2, ShieldCheck, Zap, BarChart2, ExternalLink,
@@ -31,6 +31,7 @@ const ConnectPage: React.FC = () => {
   const [error, setError]             = useState('');
   const [successMsg, setSuccessMsg]   = useState('');
   const [oauthStarted, setOauthStarted] = useState(false);
+  const [consentAccepted, setConsentAccepted] = useState(false);
 
   const fetchStatusWithRetry = async (attempts = 1, waitMs = 800): Promise<InstagramStatus | null> => {
     let last: InstagramStatus | null = null;
@@ -98,6 +99,11 @@ const ConnectPage: React.FC = () => {
 
   const handleOAuthRedirect = async () => {
     setError('');
+    if (!consentAccepted) {
+      setError('Please review and accept the Privacy Policy and Terms before connecting Instagram.');
+      setRedirecting(false);
+      return;
+    }
     setRedirecting(true);
     try {
       const oauthUrl = await getInstagramAuthUrl();
@@ -110,12 +116,12 @@ const ConnectPage: React.FC = () => {
 
   useEffect(() => {
     const shouldAutoStart = params.get('autostart') === '1';
-    if (!shouldAutoStart || loading || oauthStarted) return;
+    if (!shouldAutoStart || loading || oauthStarted || !consentAccepted) return;
     if (status?.connected) return;
 
     setOauthStarted(true);
     handleOAuthRedirect();
-  }, [params, loading, oauthStarted, status]);
+  }, [params, loading, oauthStarted, status, consentAccepted]);
 
   return (
     <div className="page-wrapper connect-page">
@@ -245,17 +251,34 @@ const ConnectPage: React.FC = () => {
                   <p className="text-sm text-slate-500 mb-6 max-w-xs mx-auto">
                     Authorize PinGuru to manage your DMs. We only request the permissions we need.
                   </p>
+                  <div className="mx-auto mb-5 max-w-md rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left">
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="mt-1 h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+                        checked={consentAccepted}
+                        onChange={(e) => setConsentAccepted(e.target.checked)}
+                      />
+                      <span className="text-xs text-slate-600 leading-relaxed">
+                        I have reviewed and agree to the{' '}
+                        <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>{' '}
+                        and{' '}
+                        <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>{' '}
+                        before connecting my Instagram account.
+                      </span>
+                    </label>
+                  </div>
                   <button
                     type="button"
                     onClick={handleOAuthRedirect}
-                    disabled={redirecting}
-                    className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-violet-600 text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all shadow-md shadow-pink-200"
+                    disabled={redirecting || !consentAccepted}
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-violet-600 text-white font-bold px-6 py-3 rounded-xl hover:opacity-90 active:scale-[0.98] transition-all shadow-md shadow-pink-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Camera size={18}/>
                     {redirecting ? 'Redirecting…' : 'Connect Instagram'}
                   </button>
                   <p className="text-xs text-slate-400 mt-4">
-                    You'll be redirected to Instagram to approve access
+                    {consentAccepted ? "You'll be redirected to Instagram to approve access" : 'Accept the policy terms to continue'}
                   </p>
                 </div>
               )}
