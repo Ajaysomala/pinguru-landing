@@ -20,7 +20,8 @@ export interface User {
 export interface DashboardStats {
   dms_sent_this_month: number;
   active_rules: number;
-  dm_limit: number;
+  dm_limit: number | null;
+  dm_remaining?: number | null;
   plan: string;
   success_rate?: number;
   total_dms_sent?: number;

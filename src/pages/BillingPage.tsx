@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Check, Zap, Users, CreditCard, ExternalLink, AlertCircle, MessageSquare } from 'lucide-react';
 import { getProfile, createCheckoutSession, getCustomerPortalUrl, requireAuth } from '../lib/api';
 import type { User } from '../lib/types';
@@ -102,12 +102,17 @@ function getDisplayPrice(base: number, cycle: BillingCycle) {
 
 const BillingPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [user, setUser]                 = useState<User | null>(null);
   const [loading, setLoading]           = useState(true);
   const [upgrading, setUpgrading]       = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
   const [error, setError]               = useState('');
   const [cycle, setCycle]               = useState<BillingCycle>('monthly');
+
+  const upgraded = searchParams.get('upgraded') === 'true';
+  const simulated = searchParams.get('simulated') === 'true';
+  const upgradedPlan = searchParams.get('plan');
 
   useEffect(() => {
     requireAuth().then(ok => { if (!ok) navigate('/login'); });
@@ -155,6 +160,17 @@ const BillingPage: React.FC = () => {
         <div className="flex items-center gap-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl px-4 py-3 mb-6 text-sm">
           <AlertCircle size={15} className="flex-shrink-0"/>
           <span>{error}</span>
+        </div>
+      )}
+
+      {upgraded && (
+        <div className="flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-3 mb-6 text-sm">
+          <Check size={15} className="flex-shrink-0"/>
+          <span>
+            {simulated
+              ? `Upgrade successful (simulated mode). Plan set to ${upgradedPlan || 'selected plan'}.`
+              : `Upgrade successful. ${upgradedPlan ? `You are now on ${upgradedPlan}.` : 'Your plan is now active.'}`}
+          </span>
         </div>
       )}
 

@@ -150,10 +150,19 @@ export async function getDashboardStats(): Promise<DashboardStats | null> {
   if (res.status === 401) { window.location.href = '/login'; return null; }
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'Failed to get stats');
+
+  const dmLimit = data.dm_limit === null || data.dm_limit === undefined
+    ? null
+    : Number(data.dm_limit);
+  const dmRemaining = data.dm_remaining === null || data.dm_remaining === undefined
+    ? null
+    : Number(data.dm_remaining);
+
   return {
     dms_sent_this_month: data.dms_sent_this_month ?? data.dm_sent_this_month ?? 0,
     active_rules: data.active_rules ?? 0,
-    dm_limit: data.dm_limit ?? 0,
+    dm_limit: Number.isNaN(dmLimit as number) ? null : dmLimit,
+    dm_remaining: Number.isNaN(dmRemaining as number) ? null : dmRemaining,
     plan: String(data.plan ?? 'free').toLowerCase(),
     success_rate: typeof data.success_rate === 'number' ? data.success_rate : undefined,
   };
@@ -257,14 +266,14 @@ export async function getPlans() {
 export async function createCheckoutSession(planId: string): Promise<{ checkout_url: string }> {
   const res = await authFetch('/billing/create-checkout', { method: 'POST', body: JSON.stringify({ plan: planId }) });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.detail || 'Failed to create checkout');
+  if (!res.ok) throw new Error(asErrorMessage(data, 'Failed to create checkout'));
   return data;
 }
 
 export async function getCustomerPortalUrl(): Promise<{ portal_url: string }> {
   const res = await authFetch('/billing/portal', { method: 'POST' });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.detail || 'Failed to get portal URL');
+  if (!res.ok) throw new Error(asErrorMessage(data, 'Failed to get portal URL'));
   return data;
 }
 

@@ -59,7 +59,10 @@ const DashboardPage: React.FC = () => {
   ];
   const allDone = steps.every(s => s.done);
 
-  const usagePct = stats ? Math.min(100, Math.round((stats.dms_sent_this_month / stats.dm_limit) * 100)) : 0;
+  const hasLimit = stats?.dm_limit !== null && stats?.dm_limit !== undefined;
+  const usagePct = stats && hasLimit
+    ? Math.min(100, Math.round((stats.dms_sent_this_month / (stats.dm_limit as number)) * 100))
+    : 0;
   const usageColor = usagePct >= 90 ? 'bg-rose-500' : usagePct >= 70 ? 'bg-amber-500' : 'bg-primary';
 
   const handleRefreshToken = async () => {
@@ -83,7 +86,14 @@ const DashboardPage: React.FC = () => {
       <div className="stats-grid">
         <StatCard label="DMs Sent"     value={loading ? '—' : stats?.dms_sent_this_month ?? 0} sub="this month"                              icon={<MessageSquare size={18} className="text-indigo-600"/>} iconBg="bg-indigo-50"  delay={0}   />
         <StatCard label="Active Rules" value={loading ? '—' : stats?.active_rules ?? 0}                                                      icon={<Zap            size={18} className="text-emerald-600"/>} iconBg="bg-emerald-50" delay={60}  />
-        <StatCard label="Monthly Limit" value={loading ? '—' : stats?.dm_limit ?? 200}         sub={`${usagePct}% used`}                     icon={<BarChart2      size={18} className="text-amber-600"/>}  iconBg="bg-amber-50"   delay={120} />
+        <StatCard
+          label="Monthly Limit"
+          value={loading ? '—' : (hasLimit ? stats?.dm_limit ?? 0 : 'Unlimited')}
+          sub={loading ? undefined : (hasLimit ? `${usagePct}% used` : 'Unlimited usage')}
+          icon={<BarChart2 size={18} className="text-amber-600"/>}
+          iconBg="bg-amber-50"
+          delay={120}
+        />
         <StatCard label="Current Plan" value={loading ? '—' : toTitleCase(stats?.plan ?? 'free')} sub={stats?.plan === 'free' ? 'Upgrade for more' : 'Active'} icon={<CreditCard     size={18} className="text-violet-600"/>} iconBg="bg-violet-50"  delay={180} />
       </div>
 
@@ -92,15 +102,18 @@ const DashboardPage: React.FC = () => {
         <div className="card mb-5">
           <div className="card-header">
             <span className="card-title flex items-center gap-2"><TrendingUp size={15} className="text-slate-400"/>DM Usage this month</span>
-            {usagePct >= 90 && <Badge variant="red" dot>Near limit</Badge>}
+            {hasLimit && usagePct >= 90 && <Badge variant="red" dot>Near limit</Badge>}
           </div>
           <div className="card-body">
             <div className="flex justify-between text-xs text-slate-500 mb-2">
               <span>{stats.dms_sent_this_month} sent</span>
-              <span>{stats.dm_limit} limit</span>
+              <span>{hasLimit ? `${stats.dm_limit} limit` : 'Unlimited'}</span>
             </div>
             <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-              <div className={`h-full rounded-full transition-all duration-700 ${usageColor}`} style={{ width: `${usagePct}%` }} />
+              <div
+                className={`h-full rounded-full transition-all duration-700 ${hasLimit ? usageColor : 'bg-emerald-500'}`}
+                style={{ width: hasLimit ? `${usagePct}%` : '100%' }}
+              />
             </div>
             {stats.plan === 'free' && (
               <p className="text-xs text-slate-400 mt-2">
