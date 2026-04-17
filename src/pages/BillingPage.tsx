@@ -137,7 +137,7 @@ const BillingPage: React.FC = () => {
     setPortalLoading(true); setError('');
     try {
       const { portal_url } = await getCustomerPortalUrl();
-      window.open(portal_url, '_blank');
+      window.open(portal_url, '_blank', 'noopener,noreferrer');
     } catch (err: any) {
       setError(err.message || 'Failed to open billing portal.');
     } finally { setPortalLoading(false); }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Users, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
-import { requireAuth, getProfile } from '../lib/api';
+import { requireAuth, getProfile, getContacts, getContactStats } from '../lib/api';
 import { Badge } from '../components/ui/Badge';
 import '../styles/dashboard.css';
 
@@ -19,20 +19,6 @@ interface Contact {
 interface ContactStats {
   total: number;
   limit: number | null;
-}
-
-const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://api.pinguru.me' : '/api')).replace(/\/$/, '');
-
-async function getContacts(page: number): Promise<{ contacts: Contact[]; total: number }> {
-  const res = await fetch(`${API}/contacts?page=${page}&limit=20`, { credentials: 'include' });
-  if (!res.ok) return { contacts: [], total: 0 };
-  return res.json();
-}
-
-async function getContactStats(): Promise<ContactStats> {
-  const res = await fetch(`${API}/contacts/stats`, { credentials: 'include' });
-  if (!res.ok) return { total: 0, limit: null };
-  return res.json();
 }
 
 const ContactsPage: React.FC = () => {

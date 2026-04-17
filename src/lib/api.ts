@@ -4,6 +4,22 @@ import type { User, DashboardStats, Rule, RuleCreatePayload, AnalyticsData } fro
 
 const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://api.pinguru.me' : '/api')).replace(/\/$/, '');
 
+export interface ContactRecord {
+  id: string;
+  ig_user_id: string;
+  ig_username?: string;
+  display_name?: string;
+  trigger_type?: string;
+  dm_count: number;
+  first_seen_at: string;
+  last_seen_at: string;
+}
+
+export interface ContactStats {
+  total: number;
+  limit: number | null;
+}
+
 type BackendRule = {
   _id?: string;
   id?: string;
@@ -143,6 +159,28 @@ export async function requestDataDeletion() {
   const res = await authFetch('/auth/data-deletion', { method: 'POST' });
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'Failed to request data deletion');
+}
+
+export async function getContacts(page: number, limit = 20): Promise<{ contacts: ContactRecord[]; total: number }> {
+  const res = await authFetch(`/contacts?page=${page}&limit=${limit}`);
+  if (res.status === 401) { window.location.href = '/login'; return { contacts: [], total: 0 }; }
+  const data = await res.json();
+  if (!res.ok) throw new Error(asErrorMessage(data, 'Failed to get contacts'));
+  return {
+    contacts: Array.isArray(data?.contacts) ? data.contacts as ContactRecord[] : [],
+    total: Number(data?.total ?? 0),
+  };
+}
+
+export async function getContactStats(): Promise<ContactStats> {
+  const res = await authFetch('/contacts/stats');
+  if (res.status === 401) { window.location.href = '/login'; return { total: 0, limit: null }; }
+  const data = await res.json();
+  if (!res.ok) throw new Error(asErrorMessage(data, 'Failed to get contact stats'));
+  return {
+    total: Number(data?.total ?? 0),
+    limit: data?.limit === null || data?.limit === undefined ? null : Number(data.limit),
+  };
 }
 
 export async function getDashboardStats(): Promise<DashboardStats | null> {
