@@ -187,7 +187,7 @@ const ContactsPage: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <Badge variant="default">{triggerLabel(c.trigger_type)}</Badge>
+                      <Badge variant="gray">{triggerLabel(c.trigger_type)}</Badge>
                     </td>
                     <td className="px-4 py-3 font-semibold text-slate-700">{c.dm_count}</td>
                     <td className="px-4 py-3 text-slate-500">{formatDate(c.first_seen_at)}</td>
