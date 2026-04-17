@@ -14,8 +14,9 @@ export function toTitleCase(value = ''): string {
   return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
 }
 
-export function getDisplayName(profile: { instagram_username?: string; email?: string; first_name?: string } | null): string {
+export function getDisplayName(profile: { instagram_username?: string; email?: string; first_name?: string; last_name?: string; display_name?: string } | null): string {
   if (!profile) return 'User';
+  if (profile.display_name) return profile.display_name;
   if (profile.first_name) return profile.first_name;
   if (profile.instagram_username) return `@${profile.instagram_username}`;
   if (profile.email) return profile.email.split('@')[0];

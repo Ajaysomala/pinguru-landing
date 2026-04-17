@@ -122,14 +122,18 @@ export async function getProfile(): Promise<User | null> {
 }
 
 export async function updateOnboarding(payload: { first_name: string; last_name: string; business_category: string }) {
-  const res = await authFetch('/auth/profile', { method: 'PATCH', body: JSON.stringify({ ...payload, onboarding_complete: true }) });
+  const displayName = [payload.first_name, payload.last_name].filter(Boolean).join(' ').trim();
+  const res = await authFetch('/auth/profile', { method: 'PATCH', body: JSON.stringify({ ...payload, display_name: displayName || payload.first_name, onboarding_complete: true }) });
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'Failed to update profile');
   return data as User;
 }
 
 export async function updateProfile(payload: Partial<User>) {
-  const res = await authFetch('/auth/profile', { method: 'PATCH', body: JSON.stringify(payload) });
+  const displayName = [payload.first_name, payload.last_name].filter(Boolean).join(' ').trim();
+  const body: Record<string, unknown> = { ...payload };
+  if (displayName) body.display_name = displayName;
+  const res = await authFetch('/auth/profile', { method: 'PATCH', body: JSON.stringify(body) });
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'Failed to update profile');
   return data as User;

@@ -26,13 +26,23 @@ const SettingsPage: React.FC = () => {
   const [pauseHours, setPauseHours] = useState(false);
   const [usageAlert, setUsageAlert] = useState(true);
 
+  const splitDisplayName = (name?: string) => {
+    if (!name) return { first: '', last: '' };
+    const parts = name.trim().split(/\s+/);
+    return {
+      first: parts[0] ?? '',
+      last: parts.slice(1).join(' '),
+    };
+  };
+
   useEffect(() => {
     requireAuth().then(ok => { if (!ok) navigate('/login'); });
     getProfile().then(p => {
       if (!p) return;
       setUser(p);
-      setFirstName(p.first_name ?? '');
-      setLastName(p.last_name ?? '');
+      const displayNameParts = splitDisplayName(p.display_name);
+      setFirstName(p.first_name ?? displayNameParts.first);
+      setLastName(p.last_name ?? displayNameParts.last);
       setCategory(p.business_category ?? '');
     }).finally(() => setLoading(false));
   }, [navigate]);
