@@ -72,7 +72,7 @@ const OnboardingPage: React.FC = () => {
               <div className="form-group">
                 <label className="form-label">First Name <span className="text-danger">*</span></label>
                 <input
-                  type="text" className="form-input" placeholder="Ajay"
+                  type="text" className="form-input" placeholder="e.g. Sarah"
                   value={firstName} onChange={e => setFirstName(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleNext()}
                   autoFocus
@@ -81,7 +81,7 @@ const OnboardingPage: React.FC = () => {
               <div className="form-group">
                 <label className="form-label">Last Name</label>
                 <input
-                  type="text" className="form-input" placeholder="Somala"
+                  type="text" className="form-input" placeholder="e.g. Johnson"
                   value={lastName} onChange={e => setLastName(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleNext()}
                 />
