@@ -59,9 +59,13 @@ const DashboardPage: React.FC = () => {
   ];
   const allDone = steps.every(s => s.done);
 
-  const hasLimit = stats?.dm_limit !== null && stats?.dm_limit !== undefined;
+  const rawLimit = stats?.dm_limit;
+  const isUnlimited =
+    !!stats &&
+    (rawLimit === null || rawLimit === undefined || (typeof rawLimit === 'number' && rawLimit <= 0 && stats.plan !== 'free'));
+  const hasLimit = !!stats && !isUnlimited && typeof rawLimit === 'number' && rawLimit > 0;
   const usagePct = stats && hasLimit
-    ? Math.min(100, Math.round((stats.dms_sent_this_month / (stats.dm_limit as number)) * 100))
+    ? Math.min(100, Math.round((stats.dms_sent_this_month / (rawLimit as number)) * 100))
     : 0;
   const usageColor = usagePct >= 90 ? 'bg-rose-500' : usagePct >= 70 ? 'bg-amber-500' : 'bg-primary';
 
@@ -88,8 +92,8 @@ const DashboardPage: React.FC = () => {
         <StatCard label="Active Rules" value={loading ? '—' : stats?.active_rules ?? 0}                                                      icon={<Zap            size={18} className="text-emerald-600"/>} iconBg="bg-emerald-50" delay={60}  />
         <StatCard
           label="Monthly Limit"
-          value={loading ? '—' : (hasLimit ? stats?.dm_limit ?? 0 : 'Unlimited')}
-          sub={loading ? undefined : (hasLimit ? `${usagePct}% used` : 'Unlimited usage')}
+          value={loading ? '—' : (hasLimit ? rawLimit ?? 0 : 'Unlimited')}
+          sub={loading ? undefined : (hasLimit ? `${usagePct}% used` : `${toTitleCase(stats?.plan ?? 'pro')} plan`) }
           icon={<BarChart2 size={18} className="text-amber-600"/>}
           iconBg="bg-amber-50"
           delay={120}
@@ -107,7 +111,7 @@ const DashboardPage: React.FC = () => {
           <div className="card-body">
             <div className="flex justify-between text-xs text-slate-500 mb-2">
               <span>{stats.dms_sent_this_month} sent</span>
-              <span>{hasLimit ? `${stats.dm_limit} limit` : 'Unlimited'}</span>
+              <span>{hasLimit ? `${rawLimit} limit` : 'Unlimited'}</span>
             </div>
             <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
               <div
