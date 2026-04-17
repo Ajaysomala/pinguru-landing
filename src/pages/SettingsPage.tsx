@@ -249,11 +249,18 @@ const SettingsPage: React.FC = () => {
                 Re-authenticate
               </button>
               <a
+                href="/support"
+                className="flex items-center gap-2 py-2.5 px-4 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+              >
+                <Shield size={14}/>
+                Open Support Center
+              </a>
+              <a
                 href="mailto:support@pinguru.me"
                 className="flex items-center gap-2 py-2.5 px-4 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
               >
                 <Shield size={14}/>
-                Contact Support
+                Email Support
               </a>
             </div>
           </div>

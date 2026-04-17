@@ -16,6 +16,7 @@ const Navbar: React.FC = () => (
     <div className="landing-nav-links">
       <a href="#features" className="landing-nav-link">Features</a>
       <a href="#pricing"  className="landing-nav-link">Pricing</a>
+      <Link to="/support" className="landing-nav-link">Support</Link>
       <Link to="/login"    className="landing-nav-link">Log in</Link>
       <Link
         to="/register"
@@ -285,6 +286,7 @@ const LandingPage: React.FC = () => {
       <footer className="landing-footer">
         <p className="landing-footer-text">© {new Date().getFullYear()} PinGuru. All rights reserved.</p>
         <div className="landing-footer-links">
+          <Link to="/support" className="landing-footer-link">Support Center</Link>
           <Link to="/privacy" className="landing-footer-link">Privacy Policy</Link>
           <Link to="/terms"   className="landing-footer-link">Terms of Service</Link>
           <a href="mailto:support@pinguru.me" className="landing-footer-link">Contact</a>

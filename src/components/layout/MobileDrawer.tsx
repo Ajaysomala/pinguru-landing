@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Zap, Camera, BarChart2, CreditCard, Settings, LogOut, X } from 'lucide-react';
+import { LayoutDashboard, Zap, Camera, BarChart2, CreditCard, Settings, LogOut, X, LifeBuoy } from 'lucide-react';
 import { logout } from '../../lib/api';
 import { getInitial, getDisplayName, toTitleCase } from '../../lib/utils';
 import type { User } from '../../lib/types';
@@ -18,6 +18,7 @@ const navItems = [
   { label: 'Analytics',  href: '/analytics',  icon: BarChart2 },
   { label: 'Billing',    href: '/billing',    icon: CreditCard },
   { label: 'Settings',   href: '/settings',   icon: Settings },
+  { label: 'Support',    href: '/support',    icon: LifeBuoy },
 ];
 
 export const MobileDrawer: React.FC<MobileDrawerProps> = ({ open, onClose, user }) => {

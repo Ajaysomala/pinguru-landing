@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Zap, Camera, BarChart2,
-  CreditCard, Settings, LogOut, Users
+  CreditCard, Settings, LogOut, Users, LifeBuoy
 } from 'lucide-react';
 import { logout } from '../../lib/api';
 import { getInitial, getDisplayName, toTitleCase } from '../../lib/utils';
@@ -67,6 +67,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ user }) => {
         >
           <Settings size={18} className="flex-shrink-0" />
           Settings
+        </NavLink>
+        <NavLink
+          to="/support"
+          className={({ isActive }) =>
+            `flex items-center gap-2.5 px-2.5 py-[9px] rounded-lg text-sm font-medium mb-0.5 no-underline transition-all duration-150 ${
+              isActive ? 'bg-indigo-900 text-white' : 'text-white/60 hover:bg-white/[0.06] hover:text-white'
+            }`
+          }
+        >
+          <LifeBuoy size={18} className="flex-shrink-0" />
+          Support
         </NavLink>
       </nav>
 

@@ -17,6 +17,7 @@ const BillingPage    = React.lazy(() => import('./pages/BillingPage'));
 const SettingsPage   = React.lazy(() => import('./pages/SettingsPage'));
 const PrivacyPage    = React.lazy(() => import('./pages/PrivacyPage'));
 const TermsPage      = React.lazy(() => import('./pages/TermsPage'));
+const SupportPage    = React.lazy(() => import('./pages/SupportPage'));
 
 const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [status, setStatus] = useState<'checking' | 'ok' | 'fail'>('checking');
@@ -80,6 +81,7 @@ const App: React.FC = () => (
       <Route path="/verify"   element={<PublicOnly><Page><VerifyPage /></Page></PublicOnly>} />
       <Route path="/privacy"  element={<Page><PrivacyPage /></Page>} />
       <Route path="/terms"    element={<Page><TermsPage /></Page>} />
+      <Route path="/support"  element={<Page><SupportPage /></Page>} />
 
       {/* Onboarding */}
       <Route path="/onboarding" element={

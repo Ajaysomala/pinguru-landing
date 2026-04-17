@@ -11,6 +11,7 @@
 @import './styles/settings.css';
 @import './styles/landing.css';
 @import './styles/legal.css';
+@import './styles/support.css';
 
 @tailwind base;
 @tailwind components;
