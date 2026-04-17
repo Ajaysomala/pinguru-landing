@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Zap, Camera, BarChart2,
-  CreditCard, Settings, LogOut
+  CreditCard, Settings, LogOut, Users
 } from 'lucide-react';
 import { logout } from '../../lib/api';
 import { getInitial, getDisplayName, toTitleCase } from '../../lib/utils';
@@ -13,11 +13,12 @@ interface SidebarProps {
 }
 
 const navItems = [
-  { label: 'Dashboard',   href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Automation',  href: '/rules',      icon: Zap },
-  { label: 'Instagram',   href: '/connect',    icon: Camera },
-  { label: 'Analytics',   href: '/analytics',  icon: BarChart2 },
-  { label: 'Billing',     href: '/billing',    icon: CreditCard },
+  { label: 'Dashboard',  href: '/dashboard', icon: LayoutDashboard },
+  { label: 'Automation', href: '/rules',      icon: Zap },
+  { label: 'Instagram',  href: '/connect',    icon: Camera },
+  { label: 'Contacts',   href: '/contacts',   icon: Users },
+  { label: 'Analytics',  href: '/analytics',  icon: BarChart2 },
+  { label: 'Billing',    href: '/billing',    icon: CreditCard },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({ user }) => {
