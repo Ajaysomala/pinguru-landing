@@ -1,4 +1,4 @@
-import type { User, DashboardStats, Rule, RuleCreatePayload, AnalyticsData } from './types';
+import type { User, DashboardStats, Rule, RuleCreatePayload, AnalyticsData, PlanStatus } from './types';
 
 const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://api.pinguru.me' : '/api')).replace(/\/$/, '');
 
@@ -59,6 +59,14 @@ function asErrorMessage(input: unknown, fallback: string): string {
     }
   }
   return fallback;
+}
+
+type ApiRequestError = Error & { status?: number };
+
+function createApiRequestError(status: number, detail: unknown, fallback: string): ApiRequestError {
+  const err = new Error(asErrorMessage(detail, fallback)) as ApiRequestError;
+  err.status = status;
+  return err;
 }
 
 async function authFetch(path: string, options: RequestInit = {}): Promise<Response> {
@@ -255,11 +263,22 @@ export async function getPlans() {
   return data;
 }
 
-export async function createCheckoutSession(planId: string): Promise<{ checkout_url: string }> {
-  const res = await authFetch('/billing/create-checkout', { method: 'POST', body: JSON.stringify({ plan: planId }) });
+export async function getPlanStatus(): Promise<PlanStatus> {
+  const res = await authFetch('/plans/status', { method: 'GET' });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.detail || 'Failed to create checkout');
-  return data;
+  if (!res.ok) {
+    throw createApiRequestError(res.status, data, 'Failed to fetch plan status');
+  }
+  return data as PlanStatus;
+}
+
+export async function createPlanCheckout(plan: 'starter' | 'pro'): Promise<{ checkout_url: string }> {
+  const res = await authFetch(`/plans/checkout/${plan}`, { method: 'POST' });
+  const data = await res.json();
+  if (!res.ok) {
+    throw createApiRequestError(res.status, data, 'Failed to create payment session');
+  }
+  return data as { checkout_url: string };
 }
 
 export async function getCustomerPortalUrl(): Promise<{ portal_url: string }> {

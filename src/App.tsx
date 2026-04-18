@@ -13,7 +13,7 @@ const ConnectPage    = React.lazy(() => import('./pages/ConnectPage'));
 const RulesPage      = React.lazy(() => import('./pages/RulesPage'));
 const ContactsPage   = React.lazy(() => import('./pages/ContactsPage'));
 const AnalyticsPage  = React.lazy(() => import('./pages/AnalyticsPage'));
-const BillingPage    = React.lazy(() => import('./pages/BillingPage'));
+const BillingPage    = React.lazy(() => import('./pages/BillingPage.tsx'));
 const SettingsPage   = React.lazy(() => import('./pages/SettingsPage'));
 const RefundPage     = React.lazy(() => import('./pages/RefundPage.tsx'));
 const PrivacyPage    = React.lazy(() => import('./pages/PrivacyPage'));

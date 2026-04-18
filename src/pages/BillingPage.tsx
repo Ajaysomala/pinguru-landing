@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Check, Zap, Users, CreditCard, ExternalLink, AlertCircle, MessageSquare } from 'lucide-react';
-import { getProfile, createCheckoutSession, getCustomerPortalUrl, requireAuth } from '../lib/api';
-import type { User } from '../lib/types';
+import { createPlanCheckout, getCustomerPortalUrl, getPlanStatus, requireAuth } from '../lib/api';
+import type { PlanStatus } from '../lib/types';
 import '../styles/dashboard.css';
 import '../styles/billing.css';
-
-type BillingCycle = 'monthly' | 'quarterly' | 'annually';
 
 interface PlanDef {
   id: 'free' | 'starter' | 'pro';
@@ -16,7 +14,13 @@ interface PlanDef {
   features: string[];
   highlight: { rules: string; dms: string; contacts: string };
   popular?: boolean;
-  stripePlanIds: { monthly: string; quarterly: string; annually: string };
+}
+
+type StatusBannerKind = 'processing' | 'success' | 'timeout';
+
+interface StatusBanner {
+  kind: StatusBannerKind;
+  message: string;
 }
 
 const PLANS: PlanDef[] = [
@@ -34,7 +38,6 @@ const PLANS: PlanDef[] = [
       'Email support',
       'Meta webhook integration',
     ],
-    stripePlanIds: { monthly: '', quarterly: '', annually: '' },
   },
   {
     id: 'starter',
@@ -52,11 +55,6 @@ const PLANS: PlanDef[] = [
       'Performance tracking',
     ],
     popular: true,
-    stripePlanIds: {
-      monthly:   'starter_monthly',
-      quarterly: 'starter_quarterly',
-      annually:  'starter_annually',
-    },
   },
   {
     id: 'pro',
@@ -73,80 +71,167 @@ const PLANS: PlanDef[] = [
       'Custom response templates',
       'Remove "Powered by PinGuru"',
     ],
-    stripePlanIds: {
-      monthly:   'pro_monthly',
-      quarterly: 'pro_quarterly',
-      annually:  'pro_annually',
-    },
   },
 ];
 
-const CYCLE_DISCOUNT: Record<BillingCycle, number> = {
-  monthly:   0,
-  quarterly: 0.10,
-  annually:  0.20,
-};
+function getCheckoutErrorMessage(status?: number, fallback?: string): string {
+  if (status === 400) return 'Cannot checkout free plan. Only upgrades are allowed.';
+  if (status === 409) return 'A checkout is already pending confirmation.';
+  if (status === 503) return 'Payments temporarily unavailable. The selected plan is not configured right now.';
+  if (status === 502) return 'Failed to create payment session. Please try again in a moment.';
+  return fallback || 'Failed to start checkout. Please try again.';
+}
 
-const CYCLE_LABEL: Record<BillingCycle, string> = {
-  monthly:   '/mo',
-  quarterly: '/mo',
-  annually:  '/mo',
-};
-
-function getDisplayPrice(base: number, cycle: BillingCycle) {
-  if (base === 0) return { price: 0, total: 0 };
-  const discounted = Math.round(base * (1 - CYCLE_DISCOUNT[cycle]));
-  const total = cycle === 'quarterly' ? discounted * 3 : cycle === 'annually' ? discounted * 12 : discounted;
-  return { price: discounted, total };
+function formatProvider(provider: string | null | undefined): string {
+  if (!provider) return 'Unknown';
+  if (provider.toLowerCase() === 'razorpay') return 'Razorpay';
+  return provider;
 }
 
 const BillingPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [user, setUser]                 = useState<User | null>(null);
-  const [loading, setLoading]           = useState(true);
-  const [upgrading, setUpgrading]       = useState<string | null>(null);
-  const [portalLoading, setPortalLoading] = useState(false);
-  const [error, setError]               = useState('');
-  const [cycle, setCycle]               = useState<BillingCycle>('monthly');
 
-  const upgraded = searchParams.get('upgraded') === 'true';
-  const simulated = searchParams.get('simulated') === 'true';
-  const upgradedPlan = searchParams.get('plan');
+  const [planStatus, setPlanStatus] = useState<PlanStatus | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [upgrading, setUpgrading] = useState<'starter' | 'pro' | null>(null);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [banner, setBanner] = useState<StatusBanner | null>(null);
+
+  const hasProcessingParam = searchParams.get('payment') === 'processing';
+
+  const fetchStatus = useCallback(async (): Promise<PlanStatus> => {
+    const status = await getPlanStatus();
+    setPlanStatus(status);
+    return status;
+  }, []);
 
   useEffect(() => {
-    requireAuth().then(ok => { if (!ok) navigate('/login'); });
-    getProfile().then(p => setUser(p)).finally(() => setLoading(false));
-  }, [navigate]);
+    let cancelled = false;
 
-  const currentPlan = user?.plan ?? 'free';
+    const init = async () => {
+      try {
+        const ok = await requireAuth();
+        if (!ok) {
+          navigate('/login');
+          return;
+        }
+        if (!cancelled) {
+          await fetchStatus();
+        }
+      } catch (err: any) {
+        if (!cancelled) {
+          setError(err?.message || 'Failed to load billing status.');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    init();
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchStatus, navigate]);
+
+  useEffect(() => {
+    if (!planStatus) return;
+
+    const shouldPoll = hasProcessingParam || planStatus.is_checkout_pending;
+    if (!shouldPoll) return;
+
+    let active = true;
+    let elapsed = 0;
+    const intervalMs = 4000;
+    const timeoutMs = 90000;
+
+    setBanner({ kind: 'processing', message: 'Processing payment. Waiting for Razorpay confirmation...' });
+
+    const poll = async () => {
+      if (!active) return;
+      elapsed += intervalMs;
+
+      try {
+        const latest = await fetchStatus();
+        const paidActivated = latest.is_active_paid && (latest.current_plan === 'starter' || latest.current_plan === 'pro');
+
+        if (paidActivated) {
+          setBanner({ kind: 'success', message: `Payment confirmed. Your ${latest.current_plan} plan is now active.` });
+          active = false;
+          return;
+        }
+
+        if (elapsed >= timeoutMs) {
+          setBanner({ kind: 'timeout', message: 'Payment is still processing. Please refresh again in a few minutes.' });
+          active = false;
+        }
+      } catch {
+        if (elapsed >= timeoutMs) {
+          setBanner({ kind: 'timeout', message: 'Payment status check timed out. Please refresh again in a few minutes.' });
+          active = false;
+        }
+      }
+    };
+
+    const id = window.setInterval(() => {
+      void poll();
+    }, intervalMs);
+
+    void poll();
+
+    return () => {
+      active = false;
+      window.clearInterval(id);
+    };
+  }, [fetchStatus, hasProcessingParam, planStatus]);
+
+  const currentPlan = planStatus?.current_plan ?? 'free';
+  const pendingPlan = planStatus?.pending_plan;
+
+  const isCurrent = (planId: PlanDef['id']) => planId === currentPlan;
+
+  const isUpgrade = useMemo(() => {
+    const order = { free: 0, starter: 1, pro: 2 };
+    return (planId: PlanDef['id']) => {
+      return (order[planId] ?? 0) > (order[currentPlan] ?? 0);
+    };
+  }, [currentPlan]);
 
   const handleUpgrade = async (plan: PlanDef) => {
-    const planId = plan.stripePlanIds[cycle];
-    if (!planId) return;
-    setUpgrading(plan.id); setError('');
+    if (plan.id === 'free') {
+      setError('Cannot checkout free plan. Only upgrades are allowed.');
+      return;
+    }
+    if (planStatus?.is_checkout_pending) {
+      setError('A checkout is already pending confirmation. Please wait for it to complete.');
+      return;
+    }
+
+    setUpgrading(plan.id);
+    setError('');
+
     try {
-      const { checkout_url } = await createCheckoutSession(planId);
+      const { checkout_url } = await createPlanCheckout(plan.id);
       window.location.href = checkout_url;
     } catch (err: any) {
-      setError(err.message || 'Failed to start checkout. Please try again.');
-    } finally { setUpgrading(null); }
+      setError(getCheckoutErrorMessage(err?.status, err?.message));
+    } finally {
+      setUpgrading(null);
+    }
   };
 
   const handleManagePortal = async () => {
-    setPortalLoading(true); setError('');
+    setPortalLoading(true);
+    setError('');
     try {
       const { portal_url } = await getCustomerPortalUrl();
       window.open(portal_url, '_blank', 'noopener,noreferrer');
     } catch (err: any) {
-      setError(err.message || 'Failed to open billing portal.');
-    } finally { setPortalLoading(false); }
-  };
-
-  const isCurrent = (planId: string) => planId === currentPlan;
-  const isUpgrade = (planId: string) => {
-    const order = { free: 0, starter: 1, pro: 2 };
-    return (order[planId as keyof typeof order] ?? 0) > (order[currentPlan as keyof typeof order] ?? 0);
+      setError(err?.message || 'Failed to open billing portal.');
+    } finally {
+      setPortalLoading(false);
+    }
   };
 
   return (
@@ -158,33 +243,38 @@ const BillingPage: React.FC = () => {
 
       {error && (
         <div className="flex items-center gap-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl px-4 py-3 mb-6 text-sm">
-          <AlertCircle size={15} className="flex-shrink-0"/>
+          <AlertCircle size={15} className="flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      {upgraded && (
-        <div className="flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-3 mb-6 text-sm">
-          <Check size={15} className="flex-shrink-0"/>
-          <span>
-            {simulated
-              ? `Upgrade successful (simulated mode). Plan set to ${upgradedPlan || 'selected plan'}.`
-              : `Upgrade successful. ${upgradedPlan ? `You are now on ${upgradedPlan}.` : 'Your plan is now active.'}`}
-          </span>
+      {banner && (
+        <div className={`flex items-center gap-2.5 rounded-xl px-4 py-3 mb-6 text-sm border ${
+          banner.kind === 'success'
+            ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+            : banner.kind === 'processing'
+              ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
+              : 'bg-amber-50 border-amber-200 text-amber-800'
+        }`}>
+          {banner.kind === 'success' ? <Check size={15} className="flex-shrink-0" /> : <AlertCircle size={15} className="flex-shrink-0" />}
+          <span>{banner.message}</span>
         </div>
       )}
 
-      {/* Current plan banner */}
-      {!loading && currentPlan !== 'free' && (
+      {/* Current plan + backend status */}
+      {!loading && planStatus && (
         <div className="billing-info-card mb-6">
           <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
-            <CreditCard size={17} className="text-primary"/>
+            <CreditCard size={17} className="text-primary" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-slate-800">
-              You're on the <span className="text-primary">{PLANS.find(p => p.id === currentPlan)?.name}</span> plan
+              Current plan: <span className="text-primary capitalize">{planStatus.current_plan}</span>
+              {planStatus.pending_plan && <span className="text-amber-700"> · Pending: {planStatus.pending_plan}</span>}
             </p>
-            <p className="text-xs text-slate-500 mt-0.5">Manage invoices, update payment method, or cancel anytime.</p>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Provider: {formatProvider(planStatus.payment_provider)} · Subscription: {planStatus.subscription_id || 'none'} · Paid active: {planStatus.is_active_paid ? 'yes' : 'no'}
+            </p>
           </div>
           <button
             onClick={handleManagePortal}
@@ -192,39 +282,16 @@ const BillingPage: React.FC = () => {
             className="flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold text-primary bg-white border border-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors disabled:opacity-50"
           >
             {portalLoading ? (
-              <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-            ) : <ExternalLink size={12}/>}
+              <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+            ) : <ExternalLink size={12} />}
             Manage
           </button>
         </div>
       )}
 
-      {/* Billing cycle toggle */}
-      <div className="flex items-center justify-center mb-8">
-        <div className="inline-flex items-center gap-1 bg-slate-100 rounded-xl p-1">
-          {(['monthly', 'quarterly', 'annually'] as BillingCycle[]).map(c => (
-            <button
-              key={c}
-              onClick={() => setCycle(c)}
-              className={`relative px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
-                cycle === c ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              {c.charAt(0).toUpperCase() + c.slice(1)}
-              {c !== 'monthly' && (
-                <span className="ml-1.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">
-                  -{CYCLE_DISCOUNT[c] * 100}%
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Plans grid */}
       <div className="billing-grid">
         {PLANS.map(plan => {
-          const { price, total } = getDisplayPrice(plan.monthlyPrice, cycle);
           return (
             <div
               key={plan.id}
@@ -232,11 +299,11 @@ const BillingPage: React.FC = () => {
             >
               {isCurrent(plan.id) && <div className="plan-badge current-badge">Current Plan</div>}
               {plan.popular && !isCurrent(plan.id) && <div className="plan-badge">Most Popular</div>}
+              {pendingPlan === plan.id && <div className="plan-badge" style={{ top: 42, background: '#f59e0b' }}>Pending Confirmation</div>}
 
               <div className="plan-name">{plan.name}</div>
               <div className="plan-description">{plan.description}</div>
 
-              {/* Price */}
               <div className="plan-price">
                 {plan.monthlyPrice === 0 ? (
                   <>
@@ -244,50 +311,40 @@ const BillingPage: React.FC = () => {
                     <span className="plan-price-period">forever</span>
                   </>
                 ) : (
-                  <div className="flex flex-col">
-                    <div className="flex items-end gap-1">
-                      <span className="plan-price-currency">₹</span>
-                      <span className="plan-price-amount">{price}</span>
-                      <span className="plan-price-period">{CYCLE_LABEL[cycle]}</span>
-                    </div>
-                    {cycle !== 'monthly' && (
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        billed ₹{total} {cycle === 'quarterly' ? 'every 3 months' : 'yearly'}
-                      </p>
-                    )}
+                  <div className="flex items-end gap-1">
+                    <span className="plan-price-currency">₹</span>
+                    <span className="plan-price-amount">{plan.monthlyPrice}</span>
+                    <span className="plan-price-period">/mo</span>
                   </div>
                 )}
               </div>
 
-              {/* Highlights */}
               <div className="flex flex-col gap-1.5 mb-4">
                 <div className="flex items-center gap-2 text-sm">
-                  <Zap size={13} className="text-primary flex-shrink-0"/>
+                  <Zap size={13} className="text-primary flex-shrink-0" />
                   <span className="font-medium text-slate-700">{plan.highlight.rules}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <MessageSquare size={13} className="text-slate-400 flex-shrink-0"/>
+                  <MessageSquare size={13} className="text-slate-400 flex-shrink-0" />
                   <span className="text-slate-600">{plan.highlight.dms}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <Users size={13} className="text-slate-400 flex-shrink-0"/>
+                  <Users size={13} className="text-slate-400 flex-shrink-0" />
                   <span className="text-slate-600">{plan.highlight.contacts}</span>
                 </div>
               </div>
 
-              <div className="plan-divider"/>
+              <div className="plan-divider" />
 
-              {/* Features */}
               <ul className="plan-features">
                 {plan.features.map(f => (
                   <li key={f} className="plan-feature">
-                    <div className="plan-feature-check"><Check size={10}/></div>
+                    <div className="plan-feature-check"><Check size={10} /></div>
                     {f}
                   </li>
                 ))}
               </ul>
 
-              {/* CTA */}
               {isCurrent(plan.id) ? (
                 <button disabled className="w-full py-2.5 text-sm font-semibold text-slate-400 bg-slate-100 rounded-xl cursor-not-allowed">
                   Current Plan
@@ -295,19 +352,19 @@ const BillingPage: React.FC = () => {
               ) : isUpgrade(plan.id) ? (
                 <button
                   onClick={() => handleUpgrade(plan)}
-                  disabled={!!upgrading}
+                  disabled={!!upgrading || planStatus?.is_checkout_pending}
                   className="w-full py-2.5 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-indigo-700 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {upgrading === plan.id ? (
-                    <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>Redirecting…</>
-                  ) : `Upgrade to ${plan.name}`}
+                    <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Redirecting...</>
+                  ) : planStatus?.is_checkout_pending ? 'Checkout Pending' : `Upgrade to ${plan.name}`}
                 </button>
               ) : (
                 <button
                   onClick={handleManagePortal}
                   className="w-full py-2.5 text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
                 >
-                  Downgrade
+                  Manage in Portal
                 </button>
               )}
             </div>
@@ -315,7 +372,6 @@ const BillingPage: React.FC = () => {
         })}
       </div>
 
-      {/* All plans include */}
       <div className="mt-8 p-5 bg-slate-50 border border-slate-200 rounded-xl">
         <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">All plans include</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -326,7 +382,7 @@ const BillingPage: React.FC = () => {
             'Real-time analytics',
           ].map(f => (
             <div key={f} className="flex items-center gap-1.5 text-xs text-slate-600">
-              <Check size={12} className="text-success flex-shrink-0"/>
+              <Check size={12} className="text-success flex-shrink-0" />
               {f}
             </div>
           ))}

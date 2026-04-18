@@ -75,6 +75,15 @@ export interface ApiError {
   status?: number;
 }
 
+export interface PlanStatus {
+  current_plan: 'free' | 'starter' | 'pro';
+  pending_plan: 'free' | 'starter' | 'pro' | null;
+  subscription_id: string | null;
+  is_active_paid: boolean;
+  is_checkout_pending: boolean;
+  payment_provider: string | null;
+}
+
 export type TriggerType = 'keyword' | 'story_mention' | 'comment' | 'new_dm';
 
 export const TRIGGER_LABELS: Record<TriggerType, string> = {
