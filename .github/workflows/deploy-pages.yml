@@ -44,6 +44,10 @@ jobs:
             sed -n '1,120p' dist/index.html
             exit 1
           fi
+          if [ ! -f dist/404.html ]; then
+            echo "ERROR: dist/404.html is missing. SPA fallback is required for direct route loads on GitHub Pages."
+            exit 1
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
