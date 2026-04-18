@@ -121,7 +121,8 @@ export async function requireAuth(): Promise<boolean> {
 
 export async function getProfile(): Promise<User | null> {
   const res = await authFetch('/auth/me');
-  if (res.status === 401) { window.location.href = '/login'; return null; }
+  // Return unauthenticated state for route guards to handle without full-page reload loops.
+  if (res.status === 401) return null;
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'Failed to get profile');
   return data;
