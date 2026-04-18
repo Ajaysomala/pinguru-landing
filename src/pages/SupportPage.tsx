@@ -71,10 +71,16 @@ const SupportPage: React.FC = () => {
             </div>
             <h2 className="text-base font-semibold text-slate-900">Policy & Compliance</h2>
             <p className="text-sm text-slate-500 mt-1">Guidance for Meta-compliant automation behavior.</p>
-            <Link to="/privacy" className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
-              Review Privacy Policy
-              <ArrowRight size={14} />
-            </Link>
+            <div className="mt-4 space-y-2">
+              <Link to="/privacy" className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+                Review Privacy Policy
+                <ArrowRight size={14} />
+              </Link>
+              <Link to="/refund" className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">
+                Review Refund Policy
+                <ArrowRight size={14} />
+              </Link>
+            </div>
           </div>
         </div>
 

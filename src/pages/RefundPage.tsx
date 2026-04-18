@@ -1,30 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, AlertTriangle, Upload, X } from 'lucide-react';
 
 const API = (import.meta.env.VITE_API_URL || 'https://api.pinguru.me').replace(/\/$/, '');
 
 const RefundPage: React.FC = () => {
   const [reason, setReason]       = useState('');
   const [paymentId, setPaymentId] = useState('');
+  const [screenshots, setScreenshots] = useState<File[]>([]);
   const [loading, setLoading]     = useState(false);
   const [success, setSuccess]     = useState('');
   const [error, setError]         = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setScreenshots([...screenshots, ...files]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const removeScreenshot = (index: number) => {
+    setScreenshots(screenshots.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = async () => {
     if (!reason.trim()) { setError('Please describe your reason for refund.'); return; }
     setLoading(true); setError(''); setSuccess('');
     try {
+      const formData = new FormData();
+      formData.append('reason', reason.trim());
+      if (paymentId.trim()) formData.append('payment_id', paymentId.trim());
+      screenshots.forEach((file, idx) => formData.append(`screenshot_${idx}`, file));
+
       const res = await fetch(`${API}/billing/refund`, {
         method: 'POST',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: reason.trim(), payment_id: paymentId.trim() || null }),
+        body: formData,
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || 'Failed to submit refund request');
       setSuccess(data.message);
-      setReason(''); setPaymentId('');
+      setReason(''); setPaymentId(''); setScreenshots([]);
     } catch (err: any) {
       setError(err.message || 'Something went wrong.');
     } finally {
@@ -98,6 +114,41 @@ const RefundPage: React.FC = () => {
                 className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none"
               />
               <p className="text-xs text-slate-400">{reason.length}/500</p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700">Payment Screenshots <span className="text-slate-400 font-normal">(optional)</span></label>
+              <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer hover:border-primary hover:bg-indigo-50/30 transition-colors" onClick={() => fileInputRef.current?.click()}>
+                <Upload size={24} className="mx-auto text-slate-400 mb-2" />
+                <p className="text-sm font-medium text-slate-700">Click to upload</p>
+                <p className="text-xs text-slate-500 mt-1">or drag and drop PNG, JPG up to 10MB</p>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              {screenshots.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-slate-600">{screenshots.length} file(s) selected</p>
+                  <div className="flex flex-wrap gap-2">
+                    {screenshots.map((file, idx) => (
+                      <div key={idx} className="inline-flex items-center gap-2 bg-slate-100 rounded-lg px-3 py-2 text-xs text-slate-700">
+                        <span className="truncate max-w-[200px]">{file.name}</span>
+                        <button
+                          onClick={() => removeScreenshot(idx)}
+                          className="text-slate-400 hover:text-rose-500 transition-colors"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <button
