@@ -27,6 +27,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const [status, setStatus] = useState<'checking' | 'ok' | 'fail'>('checking');
 
   const load = async () => {
+    setStatus('checking');
     try {
       const profile = await getProfile();
       if (profile) {

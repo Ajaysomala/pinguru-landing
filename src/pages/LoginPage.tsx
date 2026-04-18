@@ -3,10 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, AlertCircle, Lock } from 'lucide-react';
 import { loginUser } from '../lib/api';
 import { recordLoginAttempt, isLockedOut, resetLoginAttempts, formatLockoutTime } from '../lib/utils';
+import { useAuth } from '../App';
 import '../styles/auth.css';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { refresh } = useAuth();
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [showPwd, setShowPwd]   = useState(false);
@@ -36,6 +38,7 @@ const LoginPage: React.FC = () => {
     setLoading(true); setError('');
     try {
       const data = await loginUser(email, password);
+      await refresh();
       resetLoginAttempts();
       localStorage.setItem('pg_user', JSON.stringify({ plan: data.plan, instagram_connected: data.instagram_connected }));
       navigate('/dashboard');
