@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ReceiptRefundIcon, CheckCircle, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, AlertTriangle } from 'lucide-react';
 
 const API = (import.meta.env.VITE_API_URL || 'https://api.pinguru.me').replace(/\/$/, '');
 

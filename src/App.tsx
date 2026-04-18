@@ -15,7 +15,7 @@ const ContactsPage   = React.lazy(() => import('./pages/ContactsPage'));
 const AnalyticsPage  = React.lazy(() => import('./pages/AnalyticsPage'));
 const BillingPage    = React.lazy(() => import('./pages/BillingPage'));
 const SettingsPage   = React.lazy(() => import('./pages/SettingsPage'));
-const RefundPage     = React.lazy(() => import('./pages/RefundPage'));
+const RefundPage     = React.lazy(() => import('./pages/RefundPage.tsx'));
 const PrivacyPage    = React.lazy(() => import('./pages/PrivacyPage'));
 const TermsPage      = React.lazy(() => import('./pages/TermsPage'));
 const SupportPage    = React.lazy(() => import('./pages/SupportPage'));

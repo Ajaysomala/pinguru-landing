@@ -1,5 +1,3 @@
-// src/lib/api.ts — All backend calls, single source of truth
-
 import type { User, DashboardStats, Rule, RuleCreatePayload, AnalyticsData } from './types';
 
 const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://api.pinguru.me' : '/api')).replace(/\/$/, '');
@@ -47,9 +45,7 @@ function asErrorMessage(input: unknown, fallback: string): string {
   if (!input) return fallback;
   if (typeof input === 'string') return input;
   if (Array.isArray(input)) {
-    const parts = input
-      .map((item) => asErrorMessage(item, ''))
-      .filter(Boolean);
+    const parts = input.map((item) => asErrorMessage(item, '')).filter(Boolean);
     return parts.length > 0 ? parts.join(', ') : fallback;
   }
   if (typeof input === 'object') {
@@ -69,7 +65,7 @@ async function authFetch(path: string, options: RequestInit = {}): Promise<Respo
   return fetch(`${API}${path}`, {
     credentials: 'include',
     ...options,
-    headers: { 'Content-Type': 'application/json', ...(options.headers as Record<string,string> || {}) },
+    headers: { 'Content-Type': 'application/json', ...(options.headers as Record<string, string> || {}) },
   });
 }
 
@@ -110,7 +106,9 @@ export async function requireAuth(): Promise<boolean> {
   try {
     const res = await authFetch('/auth/me');
     return res.ok;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 export async function getProfile(): Promise<User | null> {
@@ -209,7 +207,10 @@ export async function toggleRule(ruleId: string): Promise<{ rule_id: string; is_
 
 export async function deleteRule(ruleId: string): Promise<void> {
   const res = await authFetch(`/automation/rules/${ruleId}`, { method: 'DELETE' });
-  if (!res.ok) { const data = await res.json(); throw new Error(data.detail || 'Failed to delete rule'); }
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.detail || 'Failed to delete rule');
+  }
 }
 
 export async function getAnalytics(days: 7 | 30 = 7): Promise<AnalyticsData[]> {
@@ -319,4 +320,34 @@ export async function getInstagramStatusLegacy() {
   const data = await res.json();
   if (!res.ok) return null;
   return data;
+}
+
+export async function getContacts(page: number = 1): Promise<{ contacts: any[]; total: number }> {
+  try {
+    const res = await authFetch(`/dashboard/contacts?page=${page}&limit=20`);
+    if (res.status === 401) { window.location.href = '/login'; return { contacts: [], total: 0 }; }
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Failed to get contacts');
+    return {
+      contacts: Array.isArray(data?.contacts) ? data.contacts : [],
+      total: data.total ?? 0,
+    };
+  } catch {
+    return { contacts: [], total: 0 };
+  }
+}
+
+export async function getContactStats(): Promise<{ total: number; limit: number | null }> {
+  try {
+    const res = await authFetch('/dashboard/contact-stats');
+    if (res.status === 401) return { total: 0, limit: null };
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Failed to get contact stats');
+    return {
+      total: data.total ?? 0,
+      limit: data.limit ?? null,
+    };
+  } catch {
+    return { total: 0, limit: null };
+  }
 }
