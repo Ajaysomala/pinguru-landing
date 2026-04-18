@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   MessageSquare, Zap, BarChart2, CreditCard,
   Camera, RefreshCw, ChevronRight, TrendingUp, CheckCircle,
 } from 'lucide-react';
-import { getDashboardStats, getInstagramStatus, refreshInstagramToken, getRules, requireAuth } from '../lib/api';
+import { getDashboardStats, getInstagramStatus, refreshInstagramToken, getRules } from '../lib/api';
 import type { DashboardStats, Rule, InstagramStatus } from '../lib/types';
 import { TRIGGER_LABELS } from '../lib/types';
 import { Badge } from '../components/ui/Badge';
@@ -12,6 +12,7 @@ import { Card, CardHeader } from '../components/ui/Card';
 import { StepChecklist } from '../components/ui/StepChecklist';
 import type { Step } from '../components/ui/StepChecklist';
 import { toTitleCase, formatRelativeTime } from '../lib/utils';
+import { useAuth } from '../App';
 import '../styles/dashboard.css';
 
 // ── Stat Card ─────────────────────────────────────────────────────────────────
@@ -34,7 +35,7 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, sub, icon, iconBg, de
 
 // ── DashboardPage ─────────────────────────────────────────────────────────────
 const DashboardPage: React.FC = () => {
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const [stats, setStats]             = useState<DashboardStats | null>(null);
   const [igStatus, setIgStatus]       = useState<InstagramStatus | null>(null);
   const [rules, setRules]             = useState<Rule[]>([]);
@@ -42,7 +43,6 @@ const DashboardPage: React.FC = () => {
   const [loading, setLoading]         = useState(true);
 
   useEffect(() => {
-    requireAuth().then(ok => { if (!ok) navigate('/login'); });
     Promise.all([getDashboardStats(), getInstagramStatus(), getRules()])
       .then(([s, ig, r]) => {
         setStats(s);
@@ -50,7 +50,7 @@ const DashboardPage: React.FC = () => {
         setRules(r?.rules?.slice(0, 3) ?? []);
       })
       .finally(() => setLoading(false));
-  }, [navigate]);
+  }, []);
 
   const steps: Step[] = [
     { id: 'profile', label: 'Complete your profile',          done: true,                   href: '/settings' },
@@ -82,7 +82,7 @@ const DashboardPage: React.FC = () => {
       <div className="page-header">
         <h1 className="page-title">Dashboard</h1>
         <p className="page-subtitle">
-          {loading ? 'Loading…' : `You're on the ${toTitleCase(stats?.plan ?? 'free')} plan`}
+          {loading ? 'Loading…' : `You're on the ${toTitleCase(stats?.plan ?? user?.plan ?? 'free')} plan`}
         </p>
       </div>
 
@@ -98,7 +98,7 @@ const DashboardPage: React.FC = () => {
           iconBg="bg-amber-50"
           delay={120}
         />
-        <StatCard label="Current Plan" value={loading ? '—' : toTitleCase(stats?.plan ?? 'free')} sub={stats?.plan === 'free' ? 'Upgrade for more' : 'Active'} icon={<CreditCard     size={18} className="text-violet-600"/>} iconBg="bg-violet-50"  delay={180} />
+        <StatCard label="Current Plan" value={loading ? '—' : toTitleCase(stats?.plan ?? user?.plan ?? 'free')} sub={(stats?.plan ?? user?.plan) === 'free' ? 'Upgrade for more' : 'Active'} icon={<CreditCard     size={18} className="text-violet-600"/>} iconBg="bg-violet-50"  delay={180} />
       </div>
 
       {/* DM Usage Bar */}

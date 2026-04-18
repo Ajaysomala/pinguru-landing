@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Shield, Bell, Trash2, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
-import { getProfile, updateProfile, requestDataDeletion, requireAuth } from '../lib/api';
+import { updateProfile, requestDataDeletion } from '../lib/api';
 import type { User as UserType } from '../lib/types';
 import { BUSINESS_CATEGORIES } from '../lib/types';
 import { Badge } from '../components/ui/Badge';
 import { toTitleCase } from '../lib/utils';
+import { useAuth } from '../App';
 import '../styles/dashboard.css';
 import '../styles/settings.css';
 
 const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user: authUser } = useAuth();
   const [user, setUser]             = useState<UserType | null>(null);
   const [loading, setLoading]       = useState(true);
   const [saving, setSaving]         = useState(false);
@@ -36,16 +38,14 @@ const SettingsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    requireAuth().then(ok => { if (!ok) navigate('/login'); });
-    getProfile().then(p => {
-      if (!p) return;
-      setUser(p);
-      const displayNameParts = splitDisplayName(p.display_name);
-      setFirstName(p.first_name ?? displayNameParts.first);
-      setLastName(p.last_name ?? displayNameParts.last);
-      setCategory(p.business_category ?? '');
-    }).finally(() => setLoading(false));
-  }, [navigate]);
+    if (!authUser) return;
+    setUser(authUser);
+    const displayNameParts = splitDisplayName(authUser.display_name);
+    setFirstName(authUser.first_name ?? displayNameParts.first);
+    setLastName(authUser.last_name ?? displayNameParts.last);
+    setCategory(authUser.business_category ?? '');
+    setLoading(false);
+  }, [authUser]);
 
   const handleSaveProfile = async () => {
     setSaving(true); setError(''); setSuccess('');

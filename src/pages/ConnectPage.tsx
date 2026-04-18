@@ -4,7 +4,7 @@ import {
   Camera, CheckCircle, RefreshCw, AlertTriangle,
   Link2, ShieldCheck, Zap, BarChart2, ExternalLink,
 } from 'lucide-react';
-import { getInstagramStatus, refreshInstagramToken, getInstagramAuthUrl, requireAuth } from '../lib/api';
+import { getInstagramStatus, refreshInstagramToken, getInstagramAuthUrl } from '../lib/api';
 import type { InstagramStatus } from '../lib/types';
 import { Badge } from '../components/ui/Badge';
 import { formatRelativeTime, isTokenExpired } from '../lib/utils';
@@ -49,10 +49,9 @@ const ConnectPage: React.FC = () => {
 
   // Load IG status on mount
   useEffect(() => {
-    requireAuth().then(ok => { if (!ok) navigate('/login'); });
     fetchStatusWithRetry(1)
       .finally(() => setLoading(false));
-  }, [navigate]);
+  }, []);
 
   // Handle backend callback flags from /auth/instagram/callback redirect
   useEffect(() => {

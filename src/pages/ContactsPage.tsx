@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Users, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
-import { requireAuth, getProfile, getContacts, getContactStats } from '../lib/api';
+import { getContacts, getContactStats } from '../lib/api';
 import { Badge } from '../components/ui/Badge';
+import { useAuth } from '../App';
 import '../styles/dashboard.css';
 
 interface Contact {
@@ -22,10 +23,9 @@ interface ContactStats {
 }
 
 const ContactsPage: React.FC = () => {
-  const navigate = useNavigate();
+  const { user: authUser } = useAuth();
   const [contacts, setContacts]   = useState<Contact[]>([]);
   const [stats, setStats]         = useState<ContactStats | null>(null);
-  const [plan, setPlan]           = useState<string>('free');
   const [page, setPage]           = useState(1);
   const [total, setTotal]         = useState(0);
   const [loading, setLoading]     = useState(true);
@@ -45,10 +45,8 @@ const ContactsPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    requireAuth().then(ok => { if (!ok) navigate('/login'); });
-    getProfile().then(p => setPlan(p?.plan ?? 'free'));
     load(1);
-  }, [navigate, load]);
+  }, [load]);
 
   const totalPages = Math.ceil(total / LIMIT);
 
@@ -65,6 +63,7 @@ const ContactsPage: React.FC = () => {
     return t.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   };
 
+  const plan = authUser?.plan ?? 'free';
   const isFree = plan === 'free';
   const usagePercent = stats && stats.limit ? Math.min(100, Math.round((stats.total / stats.limit) * 100)) : null;
 

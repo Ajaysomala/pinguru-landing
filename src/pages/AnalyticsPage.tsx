@@ -1,39 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { TrendingUp, MessageSquare, Zap } from 'lucide-react';
-import { getDashboardStats, getAnalytics, requireAuth, getProfile } from '../lib/api';
+import { getDashboardStats, getAnalytics } from '../lib/api';
 import type { DashboardStats, AnalyticsData } from '../lib/types';
 import { Badge } from '../components/ui/Badge';
 import { DMVolumeChart } from '../components/analytics/DMVolumeChart';
+import { useAuth } from '../App';
 import '../styles/dashboard.css';
 import '../styles/analytics.css';
 
 const AnalyticsPage: React.FC = () => {
-  const navigate = useNavigate();
+  const { user: authUser } = useAuth();
   const [stats, setStats]     = useState<DashboardStats | null>(null);
   const [data, setData]       = useState<AnalyticsData[]>([]);
   const [days, setDays]       = useState<7 | 30>(7);
-  const [plan, setPlan]       = useState<string>('free');
   const [loading, setLoading] = useState(true);
+  const planName = authUser?.plan ?? 'free';
 
   useEffect(() => {
-    requireAuth().then(ok => { if (!ok) navigate('/login'); });
-    Promise.all([getDashboardStats(), getProfile()])
-      .then(([s, p]) => {
-        setStats(s);
-        setPlan(p?.plan ?? 'free');
-      });
-  }, [navigate]);
+    getDashboardStats()
+      .then(s => setStats(s));
+  }, []);
 
   useEffect(() => {
-    if (plan === 'free') { setLoading(false); return; }
+    if (planName === 'free') { setData([]); setLoading(false); return; }
     setLoading(true);
     getAnalytics(days)
       .then(d => setData(d))
       .finally(() => setLoading(false));
-  }, [days, plan]);
+  }, [days, planName]);
 
-  const isFree = plan === 'free';
+  const isFree = planName === 'free';
 
   const successRate = data.length
     ? Math.round((data.reduce((a, d) => a + (d.success_count ?? 0), 0) /

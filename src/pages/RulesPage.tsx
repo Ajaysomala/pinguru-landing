@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Zap, Circle } from 'lucide-react';
-import { getRules, toggleRule, deleteRule, requireAuth, getInstagramStatus } from '../lib/api';
+import { getRules, toggleRule, deleteRule, getInstagramStatus } from '../lib/api';
 import type { Rule, InstagramStatus } from '../lib/types';
 import { RuleCard } from '../components/rules/RuleCard';
 import { RuleBuilderModal } from '../components/rules/RuleBuilderModal';
@@ -21,10 +21,9 @@ const RulesPage: React.FC = () => {
   const [connectHint, setConnectHint] = useState('');
 
   useEffect(() => {
-    requireAuth().then(ok => { if (!ok) navigate('/login'); });
     getRules().then(r => setRules(r?.rules ?? [])).finally(() => setLoading(false));
     getInstagramStatus().then(s => setIgStatus(s));
-  }, [navigate]);
+  }, []);
 
   const openBuilder = () => {
     if (!igStatus?.connected) {

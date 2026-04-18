@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Briefcase, ArrowRight, CheckCircle } from 'lucide-react';
-import { updateOnboarding, requireAuth } from '../lib/api';
+import { updateOnboarding } from '../lib/api';
 import { BUSINESS_CATEGORIES } from '../lib/types';
 import '../styles/auth.css';
 
@@ -17,8 +17,7 @@ const OnboardingPage: React.FC = () => {
   const [error, setError]         = useState('');
 
   useEffect(() => {
-    requireAuth().then(ok => { if (!ok) navigate('/login'); });
-  }, [navigate]);
+  }, []);
 
   const handleNext = () => {
     if (step === 0) {

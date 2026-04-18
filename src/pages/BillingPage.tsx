@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Check, Zap, Users, CreditCard, ExternalLink, AlertCircle, MessageSquare } from 'lucide-react';
-import { createPlanCheckout, getCustomerPortalUrl, getPlanStatus, requireAuth } from '../lib/api';
+import { createPlanCheckout, getCustomerPortalUrl, getPlanStatus } from '../lib/api';
 import type { PlanStatus } from '../lib/types';
 import '../styles/dashboard.css';
 import '../styles/billing.css';
@@ -89,7 +89,6 @@ function formatProvider(provider: string | null | undefined): string {
 }
 
 const BillingPage: React.FC = () => {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const [planStatus, setPlanStatus] = useState<PlanStatus | null>(null);
@@ -108,32 +107,18 @@ const BillingPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    let cancelled = false;
-
     const init = async () => {
       try {
-        const ok = await requireAuth();
-        if (!ok) {
-          navigate('/login');
-          return;
-        }
-        if (!cancelled) {
-          await fetchStatus();
-        }
+        await fetchStatus();
       } catch (err: any) {
-        if (!cancelled) {
-          setError(err?.message || 'Failed to load billing status.');
-        }
+        setError(err?.message || 'Failed to load billing status.');
       } finally {
-        if (!cancelled) setLoading(false);
+        setLoading(false);
       }
     };
 
     init();
-    return () => {
-      cancelled = true;
-    };
-  }, [fetchStatus, navigate]);
+  }, [fetchStatus]);
 
   useEffect(() => {
     if (!planStatus) return;
