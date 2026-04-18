@@ -310,6 +310,9 @@ export async function getInstagramStatus() {
 
   return {
     connected: Boolean(me.instagram_connected),
+    username: me.instagram_username || undefined,
+    user_id: me.instagram_user_id || undefined,
+    profile_picture: me.profile_picture || undefined,
     token_expires_at: stats?.ig_token_expires_at ?? undefined,
   };
 }

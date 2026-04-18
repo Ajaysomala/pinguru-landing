@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Shield, Bell, Trash2, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
-import { updateProfile, requestDataDeletion } from '../lib/api';
+import { User, Shield, Bell, Trash2, AlertTriangle, CheckCircle, RefreshCw, Mail, AtSign, BriefcaseBusiness, BadgeCheck, PencilLine } from 'lucide-react';
+import { getProfile, updateProfile, requestDataDeletion } from '../lib/api';
 import type { User as UserType } from '../lib/types';
 import { BUSINESS_CATEGORIES } from '../lib/types';
 import { Badge } from '../components/ui/Badge';
@@ -27,6 +27,7 @@ const SettingsPage: React.FC = () => {
   const [category, setCategory]     = useState('');
   const [pauseHours, setPauseHours] = useState(false);
   const [usageAlert, setUsageAlert] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   const splitDisplayName = (name?: string) => {
     if (!name) return { first: '', last: '' };
@@ -38,13 +39,37 @@ const SettingsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!authUser) return;
-    setUser(authUser);
-    const displayNameParts = splitDisplayName(authUser.display_name);
-    setFirstName(authUser.first_name ?? displayNameParts.first);
-    setLastName(authUser.last_name ?? displayNameParts.last);
-    setCategory(authUser.business_category ?? '');
-    setLoading(false);
+    let mounted = true;
+
+    const loadProfile = async () => {
+      setProfileLoading(true);
+      try {
+        const profile = await getProfile();
+        if (!mounted || !profile) return;
+        setUser(profile);
+        const displayNameParts = splitDisplayName(profile.display_name);
+        setFirstName(profile.first_name ?? displayNameParts.first);
+        setLastName(profile.last_name ?? displayNameParts.last);
+        setCategory(profile.business_category ?? '');
+      } catch {
+        if (!mounted && authUser) return;
+        if (authUser) {
+          setUser(authUser);
+          const displayNameParts = splitDisplayName(authUser.display_name);
+          setFirstName(authUser.first_name ?? displayNameParts.first);
+          setLastName(authUser.last_name ?? displayNameParts.last);
+          setCategory(authUser.business_category ?? '');
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+          setProfileLoading(false);
+        }
+      }
+    };
+
+    loadProfile();
+    return () => { mounted = false; };
   }, [authUser]);
 
   const handleSaveProfile = async () => {
@@ -56,6 +81,12 @@ const SettingsPage: React.FC = () => {
         business_category: category,
       });
       setUser(updated);
+      if (updated) {
+        const displayNameParts = splitDisplayName(updated.display_name);
+        setFirstName(updated.first_name ?? displayNameParts.first);
+        setLastName(updated.last_name ?? displayNameParts.last);
+        setCategory(updated.business_category ?? '');
+      }
       setSuccess('Profile updated successfully.');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err: any) {
@@ -86,9 +117,21 @@ const SettingsPage: React.FC = () => {
 
   return (
     <div className="page-wrapper">
-      <div className="page-header">
-        <h1 className="page-title">Settings</h1>
-        <p className="page-subtitle">Manage your account, security, and automation preferences</p>
+      <div className="page-header settings-hero">
+        <div>
+          <p className="settings-eyebrow">Account Settings</p>
+          <h1 className="page-title">Settings</h1>
+          <p className="page-subtitle">Manage your profile, automation preferences, and data controls from one place.</p>
+        </div>
+        <div className="settings-hero-card">
+          <div className="settings-hero-avatar">
+            {user?.first_name?.[0] || user?.display_name?.[0] || 'P'}
+          </div>
+          <div>
+            <p className="settings-hero-name">{user?.display_name || [user?.first_name, user?.last_name].filter(Boolean).join(' ') || 'Your profile'}</p>
+            <p className="settings-hero-meta">{user?.email}</p>
+          </div>
+        </div>
       </div>
 
       {/* Alerts */}
@@ -108,7 +151,7 @@ const SettingsPage: React.FC = () => {
       <div className="settings-grid">
 
         {/* ── Account Profile ── */}
-        <div className="settings-section">
+        <div className="settings-section settings-section-wide">
           <div className="settings-section-header">
             <div className="flex items-center gap-2">
               <User size={15} className="text-primary"/>
@@ -117,46 +160,57 @@ const SettingsPage: React.FC = () => {
             <p className="settings-section-desc">Your personal details and business info</p>
           </div>
           <div className="settings-section-body">
-            {/* Read-only rows */}
-            <div className="profile-row">
-              <span className="profile-row-label">Email</span>
-              <span className="profile-row-value text-slate-500">{user?.email}</span>
-            </div>
-            <div className="profile-row">
-              <span className="profile-row-label">Instagram</span>
-              <span className="profile-row-value">
-                {user?.instagram_connected
-                  ? <Badge variant="green" dot>@{user.instagram_username}</Badge>
-                  : <Badge variant="gray">Not connected</Badge>
-                }
-              </span>
-            </div>
-            <div className="profile-row">
-              <span className="profile-row-label">Plan</span>
-              <span className="profile-row-value">
-                <Badge variant={user?.plan === 'free' ? 'gray' : 'indigo'}>
-                  {toTitleCase(user?.plan ?? 'free')}
-                </Badge>
-              </span>
+            <div className="settings-summary-grid">
+              <div className="settings-summary-card settings-summary-card-primary">
+                <div className="settings-summary-icon"><Mail size={16} /></div>
+                <div>
+                  <p className="settings-summary-label">Email</p>
+                  <p className="settings-summary-value">{user?.email}</p>
+                </div>
+              </div>
+              <div className="settings-summary-card">
+                <div className="settings-summary-icon"><AtSign size={16} /></div>
+                <div>
+                  <p className="settings-summary-label">Instagram</p>
+                  <p className="settings-summary-value">
+                    {user?.instagram_connected
+                      ? (user.instagram_username ? `@${user.instagram_username}` : 'Connected')
+                      : 'Not connected'}
+                  </p>
+                </div>
+              </div>
+              <div className="settings-summary-card">
+                <div className="settings-summary-icon"><BadgeCheck size={16} /></div>
+                <div>
+                  <p className="settings-summary-label">Plan</p>
+                  <p className="settings-summary-value">{toTitleCase(user?.plan ?? 'free')}</p>
+                </div>
+              </div>
+              <div className="settings-summary-card">
+                <div className="settings-summary-icon"><BriefcaseBusiness size={16} /></div>
+                <div>
+                  <p className="settings-summary-label">Business Category</p>
+                  <p className="settings-summary-value">{category || 'Not set'}</p>
+                </div>
+              </div>
             </div>
 
-            {/* Editable fields */}
-            <div className="grid grid-cols-2 gap-3 mt-2">
+            <div className="settings-edit-grid">
               <div>
-                <label className="text-xs font-medium text-slate-600 block mb-1">First Name</label>
+                <label className="settings-field-label">First Name</label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                  className="settings-field-input"
                   value={firstName}
                   onChange={e => setFirstName(e.target.value)}
                   placeholder="First name"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-600 block mb-1">Last Name</label>
+                <label className="settings-field-label">Last Name</label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                  className="settings-field-input"
                   value={lastName}
                   onChange={e => setLastName(e.target.value)}
                   placeholder="Last name"
@@ -165,9 +219,9 @@ const SettingsPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="text-xs font-medium text-slate-600 block mb-1">Business Category</label>
+              <label className="settings-field-label">Business Category</label>
               <select
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none bg-white"
+                className="settings-field-input settings-field-select"
                 value={category}
                 onChange={e => setCategory(e.target.value)}
               >
@@ -178,10 +232,17 @@ const SettingsPage: React.FC = () => {
               </select>
             </div>
 
+            <div className="settings-profile-note">
+              <PencilLine size={14} />
+              <span>
+                These are the same onboarding details used to personalize your profile. Updating them here keeps the dashboard and onboarding data aligned.
+              </span>
+            </div>
+
             <button
               onClick={handleSaveProfile}
               disabled={saving}
-              className="w-full py-2.5 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="settings-primary-action"
             >
               {saving ? (
                 <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>Saving…</>
@@ -226,7 +287,7 @@ const SettingsPage: React.FC = () => {
               </div>
             </label>
 
-            <p className="text-xs text-slate-400 mt-1">Preferences are stored locally in your browser for now.</p>
+            <div className="settings-note-inline">Preferences are stored locally in your browser for now.</div>
 
             <button
               onClick={() => { localStorage.setItem('pg_prefs', JSON.stringify({ pauseHours, usageAlert })); setSuccess('Preferences saved.'); setTimeout(() => setSuccess(''), 2000); }}

@@ -19,7 +19,6 @@ const TRIGGER_OPTIONS: { value: TriggerType; label: string; desc: string }[] = [
 
 const COMMENT_TARGET_OPTIONS = [
 	{ value: 'specific', label: 'Specific Post', desc: 'Select from existing posts and reels' },
-	{ value: 'next', label: 'Next Post', desc: 'Activate on your next post or reel' },
 	{ value: 'any', label: 'Any Post', desc: 'Works on all posts and reels' },
 ] as const;
 
@@ -340,29 +339,6 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
 								value={name}
 								onChange={(e) => setName(e.target.value)}
 							/>
-						</div>
-
-						<div>
-							<label className="form-label mb-2 block">Trigger Type</label>
-							<div className="grid grid-cols-2 gap-2">
-								{TRIGGER_OPTIONS.map((opt) => (
-									<button
-										key={opt.value}
-										type="button"
-										onClick={() => setTriggerType(opt.value)}
-										className={`text-left px-3 py-2.5 rounded-xl border text-sm transition-all ${
-											triggerType === opt.value
-												? 'border-primary bg-indigo-50 text-primary'
-												: 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
-										}`}
-									>
-										<p className="font-semibold text-[0.8125rem]">{opt.label}</p>
-										<p className={`text-xs mt-0.5 ${triggerType === opt.value ? 'text-indigo-400' : 'text-slate-400'}`}>
-											{opt.desc}
-										</p>
-									</button>
-								))}
-							</div>
 						</div>
 
 						{triggerType === 'keyword' && (
