@@ -1,4 +1,4 @@
-import type { User, DashboardStats, Rule, RuleCreatePayload, AnalyticsData, PlanStatus } from './types';
+import type { User, DashboardStats, Rule, RuleCreatePayload, AnalyticsData, PlanStatus, InstagramMediaItem } from './types';
 
 const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://api.pinguru.me' : '/api')).replace(/\/$/, '');
 
@@ -13,6 +13,19 @@ type BackendRule = {
   is_active: boolean;
   created_at?: string;
   sent_count?: number;
+  comment_target_type?: 'specific' | 'any';
+  comment_media_filter?: 'post' | 'reel' | 'all';
+  comment_media_id?: string;
+  comment_media_permalink?: string;
+  comment_media_caption?: string;
+  comment_media_type?: string;
+  dm_attachment_url?: string;
+  dm_attachment_type?: string;
+  any_comment_keyword?: boolean;
+  public_comment_reply_enabled?: boolean;
+  public_comment_reply_template?: string;
+  ask_follow_before_dm?: boolean;
+  send_follow_up_message?: boolean;
 };
 
 function mapBackendTriggerToUi(trigger: string): Rule['trigger_type'] {
@@ -35,6 +48,19 @@ function mapRule(rule: BackendRule): Rule {
     trigger_type: mapBackendTriggerToUi(rule.trigger_type),
     keywords: rule.keywords ?? [],
     response_template: rule.response_template ?? rule.reply_message ?? '',
+    comment_target_type: rule.comment_target_type,
+    comment_media_filter: rule.comment_media_filter,
+    comment_media_id: rule.comment_media_id,
+    comment_media_permalink: rule.comment_media_permalink,
+    comment_media_caption: rule.comment_media_caption,
+    comment_media_type: rule.comment_media_type,
+    dm_attachment_url: rule.dm_attachment_url,
+    dm_attachment_type: rule.dm_attachment_type,
+    any_comment_keyword: rule.any_comment_keyword,
+    public_comment_reply_enabled: rule.public_comment_reply_enabled,
+    public_comment_reply_template: rule.public_comment_reply_template,
+    ask_follow_before_dm: rule.ask_follow_before_dm,
+    send_follow_up_message: rule.send_follow_up_message,
     is_active: Boolean(rule.is_active),
     created_at: rule.created_at ?? new Date().toISOString(),
     dm_count: rule.sent_count,
@@ -181,6 +207,19 @@ export async function createRule(payload: RuleCreatePayload): Promise<Rule> {
     trigger_type: mapUiTriggerToBackend(payload.trigger_type),
     keywords: payload.keywords,
     reply_message: payload.response_template,
+    comment_target_type: payload.comment_target_type,
+    comment_media_filter: payload.comment_media_filter,
+    comment_media_id: payload.comment_media_id,
+    comment_media_permalink: payload.comment_media_permalink,
+    comment_media_caption: payload.comment_media_caption,
+    comment_media_type: payload.comment_media_type,
+    dm_attachment_url: payload.dm_attachment_url,
+    dm_attachment_type: payload.dm_attachment_type,
+    any_comment_keyword: payload.any_comment_keyword,
+    public_comment_reply_enabled: payload.public_comment_reply_enabled,
+    public_comment_reply_template: payload.public_comment_reply_template,
+    ask_follow_before_dm: payload.ask_follow_before_dm,
+    send_follow_up_message: payload.send_follow_up_message,
   };
   const res = await authFetch('/automation/rules', { method: 'POST', body: JSON.stringify(backendPayload) });
   const data = await res.json();
@@ -194,6 +233,19 @@ export async function updateRule(ruleId: string, payload: Partial<RuleCreatePayl
   if (payload.trigger_type !== undefined) backendPayload.trigger_type = mapUiTriggerToBackend(payload.trigger_type);
   if (payload.keywords !== undefined) backendPayload.keywords = payload.keywords;
   if (payload.response_template !== undefined) backendPayload.reply_message = payload.response_template;
+  if (payload.comment_target_type !== undefined) backendPayload.comment_target_type = payload.comment_target_type;
+  if (payload.comment_media_filter !== undefined) backendPayload.comment_media_filter = payload.comment_media_filter;
+  if (payload.comment_media_id !== undefined) backendPayload.comment_media_id = payload.comment_media_id;
+  if (payload.comment_media_permalink !== undefined) backendPayload.comment_media_permalink = payload.comment_media_permalink;
+  if (payload.comment_media_caption !== undefined) backendPayload.comment_media_caption = payload.comment_media_caption;
+  if (payload.comment_media_type !== undefined) backendPayload.comment_media_type = payload.comment_media_type;
+  if (payload.dm_attachment_url !== undefined) backendPayload.dm_attachment_url = payload.dm_attachment_url;
+  if (payload.dm_attachment_type !== undefined) backendPayload.dm_attachment_type = payload.dm_attachment_type;
+  if (payload.any_comment_keyword !== undefined) backendPayload.any_comment_keyword = payload.any_comment_keyword;
+  if (payload.public_comment_reply_enabled !== undefined) backendPayload.public_comment_reply_enabled = payload.public_comment_reply_enabled;
+  if (payload.public_comment_reply_template !== undefined) backendPayload.public_comment_reply_template = payload.public_comment_reply_template;
+  if (payload.ask_follow_before_dm !== undefined) backendPayload.ask_follow_before_dm = payload.ask_follow_before_dm;
+  if (payload.send_follow_up_message !== undefined) backendPayload.send_follow_up_message = payload.send_follow_up_message;
 
   const res = await authFetch(`/automation/rules/${ruleId}`, { method: 'PUT', body: JSON.stringify(backendPayload) });
   const data = await res.json();
@@ -273,8 +325,11 @@ export async function getPlanStatus(): Promise<PlanStatus> {
   return data as PlanStatus;
 }
 
-export async function createPlanCheckout(plan: 'starter' | 'pro'): Promise<{ checkout_url: string }> {
-  const res = await authFetch(`/plans/checkout/${plan}`, { method: 'POST' });
+export async function createPlanCheckout(
+  plan: 'starter' | 'pro',
+  billingCycle: 'monthly' | 'quarterly' | 'yearly' = 'monthly',
+): Promise<{ checkout_url: string }> {
+  const res = await authFetch(`/plans/checkout/${plan}?billing_cycle=${billingCycle}`, { method: 'POST' });
   const data = await res.json();
   if (!res.ok) {
     throw createApiRequestError(res.status, data, 'Failed to create payment session');
@@ -315,6 +370,15 @@ export async function getInstagramStatus() {
     profile_picture: me.profile_picture || undefined,
     token_expires_at: stats?.ig_token_expires_at ?? undefined,
   };
+}
+
+export async function getInstagramMedia(mediaType: 'all' | 'post' | 'reel' = 'all', limit: number = 24): Promise<InstagramMediaItem[]> {
+  const safeLimit = Math.min(Math.max(limit, 1), 50);
+  const res = await authFetch(`/auth/instagram/media?media_type=${mediaType}&limit=${safeLimit}`);
+  if (res.status === 401) return [];
+  const data = await res.json();
+  if (!res.ok) throw new Error(asErrorMessage(data, 'Failed to load Instagram media'));
+  return Array.isArray(data?.media) ? data.media : [];
 }
 
 export async function getInstagramAuthUrl(): Promise<string> {

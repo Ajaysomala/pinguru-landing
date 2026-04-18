@@ -91,19 +91,19 @@ export function formatLockoutTime(ms: number): string {
 
 // Plan helpers
 export const PLAN_DM_LIMITS: Record<string, number> = {
-  free:    200,
-  starter: 1000,
-  pro:     5000,
+  free:    -1,
+  starter: -1,
+  pro:     -1,
 };
 
 export const PLAN_RULE_LIMITS: Record<string, number> = {
-  free:    1,
-  starter: 5,
+  free:    5,
+  starter: 15,
   pro:     -1, // unlimited
 };
 
 export function getPlanDmLimit(plan: string): number {
-  return PLAN_DM_LIMITS[plan.toLowerCase()] ?? 200;
+  return PLAN_DM_LIMITS[plan.toLowerCase()] ?? -1;
 }
 
 export function classNames(...classes: (string | undefined | false | null)[]): string {

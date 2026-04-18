@@ -4,7 +4,6 @@ import { User, Shield, Bell, Trash2, AlertTriangle, CheckCircle, RefreshCw, Mail
 import { getProfile, updateProfile, requestDataDeletion } from '../lib/api';
 import type { User as UserType } from '../lib/types';
 import { BUSINESS_CATEGORIES } from '../lib/types';
-import { Badge } from '../components/ui/Badge';
 import { toTitleCase } from '../lib/utils';
 import { useAuth } from '../App';
 import '../styles/dashboard.css';
@@ -27,7 +26,6 @@ const SettingsPage: React.FC = () => {
   const [category, setCategory]     = useState('');
   const [pauseHours, setPauseHours] = useState(false);
   const [usageAlert, setUsageAlert] = useState(true);
-  const [profileLoading, setProfileLoading] = useState(true);
 
   const splitDisplayName = (name?: string) => {
     if (!name) return { first: '', last: '' };
@@ -42,7 +40,6 @@ const SettingsPage: React.FC = () => {
     let mounted = true;
 
     const loadProfile = async () => {
-      setProfileLoading(true);
       try {
         const profile = await getProfile();
         if (!mounted || !profile) return;
@@ -63,7 +60,6 @@ const SettingsPage: React.FC = () => {
       } finally {
         if (mounted) {
           setLoading(false);
-          setProfileLoading(false);
         }
       }
     };

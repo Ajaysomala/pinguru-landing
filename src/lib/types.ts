@@ -33,6 +33,19 @@ export interface Rule {
   trigger_type: 'keyword' | 'story_mention' | 'comment' | 'new_dm';
   keywords: string[];
   response_template: string;
+  comment_target_type?: 'specific' | 'any';
+  comment_media_filter?: 'post' | 'reel' | 'all';
+  comment_media_id?: string;
+  comment_media_permalink?: string;
+  comment_media_caption?: string;
+  comment_media_type?: string;
+  dm_attachment_url?: string;
+  dm_attachment_type?: string;
+  any_comment_keyword?: boolean;
+  public_comment_reply_enabled?: boolean;
+  public_comment_reply_template?: string;
+  ask_follow_before_dm?: boolean;
+  send_follow_up_message?: boolean;
   is_active: boolean;
   created_at: string;
   dm_count?: number;
@@ -43,6 +56,30 @@ export interface RuleCreatePayload {
   trigger_type: 'keyword' | 'story_mention' | 'comment' | 'new_dm';
   keywords: string[];
   response_template: string;
+  comment_target_type?: 'specific' | 'any';
+  comment_media_filter?: 'post' | 'reel' | 'all';
+  comment_media_id?: string;
+  comment_media_permalink?: string;
+  comment_media_caption?: string;
+  comment_media_type?: string;
+  dm_attachment_url?: string;
+  dm_attachment_type?: string;
+  any_comment_keyword?: boolean;
+  public_comment_reply_enabled?: boolean;
+  public_comment_reply_template?: string;
+  ask_follow_before_dm?: boolean;
+  send_follow_up_message?: boolean;
+}
+
+export interface InstagramMediaItem {
+  id: string;
+  caption?: string;
+  media_type: 'post' | 'reel' | 'all';
+  media_product_type?: string | null;
+  media_url?: string;
+  thumbnail_url?: string;
+  permalink?: string;
+  timestamp?: string;
 }
 
 export interface Plan {
@@ -78,6 +115,8 @@ export interface ApiError {
 export interface PlanStatus {
   current_plan: 'free' | 'starter' | 'pro';
   pending_plan: 'free' | 'starter' | 'pro' | null;
+  current_billing_cycle: 'monthly' | 'quarterly' | 'yearly' | null;
+  pending_billing_cycle: 'monthly' | 'quarterly' | 'yearly' | null;
   subscription_id: string | null;
   is_active_paid: boolean;
   is_checkout_pending: boolean;

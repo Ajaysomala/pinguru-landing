@@ -23,6 +23,14 @@ interface StatusBanner {
   message: string;
 }
 
+type BillingCycle = 'monthly' | 'quarterly' | 'yearly';
+
+const BILLING_CYCLE_META: Record<BillingCycle, { label: string; multiplier: number; discount: number; periodLabel: string; billedEvery: string }> = {
+  monthly: { label: 'Monthly', multiplier: 1, discount: 0, periodLabel: '/mo', billedEvery: 'billed monthly' },
+  quarterly: { label: 'Quarterly', multiplier: 3, discount: 0.1, periodLabel: '/qtr', billedEvery: 'billed every 3 months' },
+  yearly: { label: 'Yearly', multiplier: 12, discount: 0.2, periodLabel: '/yr', billedEvery: 'billed annually' },
+};
+
 const PLANS: PlanDef[] = [
   {
     id: 'free',
@@ -36,7 +44,7 @@ const PLANS: PlanDef[] = [
       '500 monthly contacts',
       'Basic analytics',
       'Email support',
-      'Meta webhook integration',
+      'Powered by PinGuru footer in DMs',
     ],
   },
   {
@@ -50,9 +58,9 @@ const PLANS: PlanDef[] = [
       'Unlimited DMs',
       'Unlimited contacts',
       'Premium analytics',
+      'Ask-to-follow flow for comment automations',
       'Priority email support',
       'Custom response templates',
-      'Performance tracking',
     ],
     popular: true,
   },
@@ -67,12 +75,20 @@ const PLANS: PlanDef[] = [
       'Unlimited DMs',
       'Unlimited contacts',
       'Premium analytics',
-      'Dedicated email support',
-      'Custom response templates',
+      'Image attachment support in DMs',
+      'Ask-to-follow flow',
+      '24/7 support',
       'Remove "Powered by PinGuru"',
     ],
   },
 ];
+
+function getCyclePrice(monthlyPrice: number, cycle: BillingCycle): number {
+  if (monthlyPrice <= 0) return 0;
+  const meta = BILLING_CYCLE_META[cycle];
+  const raw = monthlyPrice * meta.multiplier * (1 - meta.discount);
+  return Math.round(raw);
+}
 
 function getCheckoutErrorMessage(status?: number, fallback?: string): string {
   if (status === 400) return 'Cannot checkout free plan. Only upgrades are allowed.';
@@ -97,6 +113,7 @@ const BillingPage: React.FC = () => {
   const [portalLoading, setPortalLoading] = useState(false);
   const [error, setError] = useState('');
   const [banner, setBanner] = useState<StatusBanner | null>(null);
+  const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
 
   const hasProcessingParam = searchParams.get('payment') === 'processing';
 
@@ -197,7 +214,7 @@ const BillingPage: React.FC = () => {
     setError('');
 
     try {
-      const { checkout_url } = await createPlanCheckout(plan.id);
+      const { checkout_url } = await createPlanCheckout(plan.id, billingCycle);
       window.location.href = checkout_url;
     } catch (err: any) {
       setError(getCheckoutErrorMessage(err?.status, err?.message));
@@ -258,7 +275,7 @@ const BillingPage: React.FC = () => {
               {planStatus.pending_plan && <span className="text-amber-700"> · Pending: {planStatus.pending_plan}</span>}
             </p>
             <p className="text-xs text-slate-500 mt-0.5">
-              Provider: {formatProvider(planStatus.payment_provider)} · Subscription: {planStatus.subscription_id || 'none'} · Paid active: {planStatus.is_active_paid ? 'yes' : 'no'}
+              Provider: {formatProvider(planStatus.payment_provider)} · Subscription: {planStatus.subscription_id || 'none'} · Cycle: {planStatus.current_billing_cycle || 'n/a'}{planStatus.pending_billing_cycle ? ` · Pending cycle: ${planStatus.pending_billing_cycle}` : ''} · Paid active: {planStatus.is_active_paid ? 'yes' : 'no'}
             </p>
           </div>
           <button
@@ -274,9 +291,24 @@ const BillingPage: React.FC = () => {
         </div>
       )}
 
+      <div className="mb-6 inline-flex rounded-xl border border-slate-200 bg-white p-1 gap-1">
+        {(Object.keys(BILLING_CYCLE_META) as BillingCycle[]).map((cycle) => (
+          <button
+            key={cycle}
+            type="button"
+            onClick={() => setBillingCycle(cycle)}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${billingCycle === cycle ? 'bg-primary text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+          >
+            {BILLING_CYCLE_META[cycle].label}
+          </button>
+        ))}
+      </div>
+
       {/* Plans grid */}
       <div className="billing-grid">
         {PLANS.map(plan => {
+          const cyclePrice = getCyclePrice(plan.monthlyPrice, billingCycle);
+          const cycleMeta = BILLING_CYCLE_META[billingCycle];
           return (
             <div
               key={plan.id}
@@ -296,10 +328,14 @@ const BillingPage: React.FC = () => {
                     <span className="plan-price-period">forever</span>
                   </>
                 ) : (
-                  <div className="flex items-end gap-1">
-                    <span className="plan-price-currency">₹</span>
-                    <span className="plan-price-amount">{plan.monthlyPrice}</span>
-                    <span className="plan-price-period">/mo</span>
+                  <div className="flex flex-col">
+                    <div className="flex items-end gap-1">
+                      <span className="plan-price-currency">₹</span>
+                      <span className="plan-price-amount">{cyclePrice}</span>
+                      <span className="plan-price-period">{cycleMeta.periodLabel}</span>
+                    </div>
+                    <span className="text-xs text-slate-500 mt-1">{cycleMeta.billedEvery}</span>
+                    {billingCycle !== 'monthly' && <span className="text-xs text-emerald-700 mt-0.5">Save {Math.round(cycleMeta.discount * 100)}% vs monthly</span>}
                   </div>
                 )}
               </div>
@@ -342,7 +378,7 @@ const BillingPage: React.FC = () => {
                 >
                   {upgrading === plan.id ? (
                     <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Redirecting...</>
-                  ) : planStatus?.is_checkout_pending ? 'Checkout Pending' : `Upgrade to ${plan.name}`}
+                  ) : planStatus?.is_checkout_pending ? 'Checkout Pending' : `Upgrade to ${plan.name} (${cycleMeta.label})`}
                 </button>
               ) : (
                 <button
