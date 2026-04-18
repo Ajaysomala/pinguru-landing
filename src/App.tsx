@@ -15,6 +15,7 @@ const ContactsPage   = React.lazy(() => import('./pages/ContactsPage'));
 const AnalyticsPage  = React.lazy(() => import('./pages/AnalyticsPage'));
 const BillingPage    = React.lazy(() => import('./pages/BillingPage'));
 const SettingsPage   = React.lazy(() => import('./pages/SettingsPage'));
+const RefundPage     = React.lazy(() => import('./pages/RefundPage'));
 const PrivacyPage    = React.lazy(() => import('./pages/PrivacyPage'));
 const TermsPage      = React.lazy(() => import('./pages/TermsPage'));
 const SupportPage    = React.lazy(() => import('./pages/SupportPage'));
@@ -99,6 +100,7 @@ const App: React.FC = () => (
       <Route path="/analytics"   element={<RequireAuth><Page><AnalyticsPage /></Page></RequireAuth>} />
       <Route path="/billing"     element={<RequireAuth><Page><BillingPage /></Page></RequireAuth>} />
       <Route path="/settings"    element={<RequireAuth><Page><SettingsPage /></Page></RequireAuth>} />
+      <Route path="/refund"      element={<RequireAuth><Page><RefundPage /></Page></RequireAuth>} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

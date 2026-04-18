@@ -4,22 +4,6 @@ import type { User, DashboardStats, Rule, RuleCreatePayload, AnalyticsData } fro
 
 const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://api.pinguru.me' : '/api')).replace(/\/$/, '');
 
-export interface ContactRecord {
-  id: string;
-  ig_user_id: string;
-  ig_username?: string;
-  display_name?: string;
-  trigger_type?: string;
-  dm_count: number;
-  first_seen_at: string;
-  last_seen_at: string;
-}
-
-export interface ContactStats {
-  total: number;
-  limit: number | null;
-}
-
 type BackendRule = {
   _id?: string;
   id?: string;
@@ -161,46 +145,15 @@ export async function requestDataDeletion() {
   if (!res.ok) throw new Error(data.detail || 'Failed to request data deletion');
 }
 
-export async function getContacts(page: number, limit = 20): Promise<{ contacts: ContactRecord[]; total: number }> {
-  const res = await authFetch(`/contacts?page=${page}&limit=${limit}`);
-  if (res.status === 401) { window.location.href = '/login'; return { contacts: [], total: 0 }; }
-  const data = await res.json();
-  if (!res.ok) throw new Error(asErrorMessage(data, 'Failed to get contacts'));
-  return {
-    contacts: Array.isArray(data?.contacts) ? data.contacts as ContactRecord[] : [],
-    total: Number(data?.total ?? 0),
-  };
-}
-
-export async function getContactStats(): Promise<ContactStats> {
-  const res = await authFetch('/contacts/stats');
-  if (res.status === 401) { window.location.href = '/login'; return { total: 0, limit: null }; }
-  const data = await res.json();
-  if (!res.ok) throw new Error(asErrorMessage(data, 'Failed to get contact stats'));
-  return {
-    total: Number(data?.total ?? 0),
-    limit: data?.limit === null || data?.limit === undefined ? null : Number(data.limit),
-  };
-}
-
 export async function getDashboardStats(): Promise<DashboardStats | null> {
   const res = await authFetch('/dashboard/stats');
   if (res.status === 401) { window.location.href = '/login'; return null; }
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'Failed to get stats');
-
-  const dmLimit = data.dm_limit === null || data.dm_limit === undefined
-    ? null
-    : Number(data.dm_limit);
-  const dmRemaining = data.dm_remaining === null || data.dm_remaining === undefined
-    ? null
-    : Number(data.dm_remaining);
-
   return {
     dms_sent_this_month: data.dms_sent_this_month ?? data.dm_sent_this_month ?? 0,
     active_rules: data.active_rules ?? 0,
-    dm_limit: Number.isNaN(dmLimit as number) ? null : dmLimit,
-    dm_remaining: Number.isNaN(dmRemaining as number) ? null : dmRemaining,
+    dm_limit: data.dm_limit ?? 0,
     plan: String(data.plan ?? 'free').toLowerCase(),
     success_rate: typeof data.success_rate === 'number' ? data.success_rate : undefined,
   };
@@ -304,14 +257,21 @@ export async function getPlans() {
 export async function createCheckoutSession(planId: string): Promise<{ checkout_url: string }> {
   const res = await authFetch('/billing/create-checkout', { method: 'POST', body: JSON.stringify({ plan: planId }) });
   const data = await res.json();
-  if (!res.ok) throw new Error(asErrorMessage(data, 'Failed to create checkout'));
+  if (!res.ok) throw new Error(data.detail || 'Failed to create checkout');
   return data;
 }
 
 export async function getCustomerPortalUrl(): Promise<{ portal_url: string }> {
   const res = await authFetch('/billing/portal', { method: 'POST' });
   const data = await res.json();
-  if (!res.ok) throw new Error(asErrorMessage(data, 'Failed to get portal URL'));
+  if (!res.ok) throw new Error(data.detail || 'Failed to get portal URL');
+  return data;
+}
+
+export async function requestRefund(reason: string, paymentId?: string): Promise<{ message: string }> {
+  const res = await authFetch('/billing/refund', { method: 'POST', body: JSON.stringify({ reason, payment_id: paymentId || null }) });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.detail || 'Failed to submit refund request');
   return data;
 }
 
