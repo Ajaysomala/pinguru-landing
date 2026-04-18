@@ -1,21 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { MobileDrawer } from './MobileDrawer';
 import { TopBar } from './TopBar';
-import { getProfile } from '../../lib/api';
 import type { User } from '../../lib/types';
 
 interface AppShellProps {
   children: React.ReactNode;
+  user: User | null;  // passed from RequireAuth via AuthContext — no fetch here
 }
 
-export const AppShell: React.FC<AppShellProps> = ({ children }) => {
+export const AppShell: React.FC<AppShellProps> = ({ children, user }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    getProfile().then(p => { if (p) setUser(p); }).catch(() => {});
-  }, []);
 
   return (
     <div className="flex min-h-screen bg-canvas">
