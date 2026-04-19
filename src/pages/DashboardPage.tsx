@@ -80,11 +80,23 @@ const DashboardPage: React.FC = () => {
   return (
     <div className="page-wrapper">
       {/* Header */}
-      <div className="page-header">
-        <h1 className="page-title">Dashboard</h1>
-        <p className="page-subtitle">
-          {loading ? 'Loading…' : `You're on the ${toTitleCase(stats?.plan ?? user?.plan ?? 'free')} plan`}
-        </p>
+      <div className="page-header flex items-start justify-between gap-3">
+        <div>
+          <h1 className="page-title">Dashboard</h1>
+          <p className="page-subtitle">
+            {loading ? 'Loading…' : `You're on the ${toTitleCase(stats?.plan ?? user?.plan ?? 'free')} plan`}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link to="/rules" className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
+            <Zap size={14} />
+            New Rule
+          </Link>
+          <Link to="/billing" className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">
+            <CreditCard size={14} />
+            Manage Plan
+          </Link>
+        </div>
       </div>
 
       {/* Stat Cards */}

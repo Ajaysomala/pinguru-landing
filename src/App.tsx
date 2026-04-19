@@ -145,7 +145,8 @@ const RulesPage      = lazyWithRetry(() => import('./pages/RulesPage'));
 const ContactsPage   = lazyWithRetry(() => import('./pages/ContactsPage'));
 const AnalyticsPage  = lazyWithRetry(() => import('./pages/AnalyticsPage'));
 const BillingPage    = lazyWithRetry(() => import('./pages/BillingPage'));
-const SettingsPage   = lazyWithRetry(() => import('./pages/SettingsPage'));
+const SettingsPage   = lazyWithRetry(() => import('./pages/SettingsPage.tsx'));
+const SettingsProfileEditPage = lazyWithRetry(() => import('./pages/SettingsProfileEditPage.tsx'));
 const RefundPage     = lazyWithRetry(() => import('./pages/RefundPage'));
 const PrivacyPage    = lazyWithRetry(() => import('./pages/PrivacyPage'));
 const TermsPage      = lazyWithRetry(() => import('./pages/TermsPage'));
@@ -193,6 +194,7 @@ const App: React.FC = () => (
         <Route path="/analytics"    element={<RequireAuth><Page><AnalyticsPage /></Page></RequireAuth>} />
         <Route path="/billing"      element={<RequireAuth><Page><BillingPage /></Page></RequireAuth>} />
         <Route path="/settings"     element={<RequireAuth><Page><SettingsPage /></Page></RequireAuth>} />
+        <Route path="/settings/profile" element={<RequireAuth><Page><SettingsProfileEditPage /></Page></RequireAuth>} />
         <Route path="/refund"       element={<RequireAuth><Page><RefundPage /></Page></RequireAuth>} />
 
         {/* Fallback */}

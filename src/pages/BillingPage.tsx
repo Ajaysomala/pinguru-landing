@@ -338,16 +338,19 @@ const BillingPage: React.FC = () => {
       {/* Current plan + backend status */}
       {!loading && planStatus && (
         <div className="billing-info-card mb-6">
-          <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
-            <CreditCard size={17} className="text-primary" />
+          <div className="w-11 h-11 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+            <CreditCard size={18} className="text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-slate-800">
-              Current plan: <span className="text-primary capitalize">{planStatus.current_plan}</span>
+            <p className="text-xs uppercase tracking-wide text-slate-500 font-semibold">Active subscription</p>
+            <p className="text-base font-semibold text-slate-800 mt-0.5">
+              <span className="text-primary capitalize">{planStatus.current_plan}</span>
+              <span className="text-slate-500"> · {planStatus.current_billing_cycle || 'monthly'}</span>
               {planStatus.pending_plan && <span className="text-amber-700"> · Pending: {planStatus.pending_plan}</span>}
             </p>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Provider: {formatProvider(planStatus.payment_provider)} · Subscription: {planStatus.subscription_id || 'none'} · Cycle: {planStatus.current_billing_cycle || 'n/a'}{planStatus.pending_billing_cycle ? ` · Pending cycle: ${planStatus.pending_billing_cycle}` : ''} · Paid active: {planStatus.is_active_paid ? 'yes' : 'no'}
+            <p className="text-xs text-slate-500 mt-1">
+              Provider: {formatProvider(planStatus.payment_provider)} · Subscription: {planStatus.subscription_id || 'none'}
+              {planStatus.pending_billing_cycle ? ` · Pending cycle: ${planStatus.pending_billing_cycle}` : ''}
             </p>
           </div>
           <button

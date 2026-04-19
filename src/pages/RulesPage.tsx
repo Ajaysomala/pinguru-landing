@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Zap, Circle } from 'lucide-react';
+import { Plus, Zap, Circle, Activity, PauseCircle } from 'lucide-react';
 import { getRules, toggleRule, deleteRule, getInstagramStatus } from '../lib/api';
 import type { Rule, InstagramStatus } from '../lib/types';
 import { RuleCard } from '../components/rules/RuleCard';
@@ -58,6 +58,7 @@ const RulesPage: React.FC = () => {
   };
 
   const activeCount = rules.filter(r => r.is_active).length;
+  const pausedCount = Math.max(0, rules.length - activeCount);
 
   return (
     <div className="page-wrapper">
@@ -91,6 +92,58 @@ const RulesPage: React.FC = () => {
       {connectHint && (
         <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
           {connectHint}
+        </div>
+      )}
+
+      {!loading && (
+        <div className="stats-grid mb-6">
+          <div className="stat-card">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="stat-label">Total Rules</p>
+                <p className="stat-value">{rules.length}</p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
+                <Zap size={17} className="text-indigo-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="stat-label">Active</p>
+                <p className="stat-value">{activeCount}</p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                <Activity size={17} className="text-emerald-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="stat-label">Paused</p>
+                <p className="stat-value">{pausedCount}</p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+                <PauseCircle size={17} className="text-amber-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="stat-label">Instagram Status</p>
+                <p className="stat-value text-[1.6rem]">{igStatus?.connected ? 'Connected' : 'Not linked'}</p>
+              </div>
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${igStatus?.connected ? 'bg-emerald-50' : 'bg-rose-50'}`}>
+                <Circle size={17} className={igStatus?.connected ? 'text-emerald-600' : 'text-rose-600'} />
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

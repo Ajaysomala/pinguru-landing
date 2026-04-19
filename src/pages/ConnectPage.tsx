@@ -121,6 +121,14 @@ const ConnectPage: React.FC = () => {
       <div className="page-header">
         <h1 className="page-title">Connect Instagram</h1>
         <p className="page-subtitle">Link your business Instagram account to enable DM automation</p>
+        {!loading && (
+          <div className="flex flex-wrap items-center gap-2 mt-3 text-xs">
+            <Badge variant={status?.connected ? 'green' : 'gray'} dot>{status?.connected ? 'Connected' : 'Not connected'}</Badge>
+            {status?.connected && (
+              <Badge variant={tokenExpired ? 'red' : 'indigo'}>{tokenExpired ? 'Token expired' : 'Token valid'}</Badge>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Alerts */}

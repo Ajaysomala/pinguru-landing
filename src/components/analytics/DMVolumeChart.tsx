@@ -13,7 +13,7 @@ import { ChevronRight, Lock, MessageSquare } from 'lucide-react';
 import type { AnalyticsData } from '../../lib/types';
 
 interface DMVolumeChartProps {
-	isFree: boolean;
+	isLocked: boolean;
 	loading: boolean;
 	data: AnalyticsData[];
 	days: 7 | 30;
@@ -33,7 +33,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export const DMVolumeChart: React.FC<DMVolumeChartProps> = ({
-	isFree,
+	isLocked,
 	loading,
 	data,
 	days,
@@ -43,7 +43,7 @@ export const DMVolumeChart: React.FC<DMVolumeChartProps> = ({
 		<div className="chart-card">
 			<div className="chart-header">
 				<h3 className="chart-title">DM Volume</h3>
-				{!isFree && (
+				{!isLocked && (
 					<div className="chart-toggle">
 						{([7, 30] as const).map((range) => (
 							<button
@@ -58,7 +58,7 @@ export const DMVolumeChart: React.FC<DMVolumeChartProps> = ({
 				)}
 			</div>
 
-			{isFree ? (
+			{isLocked ? (
 				<div className="gated-overlay">
 					<div className="gated-blur h-56 flex items-end gap-1 px-4 pb-4">
 						{[40, 65, 35, 80, 50, 90, 45, 70, 55, 85, 30, 75, 60, 95].map((height, i) => (
@@ -69,7 +69,7 @@ export const DMVolumeChart: React.FC<DMVolumeChartProps> = ({
 						<div className="gated-icon">
 							<Lock size={20} />
 						</div>
-						<p className="gated-title">Analytics locked on Free plan</p>
+						<p className="gated-title">Premium analytics is locked</p>
 						<p className="gated-desc">Upgrade to Starter or Pro to see your DM volume charts and success rate.</p>
 						<Link
 							to="/billing"
@@ -140,7 +140,7 @@ export const DMVolumeChart: React.FC<DMVolumeChartProps> = ({
 				</ResponsiveContainer>
 			)}
 
-			{!isFree && !loading && data.length > 0 && (
+			{!isLocked && !loading && data.length > 0 && (
 				<div className="flex items-center gap-5 mt-3 pt-3 border-t border-slate-100">
 					<div className="flex items-center gap-1.5 text-xs text-slate-500">
 						<span className="w-3 h-0.5 bg-primary rounded-full inline-block" />DMs Sent

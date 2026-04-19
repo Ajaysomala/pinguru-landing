@@ -22,13 +22,15 @@ const AnalyticsPage: React.FC = () => {
       .then(s => setStats(s));
   }, []);
 
+  const premiumEnabled = Boolean(stats?.premium_analytics_enabled || stats?.analytics_tier === 'premium');
+
   useEffect(() => {
-    if (planName === 'free') { setData([]); setLoading(false); return; }
+    if (!premiumEnabled) { setData([]); setLoading(false); return; }
     setLoading(true);
     getAnalytics(days)
       .then(d => setData(d))
       .finally(() => setLoading(false));
-  }, [days, planName]);
+  }, [days, premiumEnabled]);
 
   const isFree = planName === 'free';
 
@@ -36,6 +38,12 @@ const AnalyticsPage: React.FC = () => {
     ? Math.round((data.reduce((a, d) => a + (d.success_count ?? 0), 0) /
         Math.max(1, data.reduce((a, d) => a + d.dms_sent, 0))) * 100)
     : stats?.success_rate ?? 0;
+
+  const avgDmsPerDay = typeof stats?.avg_dms_per_day_30d === 'number' ? stats.avg_dms_per_day_30d : null;
+  const peakHour = typeof stats?.peak_hour_utc === 'number' ? `${String(stats.peak_hour_utc).padStart(2, '0')}:00 UTC` : '—';
+  const bestDay = stats?.best_day_30d?.date
+    ? `${new Date(stats.best_day_30d.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} (${stats.best_day_30d.sent})`
+    : '—';
 
   return (
     <div className="page-wrapper">
@@ -64,8 +72,8 @@ const AnalyticsPage: React.FC = () => {
               <TrendingUp size={14} className="text-success"/>
             </div>
           </div>
-          <p className="analytics-stat-value success">{isFree ? '—' : `${successRate}%`}</p>
-          <p className="text-xs text-slate-400 mt-1 inline-flex items-center gap-1.5">{isFree ? <><Lock size={12} />Upgrade to view</> : <><Unlock size={12} />of automations succeeded</>}</p>
+          <p className="analytics-stat-value success">{premiumEnabled ? `${successRate}%` : '—'}</p>
+          <p className="text-xs text-slate-400 mt-1 inline-flex items-center gap-1.5">{premiumEnabled ? <><Unlock size={12} />of automations succeeded</> : <><Lock size={12} />Upgrade to view</>}</p>
         </div>
 
         <div className="analytics-stat-card">
@@ -81,17 +89,34 @@ const AnalyticsPage: React.FC = () => {
       </div>
 
       <DMVolumeChart
-        isFree={isFree}
+        isLocked={!premiumEnabled}
         loading={loading}
         data={data}
         days={days}
         onDaysChange={setDays}
       />
 
+      {premiumEnabled && (
+        <div className="analytics-stats mt-5">
+          <div className="analytics-stat-card">
+            <p className="analytics-stat-label mb-2">Avg DMs / Day (30d)</p>
+            <p className="analytics-stat-value">{avgDmsPerDay ?? '—'}</p>
+          </div>
+          <div className="analytics-stat-card">
+            <p className="analytics-stat-label mb-2">Peak Hour</p>
+            <p className="analytics-stat-value">{peakHour}</p>
+          </div>
+          <div className="analytics-stat-card">
+            <p className="analytics-stat-label mb-2">Best Day</p>
+            <p className="analytics-stat-value">{bestDay}</p>
+          </div>
+        </div>
+      )}
+
       {/* Meta compliance note for free */}
-      {isFree && (
+      {!premiumEnabled && (
         <div className="mt-5 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500 flex items-start gap-2.5">
-          <Badge variant="indigo">Free Plan</Badge>
+          <Badge variant="indigo">{isFree ? 'Free Plan' : 'Upgrade Required'}</Badge>
           <span>Basic analytics are visible on all plans. Upgrade to Starter or Pro for premium analytics: success rate, DM trend charts, peak-hour insights, and 30-day reporting.</span>
         </div>
       )}

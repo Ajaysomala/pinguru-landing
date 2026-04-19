@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
-import { getContacts, getContactStats } from '../lib/api';
+import { getContacts, getContactStats, getDashboardStats } from '../lib/api';
 import { Badge } from '../components/ui/Badge';
 import { useAuth } from '../App';
 import '../styles/dashboard.css';
+import type { DashboardStats } from '../lib/types';
 
 interface Contact {
   id: string;
@@ -26,6 +27,7 @@ const ContactsPage: React.FC = () => {
   const { user: authUser } = useAuth();
   const [contacts, setContacts]   = useState<Contact[]>([]);
   const [stats, setStats]         = useState<ContactStats | null>(null);
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
   const [page, setPage]           = useState(1);
   const [total, setTotal]         = useState(0);
   const [loading, setLoading]     = useState(true);
@@ -36,10 +38,11 @@ const ContactsPage: React.FC = () => {
   const load = useCallback(async (p: number, silent = false) => {
     if (!silent) setLoading(true);
     else setRefreshing(true);
-    const [data, s] = await Promise.all([getContacts(p), getContactStats()]);
+    const [data, s, ds] = await Promise.all([getContacts(p), getContactStats(), getDashboardStats()]);
     setContacts(data.contacts);
     setTotal(data.total);
     setStats(s);
+    setDashboardStats(ds);
     setLoading(false);
     setRefreshing(false);
   }, []);
@@ -66,6 +69,8 @@ const ContactsPage: React.FC = () => {
   const plan = authUser?.plan ?? 'free';
   const isFree = plan === 'free';
   const usagePercent = stats && stats.limit ? Math.min(100, Math.round((stats.total / stats.limit) * 100)) : null;
+  const dmsSentThisMonth = dashboardStats?.dms_sent_this_month ?? 0;
+  const conversionRate = dmsSentThisMonth > 0 ? Math.min(100, Math.round(((stats?.total ?? 0) / dmsSentThisMonth) * 100)) : 0;
 
   return (
     <div className="page-wrapper">
@@ -100,25 +105,24 @@ const ContactsPage: React.FC = () => {
         </div>
 
         <div className="analytics-stat-card">
-          <p className="analytics-stat-label mb-2">Plan Limit</p>
-          <p className="analytics-stat-value">
-            {stats?.limit ? stats.limit.toLocaleString() : 'Unlimited'}
-          </p>
-          <p className="text-xs text-slate-400 mt-1">{plan} plan</p>
+          <p className="analytics-stat-label mb-2">DMs Sent This Month</p>
+          <p className="analytics-stat-value">{dmsSentThisMonth}</p>
+          <p className="text-xs text-slate-400 mt-1">from your dashboard activity</p>
         </div>
 
-        {usagePercent !== null && (
-          <div className="analytics-stat-card">
-            <p className="analytics-stat-label mb-2">Usage</p>
-            <div className="w-full bg-slate-100 rounded-full h-2 mt-3">
-              <div
-                className="bg-primary h-2 rounded-full transition-all"
-                style={{ width: `${usagePercent}%` }}
-              />
-            </div>
-            <p className="text-xs text-slate-400 mt-1">{usagePercent}% used</p>
-          </div>
-        )}
+        <div className="analytics-stat-card">
+          <p className="analytics-stat-label mb-2">Contact Capture</p>
+          <p className="analytics-stat-value">{conversionRate}%</p>
+          <p className="text-xs text-slate-400 mt-1">contacts created vs DMs sent</p>
+        </div>
+      </div>
+
+      <div className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 flex flex-wrap items-center justify-between gap-3">
+        <span>
+          <strong className="text-slate-800">Plan:</strong> {plan} · <strong className="text-slate-800">Contact Limit:</strong> {stats?.limit ? stats.limit.toLocaleString() : 'Unlimited'}
+          {usagePercent !== null && ` · ${usagePercent}% used`}
+        </span>
+        <Link to="/analytics" className="text-primary font-semibold hover:underline">View DM analytics</Link>
       </div>
 
       {/* Free upgrade prompt */}
@@ -139,6 +143,11 @@ const ContactsPage: React.FC = () => {
           <Users size={40} className="mx-auto mb-3 opacity-30" />
           <p className="font-medium">No contacts yet</p>
           <p className="text-sm mt-1">Contacts appear automatically when your automations send DMs</p>
+          {dmsSentThisMonth > 0 && (
+            <p className="text-xs mt-3 text-amber-600">
+              You have {dmsSentThisMonth} DMs this month. If contacts are still empty, recent DM logs may still be syncing.
+            </p>
+          )}
         </div>
       ) : (
         <>
