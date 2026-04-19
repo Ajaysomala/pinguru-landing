@@ -366,6 +366,126 @@
 
 .card-body { padding: 16px 20px 20px; }
 
+.dashboard-quick-actions-card,
+.dashboard-premium-locked,
+.dashboard-premium-unlocked,
+.dashboard-upgrade-card {
+  border-radius: 18px;
+}
+
+.dashboard-quick-actions-card {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+}
+
+.dashboard-action-list {
+  padding: 0 12px 14px;
+}
+
+.dashboard-action-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-action-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(79, 70, 229, 0.06), transparent 70%);
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.dashboard-action-item:hover::before {
+  opacity: 1;
+}
+
+.dashboard-premium-header {
+  padding-bottom: 6px;
+}
+
+.dashboard-premium-body {
+  position: relative;
+}
+
+.dashboard-premium-stats {
+  display: grid;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.dashboard-premium-stats strong {
+  color: var(--color-text);
+}
+
+.dashboard-premium-locked-copy {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.dashboard-premium-lock-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.dashboard-premium-locked-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+.dashboard-premium-locked {
+  background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+}
+
+.dashboard-premium-unlocked {
+  background: linear-gradient(180deg, #fbfbff 0%, #ffffff 100%);
+}
+
+.dashboard-upgrade-card {
+  position: relative;
+  color: white;
+  border: none !important;
+  background: linear-gradient(135deg, #4f46e5 0%, #6d28d9 55%, #7c3aed 100%) !important;
+  box-shadow: 0 16px 30px rgba(79, 70, 229, 0.22);
+}
+
+.dashboard-upgrade-card:hover {
+  box-shadow: 0 18px 36px rgba(79, 70, 229, 0.28);
+}
+
+.dashboard-upgrade-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.16), transparent 36%),
+    radial-gradient(circle at 0% 100%, rgba(255,255,255,0.12), transparent 28%);
+  pointer-events: none;
+}
+
+.dashboard-upgrade-card .font-semibold,
+.dashboard-upgrade-card p,
+.dashboard-upgrade-card a {
+  color: white;
+}
+
+.dashboard-upgrade-card a {
+  color: var(--color-primary);
+}
+
+.dashboard-upgrade-card a:hover {
+  color: #312e81;
+}
+
 /* --- Badges --- */
 .badge {
   display: inline-flex;

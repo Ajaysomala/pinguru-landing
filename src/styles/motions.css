@@ -1,0 +1,87 @@
+/* ============================================================
+   motions.css — Shared motion tokens and premium card effects
+   ============================================================ */
+
+.motion-fade-up {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: motionFadeUp 420ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.motion-fade-in {
+  opacity: 0;
+  animation: motionFadeIn 260ms ease forwards;
+}
+
+.motion-float-slow {
+  animation: motionFloatSlow 6s ease-in-out infinite;
+}
+
+.motion-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.motion-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.motion-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.04), transparent 55%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.motion-card:hover::before {
+  opacity: 1;
+}
+
+.motion-shine {
+  position: relative;
+}
+
+.motion-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
+  transform: translateX(-120%);
+  animation: motionShine 6.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.motion-stagger-1 { animation-delay: 60ms; }
+.motion-stagger-2 { animation-delay: 120ms; }
+.motion-stagger-3 { animation-delay: 180ms; }
+
+@keyframes motionFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes motionFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes motionFloatSlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes motionShine {
+  0%, 60% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}

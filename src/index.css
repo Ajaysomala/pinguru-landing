@@ -3,6 +3,7 @@
    ============================================================ */
 /* Section CSS imports must come before other at-rules */
 @import './styles/base.css';
+@import './styles/motions.css';
 @import './styles/dashboard.css';
 @import './styles/auth.css';
 @import './styles/rules.css';
