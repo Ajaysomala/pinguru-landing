@@ -188,7 +188,13 @@ export async function getDashboardStats(): Promise<DashboardStats | null> {
     active_rules: data.active_rules ?? 0,
     dm_limit: data.dm_limit ?? 0,
     plan: String(data.plan ?? 'free').toLowerCase(),
-    success_rate: typeof data.success_rate === 'number' ? data.success_rate : undefined,
+    success_rate: typeof data.success_rate === 'number' ? data.success_rate : null,
+    analytics_tier: data.analytics_tier === 'premium' ? 'premium' : 'basic',
+    premium_analytics_enabled: Boolean(data.premium_analytics_enabled),
+    avg_dms_per_day_30d: typeof data.avg_dms_per_day_30d === 'number' ? data.avg_dms_per_day_30d : null,
+    best_day_30d: data.best_day_30d && typeof data.best_day_30d === 'object' ? data.best_day_30d : null,
+    peak_hour_utc: typeof data.peak_hour_utc === 'number' ? data.peak_hour_utc : null,
+    busiest_weekday: typeof data.busiest_weekday === 'string' ? data.busiest_weekday : null,
   };
 }
 

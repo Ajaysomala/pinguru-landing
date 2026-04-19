@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   MessageSquare, Zap, BarChart2, CreditCard,
-  Camera, RefreshCw, ChevronRight, TrendingUp, CheckCircle,
+  Camera, RefreshCw, ChevronRight, TrendingUp, CheckCircle, Lock,
 } from 'lucide-react';
 import { getDashboardStats, getInstagramStatus, refreshInstagramToken, getRules } from '../lib/api';
 import type { DashboardStats, Rule, InstagramStatus } from '../lib/types';
@@ -68,6 +68,7 @@ const DashboardPage: React.FC = () => {
     ? Math.min(100, Math.round((stats.dms_sent_this_month / (rawLimit as number)) * 100))
     : 0;
   const usageColor = usagePct >= 90 ? 'bg-rose-500' : usagePct >= 70 ? 'bg-amber-500' : 'bg-primary';
+  const premiumAnalytics = Boolean(stats?.premium_analytics_enabled);
 
   const handleRefreshToken = async () => {
     setRefreshing(true);
@@ -121,7 +122,7 @@ const DashboardPage: React.FC = () => {
             </div>
             {stats.plan === 'free' && (
               <p className="text-xs text-slate-400 mt-2">
-                <Link to="/billing" className="text-primary font-medium hover:underline">Upgrade to Starter</Link> for 1,000 DMs/month
+                <Link to="/billing" className="text-primary font-medium hover:underline">Upgrade to Starter</Link> for premium analytics, follow-gate automation, and priority support.
               </p>
             )}
           </div>
@@ -260,6 +261,31 @@ const DashboardPage: React.FC = () => {
             </div>
           </div>
 
+          {/* Premium Analytics */}
+          <div className="card" style={{ padding: 0 }}>
+            <div className="card-header" style={{ padding: '18px 20px 0' }}>
+              <span className="card-title flex items-center gap-2">
+                <BarChart2 size={14} className="text-indigo-500" />
+                Premium Insights
+              </span>
+              {!premiumAnalytics && <Badge variant="gray"><span className="inline-flex items-center gap-1"><Lock size={11} />Locked</span></Badge>}
+            </div>
+            <div className="card-body">
+              {premiumAnalytics ? (
+                <div className="flex flex-col gap-2 text-sm text-slate-600">
+                  <div className="flex items-center justify-between"><span>Success rate</span><strong>{typeof stats?.success_rate === 'number' ? `${stats.success_rate}%` : '—'}</strong></div>
+                  <div className="flex items-center justify-between"><span>Avg DMs / day (30d)</span><strong>{typeof stats?.avg_dms_per_day_30d === 'number' ? stats.avg_dms_per_day_30d : '—'}</strong></div>
+                  <div className="flex items-center justify-between"><span>Peak hour (UTC)</span><strong>{typeof stats?.peak_hour_utc === 'number' ? `${String(stats.peak_hour_utc).padStart(2, '0')}:00` : '—'}</strong></div>
+                  <div className="flex items-center justify-between"><span>Busiest weekday</span><strong>{stats?.busiest_weekday || '—'}</strong></div>
+                </div>
+              ) : (
+                <div className="text-xs text-slate-500">
+                  Free includes basic analytics. Upgrade to Starter or Pro to unlock success rate, trend insights, peak-hour analysis, and 30-day premium reporting.
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Free plan upgrade nudge */}
           {stats?.plan === 'free' && (
             <div className="card" style={{ background: 'linear-gradient(135deg,#4F46E5 0%,#7C3AED 100%)', border: 'none' }}>
@@ -269,7 +295,7 @@ const DashboardPage: React.FC = () => {
                 </div>
                 <div>
                   <p className="font-semibold text-white text-sm">Unlock more power</p>
-                  <p className="text-white/70 text-xs mt-0.5 mb-3">Starter: 1,000 DMs + 5 rules — ₹199/mo</p>
+                  <p className="text-white/70 text-xs mt-0.5 mb-3">Starter: 15 automation flows + premium analytics — ₹199/mo</p>
                   <Link to="/billing" className="inline-flex items-center gap-1 bg-white text-primary text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors">
                     Upgrade now <ChevronRight size={12}/>
                   </Link>

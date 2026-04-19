@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { AlertCircle, ArrowLeft, Check, Plus, Sparkles, X, Link2, Upload, RefreshCw } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Check, Plus, Sparkles, X, Link2, Upload, RefreshCw, Lock, Unlock } from 'lucide-react';
 import { createRule, getInstagramMedia, getInstagramStatus } from '../../lib/api';
 import type { InstagramMediaItem, Rule, RuleCreatePayload, TriggerType } from '../../lib/types';
 import { Modal } from '../ui/Modal';
+import { useAuth } from '../../App';
 
 interface RuleBuilderModalProps {
 	open: boolean;
@@ -52,6 +53,7 @@ function getErrorText(err: unknown): string {
 }
 
 export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClose, onCreated }) => {
+	const { user } = useAuth();
 	const [step, setStep] = useState<'choose' | 'details'>('choose');
 	const [name, setName] = useState('');
 	const [triggerType, setTriggerType] = useState<TriggerType | null>(null);
@@ -75,6 +77,9 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
 	const [template, setTemplate] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
+	const plan = user?.plan ?? 'free';
+	const isStarterOrPro = plan === 'starter' || plan === 'pro';
+	const isPro = plan === 'pro';
 
 	const kwInputRef = useRef<HTMLInputElement>(null);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -84,6 +89,22 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
 			setStep('choose');
 		}
 	}, [open]);
+
+	useEffect(() => {
+		if (!isStarterOrPro && askFollowBeforeDm) setAskFollowBeforeDm(false);
+		if (!isPro && publicCommentReplyEnabled) setPublicCommentReplyEnabled(false);
+		if (!isPro && sendFollowUpMessage) setSendFollowUpMessage(false);
+		if (!isPro && dmAttachmentUrl) setDmAttachmentUrl('');
+		if (!isPro && showAttachmentInput) setShowAttachmentInput(false);
+	}, [
+		askFollowBeforeDm,
+		dmAttachmentUrl,
+		isPro,
+		isStarterOrPro,
+		publicCommentReplyEnabled,
+		sendFollowUpMessage,
+		showAttachmentInput,
+	]);
 
 	const reset = () => {
 		setStep('choose');
@@ -189,6 +210,13 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
 	const addLinkToMessage = () => {
 		insertVar(' https://');
 	};
+
+	const lockBadge = (enabled: boolean, requiredPlan: 'starter' | 'pro') => (
+		<span className={`feature-lock-badge ${enabled ? 'unlocked' : 'locked'}`}>
+			{enabled ? <Unlock size={11} /> : <Lock size={11} />}
+			{enabled ? 'Unlocked' : requiredPlan === 'starter' ? 'Starter+' : 'Pro'}
+		</span>
+	);
 
 	const handleSubmit = async () => {
 		if (!name.trim()) {
@@ -480,9 +508,15 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
 										<button type="button" className="wizard-inline-button" onClick={addLinkToMessage}>
 											<Link2 size={14} /> Add Link
 										</button>
-										<button type="button" className="wizard-inline-button" onClick={() => setShowAttachmentInput((prev) => !prev)}>
+										<button
+											type="button"
+											className={`wizard-inline-button ${!isPro ? 'disabled' : ''}`}
+											onClick={() => isPro && setShowAttachmentInput((prev) => !prev)}
+											disabled={!isPro}
+										>
 											<Upload size={14} /> {showAttachmentInput ? 'Remove Image' : 'Upload Image'}
 										</button>
+										{lockBadge(isPro, 'pro')}
 									</div>
 									{showAttachmentInput && (
 										<div className="wizard-attachment-field">
@@ -529,11 +563,12 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
 										</div>
 									</div>
 									<div className="wizard-toggle-row compact">
-										<span>Publicly reply to comments</span>
+										<span className="wizard-toggle-label">Publicly reply to comments {lockBadge(isPro, 'pro')}</span>
 										<button
 											type="button"
-											onClick={() => setPublicCommentReplyEnabled((prev) => !prev)}
+											onClick={() => isPro && setPublicCommentReplyEnabled((prev) => !prev)}
 											className={`wizard-switch ${publicCommentReplyEnabled ? 'on' : ''}`}
+											disabled={!isPro}
 										>
 											<span />
 										</button>
@@ -548,21 +583,23 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
 										/>
 									)}
 									<div className="wizard-toggle-row compact">
-										<span>Ask to follow before sending DM</span>
+										<span className="wizard-toggle-label">Ask to follow before sending DM {lockBadge(isStarterOrPro, 'starter')}</span>
 										<button
 											type="button"
-											onClick={() => setAskFollowBeforeDm((prev) => !prev)}
+											onClick={() => isStarterOrPro && setAskFollowBeforeDm((prev) => !prev)}
 											className={`wizard-switch ${askFollowBeforeDm ? 'on' : ''}`}
+											disabled={!isStarterOrPro}
 										>
 											<span />
 										</button>
 									</div>
 									<div className="wizard-toggle-row compact">
-										<span>Send follow-up message</span>
+										<span className="wizard-toggle-label">Send follow-up message {lockBadge(isPro, 'pro')}</span>
 										<button
 											type="button"
-											onClick={() => setSendFollowUpMessage((prev) => !prev)}
+											onClick={() => isPro && setSendFollowUpMessage((prev) => !prev)}
 											className={`wizard-switch ${sendFollowUpMessage ? 'on' : ''}`}
+											disabled={!isPro}
 										>
 											<span />
 										</button>

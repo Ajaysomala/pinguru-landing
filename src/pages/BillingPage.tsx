@@ -27,8 +27,8 @@ type BillingCycle = 'monthly' | 'quarterly' | 'yearly';
 
 const BILLING_CYCLE_META: Record<BillingCycle, { label: string; multiplier: number; discount: number; periodLabel: string; billedEvery: string }> = {
   monthly: { label: 'Monthly', multiplier: 1, discount: 0, periodLabel: '/mo', billedEvery: 'billed monthly' },
-  quarterly: { label: 'Quarterly', multiplier: 3, discount: 0.1, periodLabel: '/qtr', billedEvery: 'billed every 3 months' },
-  yearly: { label: 'Yearly', multiplier: 12, discount: 0.2, periodLabel: '/yr', billedEvery: 'billed annually' },
+  quarterly: { label: 'Quarterly', multiplier: 3, discount: 0, periodLabel: '/qtr', billedEvery: 'billed every 3 months' },
+  yearly: { label: 'Yearly', multiplier: 12, discount: 0, periodLabel: '/yr', billedEvery: 'billed annually' },
 };
 
 const PLANS: PlanDef[] = [
@@ -44,7 +44,7 @@ const PLANS: PlanDef[] = [
       '500 monthly contacts',
       'Basic analytics',
       'Email support',
-      'Powered by PinGuru footer in DMs',
+      'DM footer: © PinGuru',
     ],
   },
   {
@@ -58,9 +58,9 @@ const PLANS: PlanDef[] = [
       'Unlimited DMs',
       'Unlimited contacts',
       'Premium analytics',
-      'Ask-to-follow flow for comment automations',
-      'Priority email support',
-      'Custom response templates',
+      'No DM footer branding',
+      'Ask-to-follow before DM delivery',
+      'Priority email support (faster queue)',
     ],
     popular: true,
   },
@@ -75,10 +75,9 @@ const PLANS: PlanDef[] = [
       'Unlimited DMs',
       'Unlimited contacts',
       'Premium analytics',
-      'Image attachment support in DMs',
-      'Ask-to-follow flow',
-      '24/7 support',
-      'Remove "Powered by PinGuru"',
+      '24/7 faster support response',
+      'No DM footer branding',
+      'Ask-to-follow before DM delivery',
     ],
   },
 ];
@@ -335,7 +334,7 @@ const BillingPage: React.FC = () => {
                       <span className="plan-price-period">{cycleMeta.periodLabel}</span>
                     </div>
                     <span className="text-xs text-slate-500 mt-1">{cycleMeta.billedEvery}</span>
-                    {billingCycle !== 'monthly' && <span className="text-xs text-emerald-700 mt-0.5">Save {Math.round(cycleMeta.discount * 100)}% vs monthly</span>}
+                    {billingCycle !== 'monthly' && cycleMeta.discount > 0 && <span className="text-xs text-emerald-700 mt-0.5">Save {Math.round(cycleMeta.discount * 100)}% vs monthly</span>}
                   </div>
                 )}
               </div>

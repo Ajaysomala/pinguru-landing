@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, MessageSquare, Zap } from 'lucide-react';
+import { TrendingUp, MessageSquare, Zap, Lock, Unlock } from 'lucide-react';
 import { getDashboardStats, getAnalytics } from '../lib/api';
 import type { DashboardStats, AnalyticsData } from '../lib/types';
 import { Badge } from '../components/ui/Badge';
@@ -65,7 +65,7 @@ const AnalyticsPage: React.FC = () => {
             </div>
           </div>
           <p className="analytics-stat-value success">{isFree ? '—' : `${successRate}%`}</p>
-          <p className="text-xs text-slate-400 mt-1">{isFree ? 'Upgrade to view' : 'of automations succeeded'}</p>
+          <p className="text-xs text-slate-400 mt-1 inline-flex items-center gap-1.5">{isFree ? <><Lock size={12} />Upgrade to view</> : <><Unlock size={12} />of automations succeeded</>}</p>
         </div>
 
         <div className="analytics-stat-card">
@@ -92,7 +92,7 @@ const AnalyticsPage: React.FC = () => {
       {isFree && (
         <div className="mt-5 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500 flex items-start gap-2.5">
           <Badge variant="indigo">Free Plan</Badge>
-          <span>Basic DM counts are visible on all plans. Upgrade for full analytics, success rate tracking, and 30-day history.</span>
+          <span>Basic analytics are visible on all plans. Upgrade to Starter or Pro for premium analytics: success rate, DM trend charts, peak-hour insights, and 30-day reporting.</span>
         </div>
       )}
     </div>

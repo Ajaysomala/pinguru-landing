@@ -23,8 +23,14 @@ export interface DashboardStats {
   dm_limit: number | null;
   dm_remaining?: number | null;
   plan: string;
-  success_rate?: number;
+  success_rate?: number | null;
   total_dms_sent?: number;
+  analytics_tier?: 'basic' | 'premium';
+  premium_analytics_enabled?: boolean;
+  avg_dms_per_day_30d?: number | null;
+  best_day_30d?: { date: string; sent: number } | null;
+  peak_hour_utc?: number | null;
+  busiest_weekday?: string | null;
 }
 
 export interface Rule {
@@ -87,8 +93,8 @@ export interface Plan {
   name: 'free' | 'starter' | 'pro';
   display_name: string;
   price_inr: number;
-  dm_limit: number;
-  rule_limit: number;
+  dm_limit: number | null;
+  rule_limit: number | 'Unlimited';
   features: string[];
   stripe_price_id?: string;
 }
