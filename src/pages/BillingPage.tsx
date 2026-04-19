@@ -252,8 +252,6 @@ const BillingPage: React.FC = () => {
           prefill: { email: session.prefill_email },
           theme: { color: '#4F46E5' },
           handler: () => {
-            clearPaymentParams();
-            clearPollingSuppression();
             setBanner({ kind: 'processing', message: 'Payment received. Activating your plan...' });
             navigate('/billing?payment=processing&provider=razorpay', { replace: true });
           },
