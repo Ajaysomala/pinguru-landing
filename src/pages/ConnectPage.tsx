@@ -19,6 +19,21 @@ const HOW_STEPS = [
   { icon: <BarChart2 size={18} className="text-violet-600" />, title: 'Track in analytics', desc: 'See every DM sent and rule triggered in the Analytics tab.' },
 ];
 
+const REQUESTED_PERMISSIONS = [
+  {
+    perm: 'instagram_basic',
+    title: 'Basic profile access',
+    desc: 'Read your username and profile picture so your connected account is shown correctly.',
+    level: 'Required',
+  },
+  {
+    perm: 'instagram_manage_messages',
+    title: 'Message access',
+    desc: 'Send and receive DMs on your behalf to run your automation workflows.',
+    level: 'Required',
+  },
+] as const;
+
 // ── ConnectPage ───────────────────────────────────────────────────────────────
 const ConnectPage: React.FC = () => {
   const navigate = useNavigate();
@@ -159,7 +174,7 @@ const ConnectPage: React.FC = () => {
         <div className="connect-main-col flex flex-col gap-5">
 
           {/* Main connect card */}
-          <div className="card connect-main-card" style={{ padding: 0 }}>
+          <div className="card connect-main-card connect-animate-in" style={{ padding: 0 }}>
             <div className="card-header" style={{ padding: '20px 22px 0' }}>
               <span className="card-title flex items-center gap-2">
                 <Camera size={16} className="text-pink-500"/> Account Status
@@ -270,26 +285,30 @@ const ConnectPage: React.FC = () => {
           </div>
 
           {/* Permissions info */}
-          <div className="card">
-            <div className="card-header">
+          <div className="card connect-permissions-card connect-animate-in" style={{ animationDelay: '80ms' }}>
+            <div className="card-header connect-permissions-header">
               <span className="card-title flex items-center gap-2">
                 <ShieldCheck size={15} className="text-emerald-500"/> What we request
               </span>
+              <Badge variant="green">Only essential access</Badge>
             </div>
-            <div className="flex flex-col gap-3">
-              {[
-                { perm: 'instagram_basic',           desc: 'Read your username and profile picture' },
-                { perm: 'instagram_manage_messages', desc: 'Send and receive DMs on your behalf' },
-              ].map(item => (
-                <div key={item.perm} className="flex items-start gap-2.5">
-                  <CheckCircle size={14} className="text-emerald-500 flex-shrink-0 mt-0.5"/>
-                  <div>
-                    <code className="text-xs font-mono text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">{item.perm}</code>
-                    <p className="text-xs text-slate-500 mt-0.5">{item.desc}</p>
+            <div className="connect-permissions-list">
+              {REQUESTED_PERMISSIONS.map((item, idx) => (
+                <div key={item.perm} className="connect-permission-item" style={{ animationDelay: `${120 + idx * 60}ms` }}>
+                  <div className="connect-permission-check">
+                    <CheckCircle size={16} className="text-emerald-600"/>
+                  </div>
+                  <div className="connect-permission-copy">
+                    <div className="connect-permission-top">
+                      <p className="connect-permission-title">{item.title}</p>
+                      <span className="connect-permission-level">{item.level}</span>
+                    </div>
+                    <p className="connect-permission-key">{item.perm}</p>
+                    <p className="connect-permission-desc">{item.desc}</p>
                   </div>
                 </div>
               ))}
-              <p className="text-xs text-slate-400 mt-1 border-t border-slate-100 pt-3">
+              <p className="connect-permission-note">
                 We never post on your behalf, access your followers list, or request unnecessary permissions.
               </p>
             </div>
@@ -298,13 +317,13 @@ const ConnectPage: React.FC = () => {
 
         {/* Right — How It Works */}
         <div className="connect-side-col flex flex-col gap-5">
-          <div className="card connect-side-card">
+          <div className="card connect-side-card connect-animate-in" style={{ animationDelay: '140ms' }}>
             <div className="card-header">
               <span className="card-title">How It Works</span>
             </div>
             <div className="flex flex-col gap-5">
               {HOW_STEPS.map((step, i) => (
-                <div key={i} className="flex gap-3.5">
+                <div key={i} className="flex gap-3.5 connect-step-row" style={{ animationDelay: `${180 + i * 60}ms` }}>
                   <div className="flex flex-col items-center">
                     <div className="w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center flex-shrink-0">
                       {step.icon}
@@ -321,20 +340,22 @@ const ConnectPage: React.FC = () => {
               ))}
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Meta compliance note */}
-          <div className="card connect-side-card connect-policy-card" style={{ background: '#FAFAFA' }}>
-            <div className="flex items-start gap-3">
-              <ShieldCheck size={18} className="text-emerald-500 flex-shrink-0 mt-0.5"/>
-              <div>
-                <p className="font-semibold text-slate-800 text-sm mb-1">Meta Platform Policy</p>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  PinGuru is built in compliance with Meta's Platform Policy. Your data is never sold or shared with third parties.
-                  You can revoke access anytime from your Instagram settings or via{' '}
-                  <a href="/settings" className="text-primary hover:underline">Settings → Delete My Data</a>.
-                </p>
-              </div>
-            </div>
+      {/* Meta compliance note */}
+      <div className="connect-policy-note connect-animate-in" style={{ animationDelay: '220ms' }}>
+        <div className="connect-policy-glow" aria-hidden="true" />
+        <div className="connect-policy-content">
+          <div className="connect-policy-icon-wrap">
+            <ShieldCheck size={18} className="text-emerald-600"/>
+          </div>
+          <div>
+            <p className="connect-policy-title">Meta Platform Policy</p>
+            <p className="connect-policy-text">
+              PinGuru is built in compliance with Meta Platform Policy. Your data is never sold or shared with third parties.
+              You can revoke access anytime from Instagram settings or from <Link to="/settings" className="connect-policy-link">Settings - Delete My Data</Link>.
+            </p>
           </div>
         </div>
       </div>
