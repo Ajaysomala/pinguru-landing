@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Check, Zap, Users, CreditCard, ExternalLink, AlertCircle, MessageSquare } from 'lucide-react';
 import { cancelPendingCheckout, createPlanCheckout, getCustomerPortalUrl, getPlanStatus } from '../lib/api';
 import type { PlanStatus } from '../lib/types';
@@ -94,8 +94,18 @@ function formatProvider(provider: string | null | undefined): string {
   return provider;
 }
 
+const BILLING_POLL_SUPPRESS_KEY = 'pg_billing_poll_suppressed_until';
+
+function getBillingPollSuppressedUntil(): number {
+  const value = sessionStorage.getItem(BILLING_POLL_SUPPRESS_KEY);
+  if (!value) return 0;
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
 const BillingPage: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [planStatus, setPlanStatus] = useState<PlanStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -105,8 +115,27 @@ const BillingPage: React.FC = () => {
   const [error, setError] = useState('');
   const [banner, setBanner] = useState<StatusBanner | null>(null);
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
+  const [pollingSuppressedUntil, setPollingSuppressedUntil] = useState<number>(() => getBillingPollSuppressedUntil());
 
   const hasProcessingParam = searchParams.get('payment') === 'processing';
+  const isPollingSuppressed = pollingSuppressedUntil > Date.now();
+
+  const clearPaymentParams = useCallback(() => {
+    if (searchParams.has('payment') || searchParams.has('provider')) {
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
+  const suppressPolling = useCallback((durationMs: number) => {
+    const until = Date.now() + durationMs;
+    sessionStorage.setItem(BILLING_POLL_SUPPRESS_KEY, String(until));
+    setPollingSuppressedUntil(until);
+  }, []);
+
+  const clearPollingSuppression = useCallback(() => {
+    sessionStorage.removeItem(BILLING_POLL_SUPPRESS_KEY);
+    setPollingSuppressedUntil(0);
+  }, []);
 
   const fetchStatus = useCallback(async (): Promise<PlanStatus> => {
     const status = await getPlanStatus();
@@ -128,7 +157,7 @@ const BillingPage: React.FC = () => {
     init();
   }, [fetchStatus]);
 
-  const shouldPoll = hasProcessingParam || Boolean(planStatus?.is_checkout_pending);
+  const shouldPoll = !isPollingSuppressed && (hasProcessingParam || Boolean(planStatus?.is_checkout_pending));
 
   useEffect(() => {
     if (!planStatus) return;
@@ -152,17 +181,23 @@ const BillingPage: React.FC = () => {
 
         if (paidActivated) {
           setBanner({ kind: 'success', message: `Payment confirmed. Your ${latest.current_plan} plan is now active.` });
+          clearPaymentParams();
+          clearPollingSuppression();
           active = false;
           return;
         }
 
         if (elapsedMs >= timeoutMs) {
           setBanner({ kind: 'timeout', message: 'Payment is still processing. Please refresh again in a few minutes.' });
+          clearPaymentParams();
+          suppressPolling(10 * 60 * 1000);
           active = false;
         }
       } catch {
         if (elapsedMs >= timeoutMs) {
           setBanner({ kind: 'timeout', message: 'Payment status check timed out. Please refresh again in a few minutes.' });
+          clearPaymentParams();
+          suppressPolling(10 * 60 * 1000);
           active = false;
         }
       }
@@ -178,7 +213,7 @@ const BillingPage: React.FC = () => {
       active = false;
       window.clearInterval(id);
     };
-  }, [fetchStatus, hasProcessingParam, shouldPoll]);
+  }, [clearPaymentParams, clearPollingSuppression, fetchStatus, hasProcessingParam, shouldPoll, suppressPolling]);
 
   const currentPlan = planStatus?.current_plan ?? 'free';
   const pendingPlan = planStatus?.pending_plan;
@@ -206,8 +241,38 @@ const BillingPage: React.FC = () => {
     setError('');
 
     try {
-      const { checkout_url } = await createPlanCheckout(plan.id, billingCycle);
-      window.location.href = checkout_url;
+      const session = await createPlanCheckout(plan.id, billingCycle);
+
+      if (session.subscription_id && session.key_id && (window as any).Razorpay) {
+        const rzp = new (window as any).Razorpay({
+          key: session.key_id,
+          subscription_id: session.subscription_id,
+          name: 'PinGuru',
+          description: `${plan.name} Plan (${billingCycle})`,
+          prefill: { email: session.prefill_email },
+          theme: { color: '#4F46E5' },
+          handler: () => {
+            clearPaymentParams();
+            clearPollingSuppression();
+            setBanner({ kind: 'processing', message: 'Payment received. Activating your plan...' });
+            navigate('/billing?payment=processing&provider=razorpay', { replace: true });
+          },
+          modal: {
+            ondismiss: () => {
+              setError('Payment was cancelled. You can try again anytime.');
+            },
+          },
+        });
+
+        rzp.on('payment.failed', (response: any) => {
+          setError(`Payment failed: ${response?.error?.description || 'Please try again.'}`);
+        });
+
+        rzp.open();
+        return;
+      }
+
+      window.location.href = session.checkout_url;
     } catch (err: any) {
       setError(getCheckoutErrorMessage(err?.status, err?.message));
     } finally {
@@ -235,6 +300,8 @@ const BillingPage: React.FC = () => {
       await cancelPendingCheckout();
       const latest = await fetchStatus();
       setPlanStatus(latest);
+      clearPaymentParams();
+      clearPollingSuppression();
       setBanner({ kind: 'timeout', message: 'Pending checkout was cancelled. You can start a new upgrade anytime.' });
     } catch (err: any) {
       setError(err?.message || 'Failed to cancel pending checkout.');

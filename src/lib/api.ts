@@ -334,7 +334,14 @@ export async function getPlanStatus(): Promise<PlanStatus> {
 export async function createPlanCheckout(
   plan: 'starter' | 'pro',
   billingCycle: 'monthly' | 'quarterly' | 'yearly' = 'monthly',
-): Promise<{ checkout_url: string }> {
+): Promise<{
+  subscription_id: string;
+  checkout_url: string;
+  key_id: string;
+  prefill_email: string;
+  plan: string;
+  billing_cycle: string;
+}> {
   const res = await authFetch('/billing/create-checkout', {
     method: 'POST',
     body: JSON.stringify({ plan, billing_cycle: billingCycle }),
@@ -355,7 +362,18 @@ export async function createPlanCheckout(
   if (!res.ok) {
     throw createApiRequestError(res.status, data, 'Failed to create payment session');
   }
-  return data as { checkout_url: string };
+  if (!data?.checkout_url && !data?.subscription_id) {
+    throw new Error('Payment session returned invalid data. Please try again.');
+  }
+
+  return data as {
+    subscription_id: string;
+    checkout_url: string;
+    key_id: string;
+    prefill_email: string;
+    plan: string;
+    billing_cycle: string;
+  };
 }
 
 export async function getCustomerPortalUrl(): Promise<{ portal_url: string }> {
