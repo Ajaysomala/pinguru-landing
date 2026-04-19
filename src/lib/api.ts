@@ -335,8 +335,23 @@ export async function createPlanCheckout(
   plan: 'starter' | 'pro',
   billingCycle: 'monthly' | 'quarterly' | 'yearly' = 'monthly',
 ): Promise<{ checkout_url: string }> {
-  const res = await authFetch(`/plans/checkout/${plan}?billing_cycle=${billingCycle}`, { method: 'POST' });
-  const data = await res.json();
+  const res = await authFetch('/billing/create-checkout', {
+    method: 'POST',
+    body: JSON.stringify({ plan, billing_cycle: billingCycle }),
+  });
+
+  let data: any = null;
+  const contentType = res.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    data = await res.json();
+  } else {
+    const text = await res.text();
+    if (!res.ok) {
+      throw createApiRequestError(res.status, text || 'Unexpected non-JSON response', 'Failed to create payment session');
+    }
+    throw new Error('Payment service returned an unexpected response format.');
+  }
+
   if (!res.ok) {
     throw createApiRequestError(res.status, data, 'Failed to create payment session');
   }

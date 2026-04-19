@@ -39,9 +39,6 @@ const PLANS: PlanDef[] = [
     monthlyPrice: 0,
     highlight: { rules: '5 automation flows', dms: 'Unlimited DMs', contacts: '500 contacts/mo' },
     features: [
-      '5 automation flows',
-      'Unlimited DMs',
-      '500 monthly contacts',
       'Basic analytics',
       'Email support',
       'DM footer: © PinGuru',
@@ -54,9 +51,6 @@ const PLANS: PlanDef[] = [
     monthlyPrice: 199,
     highlight: { rules: '15 automation flows', dms: 'Unlimited DMs', contacts: 'Unlimited contacts' },
     features: [
-      '15 automation flows',
-      'Unlimited DMs',
-      'Unlimited contacts',
       'Premium analytics',
       'No DM footer branding',
       'Ask-to-follow before DM delivery',
@@ -71,9 +65,6 @@ const PLANS: PlanDef[] = [
     monthlyPrice: 499,
     highlight: { rules: 'Unlimited flows', dms: 'Unlimited DMs', contacts: 'Unlimited contacts' },
     features: [
-      'Unlimited automation flows',
-      'Unlimited DMs',
-      'Unlimited contacts',
       'Premium analytics',
       '24/7 faster support response',
       'No DM footer branding',
