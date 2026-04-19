@@ -127,10 +127,11 @@ const BillingPage: React.FC = () => {
     init();
   }, [fetchStatus]);
 
+  const shouldPoll = hasProcessingParam || Boolean(planStatus?.is_checkout_pending);
+
   useEffect(() => {
     if (!planStatus) return;
 
-    const shouldPoll = hasProcessingParam || planStatus.is_checkout_pending;
     if (!shouldPoll) return;
 
     let active = true;
@@ -176,7 +177,7 @@ const BillingPage: React.FC = () => {
       active = false;
       window.clearInterval(id);
     };
-  }, [fetchStatus, hasProcessingParam, planStatus]);
+  }, [fetchStatus, hasProcessingParam, shouldPoll]);
 
   const currentPlan = planStatus?.current_plan ?? 'free';
   const pendingPlan = planStatus?.pending_plan;
