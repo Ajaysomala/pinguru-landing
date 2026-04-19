@@ -4,6 +4,60 @@ import { getProfile } from './lib/api';
 import { AppShell } from './components/layout/AppShell';
 import type { User } from './lib/types';
 
+class AppErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; message: string }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, message: '' };
+  }
+
+  static getDerivedStateFromError(error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unexpected client error';
+    return { hasError: true, message };
+  }
+
+  componentDidCatch(error: unknown) {
+    console.error('AppErrorBoundary caught error:', error);
+  }
+
+  render() {
+    if (!this.state.hasError) return this.props.children;
+
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-canvas px-4">
+        <div className="max-w-md w-full bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-center">
+          <h1 className="text-lg font-semibold text-slate-800">Something went wrong</h1>
+          <p className="text-sm text-slate-500 mt-2">{this.state.message || 'The app failed to render. Please reload once.'}</p>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-indigo-700 transition-colors"
+          >
+            Reload app
+          </button>
+        </div>
+      </div>
+    );
+  }
+}
+
+function lazyWithRetry<T extends React.ComponentType<any>>(
+  importer: () => Promise<{ default: T }>,
+) {
+  return React.lazy(async () => {
+    try {
+      return await importer();
+    } catch (error) {
+      const key = 'pg_lazy_retry_done';
+      const retried = sessionStorage.getItem(key) === '1';
+      if (!retried) {
+        sessionStorage.setItem(key, '1');
+        window.location.reload();
+      }
+      throw error;
+    }
+  });
+}
+
 // ── Auth context ──────────────────────────────────────────────────────────────
 // One single /auth/me call at app boot. Every component reads from here —
 // no component fetches /auth/me independently.
@@ -80,22 +134,22 @@ const PublicOnly: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 // ── Lazy pages ────────────────────────────────────────────────────────────────
 
-const LandingPage    = React.lazy(() => import('./pages/LandingPage'));
-const LoginPage      = React.lazy(() => import('./pages/LoginPage'));
-const RegisterPage   = React.lazy(() => import('./pages/RegisterPage'));
-const VerifyPage     = React.lazy(() => import('./pages/VerifyEmailPage'));
-const OnboardingPage = React.lazy(() => import('./pages/OnboardingPage'));
-const DashboardPage  = React.lazy(() => import('./pages/DashboardPage'));
-const ConnectPage    = React.lazy(() => import('./pages/ConnectPage'));
-const RulesPage      = React.lazy(() => import('./pages/RulesPage'));
-const ContactsPage   = React.lazy(() => import('./pages/ContactsPage'));
-const AnalyticsPage  = React.lazy(() => import('./pages/AnalyticsPage'));
-const BillingPage    = React.lazy(() => import('./pages/BillingPage'));
-const SettingsPage   = React.lazy(() => import('./pages/SettingsPage'));
-const RefundPage     = React.lazy(() => import('./pages/RefundPage'));
-const PrivacyPage    = React.lazy(() => import('./pages/PrivacyPage'));
-const TermsPage      = React.lazy(() => import('./pages/TermsPage'));
-const SupportPage    = React.lazy(() => import('./pages/SupportPage'));
+const LandingPage    = lazyWithRetry(() => import('./pages/LandingPage'));
+const LoginPage      = lazyWithRetry(() => import('./pages/LoginPage'));
+const RegisterPage   = lazyWithRetry(() => import('./pages/RegisterPage'));
+const VerifyPage     = lazyWithRetry(() => import('./pages/VerifyEmailPage'));
+const OnboardingPage = lazyWithRetry(() => import('./pages/OnboardingPage'));
+const DashboardPage  = lazyWithRetry(() => import('./pages/DashboardPage'));
+const ConnectPage    = lazyWithRetry(() => import('./pages/ConnectPage'));
+const RulesPage      = lazyWithRetry(() => import('./pages/RulesPage'));
+const ContactsPage   = lazyWithRetry(() => import('./pages/ContactsPage'));
+const AnalyticsPage  = lazyWithRetry(() => import('./pages/AnalyticsPage'));
+const BillingPage    = lazyWithRetry(() => import('./pages/BillingPage'));
+const SettingsPage   = lazyWithRetry(() => import('./pages/SettingsPage'));
+const RefundPage     = lazyWithRetry(() => import('./pages/RefundPage'));
+const PrivacyPage    = lazyWithRetry(() => import('./pages/PrivacyPage'));
+const TermsPage      = lazyWithRetry(() => import('./pages/TermsPage'));
+const SupportPage    = lazyWithRetry(() => import('./pages/SupportPage'));
 
 const Page: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <React.Suspense fallback={
@@ -111,8 +165,9 @@ const Page: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 const App: React.FC = () => (
   <BrowserRouter>
-    <AuthProvider>
-      <Routes>
+    <AppErrorBoundary>
+      <AuthProvider>
+        <Routes>
         {/* Public */}
         <Route path="/"         element={<PublicOnly><Page><LandingPage /></Page></PublicOnly>} />
         <Route path="/login"    element={<PublicOnly><Page><LoginPage /></Page></PublicOnly>} />
@@ -142,8 +197,9 @@ const App: React.FC = () => (
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </AuthProvider>
+        </Routes>
+      </AuthProvider>
+    </AppErrorBoundary>
   </BrowserRouter>
 );
 

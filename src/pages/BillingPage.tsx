@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Check, Zap, Users, CreditCard, ExternalLink, AlertCircle, MessageSquare } from 'lucide-react';
-import { createPlanCheckout, getCustomerPortalUrl, getPlanStatus } from '../lib/api';
+import { cancelPendingCheckout, createPlanCheckout, getCustomerPortalUrl, getPlanStatus } from '../lib/api';
 import type { PlanStatus } from '../lib/types';
 import '../styles/dashboard.css';
 import '../styles/billing.css';
@@ -101,6 +101,7 @@ const BillingPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [upgrading, setUpgrading] = useState<'starter' | 'pro' | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
   const [error, setError] = useState('');
   const [banner, setBanner] = useState<StatusBanner | null>(null);
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
@@ -135,7 +136,7 @@ const BillingPage: React.FC = () => {
     if (!shouldPoll) return;
 
     let active = true;
-    let elapsed = 0;
+    const startedAt = Date.now();
     const intervalMs = 4000;
     const timeoutMs = 90000;
 
@@ -143,7 +144,7 @@ const BillingPage: React.FC = () => {
 
     const poll = async () => {
       if (!active) return;
-      elapsed += intervalMs;
+      const elapsedMs = Date.now() - startedAt;
 
       try {
         const latest = await fetchStatus();
@@ -155,12 +156,12 @@ const BillingPage: React.FC = () => {
           return;
         }
 
-        if (elapsed >= timeoutMs) {
+        if (elapsedMs >= timeoutMs) {
           setBanner({ kind: 'timeout', message: 'Payment is still processing. Please refresh again in a few minutes.' });
           active = false;
         }
       } catch {
-        if (elapsed >= timeoutMs) {
+        if (elapsedMs >= timeoutMs) {
           setBanner({ kind: 'timeout', message: 'Payment status check timed out. Please refresh again in a few minutes.' });
           active = false;
         }
@@ -227,6 +228,21 @@ const BillingPage: React.FC = () => {
     }
   };
 
+  const handleCancelPending = async () => {
+    setCancelLoading(true);
+    setError('');
+    try {
+      await cancelPendingCheckout();
+      const latest = await fetchStatus();
+      setPlanStatus(latest);
+      setBanner({ kind: 'timeout', message: 'Pending checkout was cancelled. You can start a new upgrade anytime.' });
+    } catch (err: any) {
+      setError(err?.message || 'Failed to cancel pending checkout.');
+    } finally {
+      setCancelLoading(false);
+    }
+  };
+
   return (
     <div className="page-wrapper">
       <div className="page-header">
@@ -279,6 +295,18 @@ const BillingPage: React.FC = () => {
             ) : <ExternalLink size={12} />}
             Manage
           </button>
+          {planStatus.is_checkout_pending && (
+            <button
+              onClick={handleCancelPending}
+              disabled={cancelLoading}
+              className="ml-2 flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 bg-white border border-rose-200 px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors disabled:opacity-50"
+            >
+              {cancelLoading ? (
+                <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+              ) : null}
+              Cancel Pending
+            </button>
+          )}
         </div>
       )}
 

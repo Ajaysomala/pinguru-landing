@@ -365,6 +365,13 @@ export async function getCustomerPortalUrl(): Promise<{ portal_url: string }> {
   return data;
 }
 
+export async function cancelPendingCheckout(): Promise<{ cancelled: boolean; message?: string }> {
+  const res = await authFetch('/billing/cancel-pending', { method: 'POST' });
+  const data = await res.json();
+  if (!res.ok) throw createApiRequestError(res.status, data, 'Failed to cancel pending checkout');
+  return data as { cancelled: boolean; message?: string };
+}
+
 export async function requestRefund(reason: string, paymentId?: string): Promise<{ message: string }> {
   const res = await authFetch('/billing/refund', { method: 'POST', body: JSON.stringify({ reason, payment_id: paymentId || null }) });
   const data = await res.json();
