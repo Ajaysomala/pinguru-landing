@@ -131,6 +131,9 @@ const LoginPage: React.FC = () => {
         <p className="auth-footer">
           Don't have an account? <Link to="/register">Create one free</Link>
         </p>
+        <p className="auth-footer" style={{ marginTop: 8 }}>
+          Forgot your password? <Link to="/forgot-password">Reset it here</Link>
+        </p>
       </div>
     </div>
   );

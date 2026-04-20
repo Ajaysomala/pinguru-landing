@@ -139,6 +139,7 @@ const LoginPage      = lazyWithRetry(() => import('./pages/LoginPage'));
 const RegisterPage   = lazyWithRetry(() => import('./pages/RegisterPage'));
 const VerifyPage     = lazyWithRetry(() => import('./pages/VerifyEmailPage'));
 const OnboardingPage = lazyWithRetry(() => import('./pages/OnboardingPage'));
+const ForgotPasswordPage = lazyWithRetry(() => import('./pages/ForgotPasswordPage'));
 const DashboardPage  = lazyWithRetry(() => import('./pages/DashboardPage'));
 const ConnectPage    = lazyWithRetry(() => import('./pages/ConnectPage'));
 const RulesPage      = lazyWithRetry(() => import('./pages/RulesPage'));
@@ -174,6 +175,7 @@ const App: React.FC = () => (
         <Route path="/login"    element={<PublicOnly><Page><LoginPage /></Page></PublicOnly>} />
         <Route path="/register" element={<PublicOnly><Page><RegisterPage /></Page></PublicOnly>} />
         <Route path="/verify"   element={<PublicOnly><Page><VerifyPage /></Page></PublicOnly>} />
+        <Route path="/forgot-password" element={<Page><ForgotPasswordPage /></Page>} />
         <Route path="/privacy"  element={<Page><PrivacyPage /></Page>} />
         <Route path="/terms"    element={<Page><TermsPage /></Page>} />
         <Route path="/support"  element={<Page><SupportPage /></Page>} />

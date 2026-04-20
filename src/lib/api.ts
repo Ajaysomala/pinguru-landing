@@ -128,6 +128,23 @@ export async function resendEmailOtp(email: string) {
   if (!res.ok) throw new Error(data.detail || 'Failed to resend OTP');
 }
 
+export async function requestPasswordReset(email: string): Promise<{ message: string; reset_token?: string; reset_url?: string }> {
+  const res = await authFetch('/auth/forgot-password/request', { method: 'POST', body: JSON.stringify({ email }) });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.detail || 'Failed to request password reset');
+  return data;
+}
+
+export async function resetPassword(email: string, resetToken: string, newPassword: string): Promise<{ message: string }> {
+  const res = await authFetch('/auth/forgot-password/reset', {
+    method: 'POST',
+    body: JSON.stringify({ email, reset_token: resetToken, new_password: newPassword }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.detail || 'Failed to reset password');
+  return data;
+}
+
 export async function logout() {
   try { await authFetch('/auth/logout', { method: 'POST' }); } catch {}
   localStorage.removeItem('pg_user');
