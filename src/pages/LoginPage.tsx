@@ -48,7 +48,7 @@ const LoginPage: React.FC = () => {
         setLockoutMsg(`Too many attempts. Locked for 15 minutes.`);
       } else {
         setRemaining(result.remaining);
-        const msg = err.message || 'Invalid email or password';
+        const msg = err.message || 'Invalid credentials';
         setError(msg);
         if (msg.toLowerCase().includes('not verified')) {
           localStorage.setItem('pg_verify_email', email);
