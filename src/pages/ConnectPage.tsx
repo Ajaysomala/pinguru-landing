@@ -133,7 +133,7 @@ const ConnectPage: React.FC = () => {
 
   return (
     <div className="page-wrapper connect-page">
-      <div className="page-header">
+      <div className="page-header connect-hero">
         <h1 className="page-title">Connect Instagram</h1>
         <p className="page-subtitle">Link your business Instagram account to enable DM automation</p>
         {!loading && (

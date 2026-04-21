@@ -61,7 +61,7 @@ const RulesPage: React.FC = () => {
   const pausedCount = Math.max(0, rules.length - activeCount);
 
   return (
-    <div className="page-wrapper">
+    <div className="page-wrapper rules-page">
       {/* Header */}
       <div className="page-header flex items-start justify-between">
         <div>
@@ -96,7 +96,7 @@ const RulesPage: React.FC = () => {
       )}
 
       {!loading && (
-        <div className="stats-grid mb-6">
+        <div className="stats-grid rules-stats-grid mb-6">
           <div className="stat-card">
             <div className="flex items-center justify-between">
               <div>
@@ -159,7 +159,7 @@ const RulesPage: React.FC = () => {
 
       {/* Empty state */}
       {!loading && rules.length === 0 && (
-        <div className="card text-center py-14">
+        <div className="card rules-empty-card text-center py-14">
           <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center mx-auto mb-4">
             <Zap size={28} className="text-primary"/>
           </div>

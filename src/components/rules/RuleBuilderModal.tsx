@@ -40,17 +40,41 @@ const COMMENT_MEDIA_PREVIEW: InstagramMediaItem[] = [
   { id: 'preview-4', media_type: 'reel', caption: 'Reel' },
 ];
 
-const TEMPLATE_VARS = ['{name}', '{username}', '{keyword}'];
+const TEMPLATE_VARS = ['{{name}}', '{{username}}', '{{keyword}}'];
 
 // Sample values for live phone preview
 const PREVIEW_VALUES: Record<string, string> = {
-  '{name}': 'Rahul',
-  '{username}': 'rahul_dev',
-  '{keyword}': 'price',
+  '{{name}}': 'Rahul',
+  '{{username}}': 'rahul_dev',
+  '{{keyword}}': 'price',
 };
 
+function normalizeTemplateVariables(input: string): string {
+  const sentinels: Record<string, string> = {
+    '{{name}}': '__PG_NAME__',
+    '{{username}}': '__PG_USERNAME__',
+    '{{keyword}}': '__PG_KEYWORD__',
+  };
+
+  let normalized = input;
+  Object.entries(sentinels).forEach(([token, sentinel]) => {
+    normalized = normalized.split(token).join(sentinel);
+  });
+
+  normalized = normalized
+    .split('{name}').join('{{name}}')
+    .split('{username}').join('{{username}}')
+    .split('{keyword}').join('{{keyword}}');
+
+  Object.entries(sentinels).forEach(([token, sentinel]) => {
+    normalized = normalized.split(sentinel).join(token);
+  });
+
+  return normalized;
+}
+
 function renderTemplate(template: string): string {
-  let result = template;
+  let result = normalizeTemplateVariables(template);
   Object.entries(PREVIEW_VALUES).forEach(([key, val]) => {
     result = result.split(key).join(val);
   });
@@ -360,13 +384,15 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
       name: name.trim() || `${TRIGGER_OPTIONS.find(t => t.value === triggerType)?.label} Rule`,
       trigger_type: triggerType,
       keywords: triggerType === 'keyword' || (triggerType === 'comment' && !anyCommentKeyword) ? keywords : [],
-      response_template: template.trim(),
+      response_template: normalizeTemplateVariables(template.trim()),
       ...(triggerType === 'comment' && {
         comment_target_type: commentTarget,
         comment_media_id: commentTarget === 'specific' ? selectedMediaId : undefined,
         any_comment_keyword: anyCommentKeyword,
         public_comment_reply_enabled: publicCommentReplyEnabled,
-        public_comment_reply_template: publicCommentReplyEnabled ? publicCommentReplyTemplate : undefined,
+        public_comment_reply_template: publicCommentReplyEnabled
+          ? normalizeTemplateVariables(publicCommentReplyTemplate)
+          : undefined,
       }),
       ask_follow_before_dm: askFollowBeforeDm,
       send_follow_up_message: sendFollowUpMessage,
@@ -638,7 +664,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
               <textarea
                 ref={textareaRef}
                 className="template-textarea"
-                placeholder={`Hi {name}! Thanks for reaching out. Here's what you need to know...`}
+                placeholder={`Hi {{name}}! Thanks for reaching out. Here's what you need to know...`}
                 value={template}
                 onChange={e => setTemplate(e.target.value)}
                 rows={5}

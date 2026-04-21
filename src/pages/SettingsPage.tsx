@@ -114,7 +114,7 @@ const SettingsPage: React.FC = () => {
   const fullName = user?.display_name || [user?.first_name, user?.last_name].filter(Boolean).join(' ') || 'Your profile';
 
   return (
-    <div className="page-wrapper">
+    <div className="page-wrapper settings-page">
       <div className="page-header settings-hero">
         <div>
           <p className="settings-eyebrow">Account Settings</p>

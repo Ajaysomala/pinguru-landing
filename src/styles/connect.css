@@ -5,6 +5,34 @@
 .connect-page {
   max-width: 1280px;
   margin: 0 auto;
+  position: relative;
+}
+
+.connect-page::before {
+  content: '';
+  position: fixed;
+  right: -160px;
+  top: -160px;
+  width: 420px;
+  height: 420px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.16) 0%, rgba(219, 39, 119, 0.1) 42%, transparent 72%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.connect-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+.connect-hero {
+  background: linear-gradient(145deg, #ffffff 0%, #faf7ff 100%);
+  border: 1px solid rgba(124, 58, 237, 0.16);
+  border-radius: 20px;
+  padding: 18px 22px;
+  box-shadow: 0 14px 30px rgba(124, 58, 237, 0.11);
+  margin-bottom: 8px;
 }
 
 .connect-animate-in {
@@ -40,18 +68,36 @@
 .connect-main-card {
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  box-shadow: 0 14px 34px rgba(124, 58, 237, 0.1);
 }
 
 .connect-main-card::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 100% 0%, rgba(79, 70, 229, 0.06), transparent 48%);
+  background: radial-gradient(circle at 100% 0%, rgba(124, 58, 237, 0.18), rgba(219, 39, 119, 0.07) 45%, transparent 70%);
   pointer-events: none;
+}
+
+.connect-main-card,
+.connect-permissions-card,
+.connect-side-card {
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.connect-main-card:hover,
+.connect-permissions-card:hover,
+.connect-side-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 42px rgba(124, 58, 237, 0.16);
+  border-color: rgba(124, 58, 237, 0.24);
 }
 
 .connect-permissions-card {
   overflow: hidden;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  background: linear-gradient(145deg, #ffffff 0%, #fcfbff 100%);
 }
 
 .connect-permissions-header {
@@ -68,10 +114,10 @@
 .connect-permission-item {
   display: flex;
   gap: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(124, 58, 237, 0.12);
   border-radius: 14px;
   padding: 14px;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(145deg, #ffffff 0%, #fbfaff 100%);
   transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
   opacity: 0;
   transform: translateY(8px);
@@ -79,8 +125,8 @@
 }
 
 .connect-permission-item:hover {
-  border-color: #bfdbfe;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  border-color: rgba(124, 58, 237, 0.26);
+  box-shadow: 0 12px 26px rgba(124, 58, 237, 0.14);
   transform: translateY(-2px);
 }
 
@@ -120,9 +166,9 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #065f46;
-  background: #d1fae5;
-  border: 1px solid #6ee7b7;
+  color: #6d28d9;
+  background: linear-gradient(135deg, #ede9fe, #fce7f3);
+  border: 1px solid rgba(124, 58, 237, 0.2);
   border-radius: 999px;
   padding: 2px 8px;
   flex-shrink: 0;
@@ -163,11 +209,23 @@
   animation: connectSlideIn 360ms ease forwards;
 }
 
+.connect-side-card {
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  background: linear-gradient(145deg, #ffffff 0%, #fbfaff 100%);
+}
+
+.connect-side-card .card-title {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .connect-policy-note {
   margin-top: 18px;
   position: relative;
-  border: 1px solid #cfe3d7;
-  background: linear-gradient(180deg, #f8fffb 0%, #f7faf8 100%);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  background: linear-gradient(145deg, #ffffff 0%, #f8f5ff 100%);
   border-radius: 16px;
   overflow: hidden;
 }
@@ -179,7 +237,7 @@
   width: 180px;
   height: 180px;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.18) 0%, rgba(219, 39, 119, 0.08) 45%, transparent 70%);
   animation: connectFloat 5s ease-in-out infinite;
 }
 
@@ -196,8 +254,8 @@
   width: 34px;
   height: 34px;
   border-radius: 12px;
-  border: 1px solid #a7f3d0;
-  background: #ecfdf5;
+  border: 1px solid rgba(124, 58, 237, 0.24);
+  background: linear-gradient(135deg, #ede9fe, #fce7f3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -218,12 +276,25 @@
 }
 
 .connect-policy-link {
-  color: #4338ca;
+  color: #7c3aed;
   font-weight: 600;
 }
 
 .connect-policy-link:hover {
   text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .connect-page::before,
+  .connect-main-card,
+  .connect-permissions-card,
+  .connect-side-card,
+  .connect-permission-item,
+  .connect-step-row,
+  .connect-policy-glow {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
 @keyframes connectFadeUp {
