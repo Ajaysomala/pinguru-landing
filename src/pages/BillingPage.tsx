@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Check, Zap, Users, CreditCard, ExternalLink, AlertCircle, MessageSquare } from 'lucide-react';
 import { cancelPendingCheckout, createPlanCheckout, getCustomerPortalUrl, getPlanStatus } from '../lib/api';
 import type { PlanStatus } from '../lib/types';
+import { sanitizeApiError } from '../lib/utils';
 import '../styles/dashboard.css';
 import '../styles/billing.css';
 
@@ -148,7 +149,7 @@ const BillingPage: React.FC = () => {
       try {
         await fetchStatus();
       } catch (err: any) {
-        setError(err?.message || 'Failed to load billing status.');
+        setError(sanitizeApiError(err));
       } finally {
         setLoading(false);
       }
@@ -272,7 +273,7 @@ const BillingPage: React.FC = () => {
 
       window.location.href = session.checkout_url;
     } catch (err: any) {
-      setError(getCheckoutErrorMessage(err?.status, err?.message));
+      setError(getCheckoutErrorMessage(err?.status, sanitizeApiError(err)));
     } finally {
       setUpgrading(null);
     }
@@ -285,7 +286,7 @@ const BillingPage: React.FC = () => {
       const { portal_url } = await getCustomerPortalUrl();
       window.open(portal_url, '_blank', 'noopener,noreferrer');
     } catch (err: any) {
-      setError(err?.message || 'Failed to open billing portal.');
+      setError(sanitizeApiError(err, 'Failed to open billing portal.'));
     } finally {
       setPortalLoading(false);
     }
@@ -302,7 +303,7 @@ const BillingPage: React.FC = () => {
       clearPollingSuppression();
       setBanner({ kind: 'timeout', message: 'Pending checkout was cancelled. You can start a new upgrade anytime.' });
     } catch (err: any) {
-      setError(err?.message || 'Failed to cancel pending checkout.');
+      setError(sanitizeApiError(err, 'Failed to cancel pending checkout.'));
     } finally {
       setCancelLoading(false);
     }
@@ -316,9 +317,13 @@ const BillingPage: React.FC = () => {
       </div>
 
       {error && (
-        <div className="flex items-center gap-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl px-4 py-3 mb-6 text-sm">
-          <AlertCircle size={15} className="flex-shrink-0" />
-          <span>{error}</span>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 10,
+          background: '#FFF1F2', border: '1px solid #FDA4AF',
+          borderRadius: 12, padding: '12px 16px', marginBottom: 20,
+          fontSize: '0.875rem', color: '#9F1239'
+        }}>
+          <AlertCircle size={15} style={{ flexShrink: 0 }} /> {error}
         </div>
       )}
 

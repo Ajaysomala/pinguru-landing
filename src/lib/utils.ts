@@ -109,3 +109,14 @@ export function getPlanDmLimit(plan: string): number {
 export function classNames(...classes: (string | undefined | false | null)[]): string {
   return classes.filter(Boolean).join(' ');
 }
+
+export function sanitizeApiError(err: unknown, fallback = 'Something went wrong. Please try again.'): string {
+  if (!err) return fallback;
+  const msg = err instanceof Error ? err.message : String(err);
+  // Raw HTML from 502/504 — strip it
+  if (msg.includes('<!DOCTYPE') || msg.includes('<html') || msg.includes('502') || msg.includes('504')) {
+    return 'Service temporarily unavailable. Please refresh and try again.';
+  }
+  if (msg.length > 200) return fallback; // suspiciously long = raw response
+  return msg || fallback;
+}

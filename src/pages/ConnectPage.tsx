@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { getInstagramStatus, refreshInstagramToken, getInstagramAuthUrl } from '../lib/api';
 import type { InstagramStatus } from '../lib/types';
-import { formatRelativeTime, isTokenExpired } from '../lib/utils';
+import { formatRelativeTime, isTokenExpired, sanitizeApiError } from '../lib/utils';
 import '../styles/dashboard.css';
 import '../styles/connect.css';
 
@@ -44,7 +44,7 @@ const ConnectPage: React.FC = () => {
   useEffect(() => {
     const igConnected = params.get('ig_connected');
     const igError = params.get('ig_error');
-    if (igError) { setError(decodeURIComponent(igError)); return; }
+    if (igError) { setError(sanitizeApiError(decodeURIComponent(igError))); return; }
     if (igConnected === 'true') {
       setSuccessMsg('Instagram connected successfully!');
       setError('');
@@ -65,14 +65,14 @@ const ConnectPage: React.FC = () => {
       setStatus(fresh);
       setSuccessMsg('Token refreshed successfully.');
       setTimeout(() => setSuccessMsg(''), 3000);
-    } catch (err: any) { setError(err.message || 'Failed to refresh token.'); }
+    } catch (err: any) { setError(sanitizeApiError(err, 'Failed to refresh token.')); }
     finally { setRefreshing(false); }
   };
 
   const handleOAuthRedirect = async () => {
     setError(''); setRedirecting(true);
     try { window.location.href = await getInstagramAuthUrl(); }
-    catch (err: any) { setError(err?.message || 'Failed to start Instagram connection.'); setRedirecting(false); }
+    catch (err: any) { setError(sanitizeApiError(err, 'Failed to start Instagram connection.')); setRedirecting(false); }
   };
 
   useEffect(() => {
@@ -129,8 +129,8 @@ const ConnectPage: React.FC = () => {
 
       {/* ── Alerts ────────────────────────────────────────── */}
       {error && (
-        <div style={{ display:'flex',alignItems:'flex-start',gap:10,background:'var(--color-danger-light)',border:'1px solid rgba(244,63,94,0.2)',borderRadius:14,padding:'14px 16px',marginBottom:20,fontSize:'0.875rem',color:'#9F1239' }}>
-          <AlertTriangle size={15} style={{ flexShrink:0,marginTop:1 }}/> {error}
+        <div style={{ display:'flex',alignItems:'center',gap:10,background:'#FFF1F2',border:'1px solid #FDA4AF',borderRadius:12,padding:'12px 16px',marginBottom:20,fontSize:'0.875rem',color:'#9F1239' }}>
+          <AlertTriangle size={15} style={{ flexShrink:0 }}/> {error}
         </div>
       )}
       {successMsg && (
