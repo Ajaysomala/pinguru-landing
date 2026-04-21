@@ -351,3 +351,16 @@
     padding: 12px;
   }
 }
+/* Responsive grid fix */
+.connect-grid-responsive {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .connect-grid-responsive {
+    grid-template-columns: 1fr;
+  }
+}

@@ -794,3 +794,123 @@
   flex: 1;
   background: transparent;
 }
+
+/* ── Rule Builder responsive layout ─────────────────────────── */
+
+/* Mobile preview toggle — only shown on mobile */
+.rb-preview-toggle-wrap {
+  display: none;
+  margin-bottom: 14px;
+}
+
+.rb-preview-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(219,39,119,0.04));
+  border: 1.5px solid rgba(124,58,237,0.2);
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: all 150ms;
+}
+.rb-preview-toggle-btn:hover {
+  background: linear-gradient(135deg, rgba(124,58,237,0.14), rgba(219,39,119,0.07));
+}
+
+/* Mobile preview panel */
+.rb-preview-mobile {
+  display: none;
+  justify-content: center;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--color-canvas);
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+}
+
+/* Desktop: 2-column layout */
+.rb-layout {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 28px;
+  align-items: start;
+}
+
+.rb-form-col { min-width: 0; }
+
+/* Desktop preview column */
+.rb-preview-col {
+  position: sticky;
+  top: 24px;
+}
+
+/* Variable chip row */
+.rb-var-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.rb-var-chip {
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(219,39,119,0.05));
+  border: 1px solid rgba(124,58,237,0.2);
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms;
+  white-space: nowrap;
+}
+.rb-var-chip:hover {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* ── MOBILE: single column, toggle-based preview ─────────────── */
+@media (max-width: 700px) {
+  .rb-preview-toggle-wrap { display: block; }
+  .rb-preview-mobile { display: flex; }
+
+  .rb-layout {
+    grid-template-columns: 1fr;
+  }
+
+  /* Hide desktop preview col on mobile */
+  .rb-preview-col { display: none; }
+
+  /* Make modal full-width on mobile */
+  .modal.modal-xl {
+    max-width: 100%;
+    max-height: 95vh;
+    margin: 0;
+    border-radius: 20px 20px 0 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .rb-var-chips {
+    gap: 5px;
+  }
+
+  .rb-var-chip {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+}
