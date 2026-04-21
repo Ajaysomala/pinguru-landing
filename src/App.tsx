@@ -135,6 +135,7 @@ const PublicOnly: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 // ── Lazy pages ────────────────────────────────────────────────────────────────
 
 const LandingPage    = lazyWithRetry(() => import('./pages/LandingPage'));
+const BlogPage       = lazyWithRetry(() => import('./pages/BlogPage'));
 const LoginPage      = lazyWithRetry(() => import('./pages/LoginPage'));
 const RegisterPage   = lazyWithRetry(() => import('./pages/RegisterPage'));
 const VerifyPage     = lazyWithRetry(() => import('./pages/VerifyEmailPage'));
@@ -179,6 +180,8 @@ const App: React.FC = () => (
         <Route path="/privacy"  element={<Page><PrivacyPage /></Page>} />
         <Route path="/terms"    element={<Page><TermsPage /></Page>} />
         <Route path="/support"  element={<Page><SupportPage /></Page>} />
+        <Route path="/blog"     element={<Page><BlogPage /></Page>} />
+        <Route path="/blog/:slug" element={<Page><BlogPage /></Page>} />
 
         {/* Onboarding */}
         <Route path="/onboarding" element={

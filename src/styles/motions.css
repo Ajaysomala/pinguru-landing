@@ -1,87 +1,138 @@
 /* ============================================================
-   motions.css — Shared motion tokens and premium card effects
+   motions.css — Shared motion tokens v3.0
    ============================================================ */
 
+/* ── Fade + slide animations ────────────────────────────────── */
 .motion-fade-up {
   opacity: 0;
-  transform: translateY(10px);
+  transform: translateY(12px);
   animation: motionFadeUp 420ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .motion-fade-in {
   opacity: 0;
-  animation: motionFadeIn 260ms ease forwards;
+  animation: motionFadeIn 300ms ease forwards;
 }
 
+/* ── Float ────────────────────────────────────────────────────── */
 .motion-float-slow {
-  animation: motionFloatSlow 6s ease-in-out infinite;
+  animation: motionFloatSlow 5s ease-in-out infinite;
 }
 
+/* ── Card hover ──────────────────────────────────────────────── */
 .motion-card {
   position: relative;
   overflow: hidden;
-  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
 }
 
 .motion-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(124, 58, 237, 0.1);
 }
 
 .motion-card::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.04), transparent 55%);
+  background: linear-gradient(135deg, rgba(124,58,237,0.04), rgba(219,39,119,0.02) 60%);
   pointer-events: none;
   opacity: 0;
-  transition: opacity 180ms ease;
+  transition: opacity 200ms ease;
 }
 
-.motion-card:hover::before {
-  opacity: 1;
-}
+.motion-card:hover::before { opacity: 1; }
 
+/* ── Shimmer / shine ─────────────────────────────────────────── */
 .motion-shine {
   position: relative;
 }
 
 .motion-shine::after {
   content: '';
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
   transform: translateX(-120%);
-  animation: motionShine 6.5s ease-in-out infinite;
+  animation: motionShine 7s ease-in-out infinite;
   pointer-events: none;
 }
 
+/* ── Gradient button pulse ───────────────────────────────────── */
+.motion-glow {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+  animation: motionGlow 3s ease-in-out infinite;
+}
+
+/* ── Stagger delays ──────────────────────────────────────────── */
 .motion-stagger-1 { animation-delay: 60ms; }
 .motion-stagger-2 { animation-delay: 120ms; }
 .motion-stagger-3 { animation-delay: 180ms; }
+.motion-stagger-4 { animation-delay: 240ms; }
+.motion-stagger-5 { animation-delay: 300ms; }
 
+/* ── Skeletons ───────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, #F1F5F9 25%, #E9EFF6 50%, #F1F5F9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+  border-radius: 8px;
+}
+
+/* ── Keyframes ───────────────────────────────────────────────── */
 @keyframes motionFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes motionFadeIn {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
 }
 
 @keyframes motionFloatSlow {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  50%       { transform: translateY(-7px); }
 }
 
 @keyframes motionShine {
-  0%, 60% { transform: translateX(-120%); }
-  100% { transform: translateX(120%); }
+  0%, 55% { transform: translateX(-120%); }
+  100%     { transform: translateX(120%); }
+}
+
+@keyframes motionGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(124,58,237,0.3); }
+  50%       { box-shadow: 0 0 35px rgba(124,58,237,0.5), 0 0 60px rgba(219,39,119,0.2); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── Pulsing status dot ──────────────────────────────────────── */
+.pulse-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.pulse-dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.3;
+  animation: pulseDotRing 2s ease-in-out infinite;
+}
+
+@keyframes pulseDotRing {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50%       { transform: scale(1.6); opacity: 0; }
 }

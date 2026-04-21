@@ -1,23 +1,34 @@
 /* ============================================================
    base.css — Global resets, CSS tokens, typography
-   PinGuru Frontend v2.0
+   PinGuru Frontend v3.0  –  Bold new color system
    ============================================================ */
-
-/* --- Google Fonts are loaded via index.html --- */
 
 /* --- CSS Design Tokens --- */
 :root {
-  /* Brand Colors */
-  --color-primary:        #4F46E5;
-  --color-primary-hover:  #4338CA;
-  --color-primary-light:  #EEF2FF;
-  --color-primary-ring:   rgba(79, 70, 229, 0.3);
+  /* ── Brand Colors (NEW: Vibrant Violet → Pink) ── */
+  --color-primary:        #7C3AED;
+  --color-primary-hover:  #6D28D9;
+  --color-primary-light:  #EDE9FE;
+  --color-primary-ring:   rgba(124, 58, 237, 0.35);
+
+  --color-accent:         #DB2777;
+  --color-accent-hover:   #BE185D;
+  --color-accent-light:   #FCE7F3;
+
+  --color-orange:         #F97316;
+  --color-cyan:           #06B6D4;
+
+  /* Gradients */
+  --gradient-brand:       linear-gradient(135deg, #7C3AED 0%, #DB2777 60%, #F97316 100%);
+  --gradient-hero:        linear-gradient(145deg, #0D0B1E 0%, #1A1040 40%, #220D3A 100%);
+  --gradient-subtle:      linear-gradient(135deg, #EDE9FE 0%, #FCE7F3 100%);
+  --gradient-card:        linear-gradient(145deg, rgba(124,58,237,0.04) 0%, rgba(219,39,119,0.02) 100%);
 
   /* Layout Colors */
-  --color-sidebar:        #0F172A;
-  --color-sidebar-hover:  #1E293B;
-  --color-sidebar-active: #312E81;
-  --color-canvas:         #F8FAFC;
+  --color-sidebar:        #0D0B1E;
+  --color-sidebar-hover:  #1A1040;
+  --color-sidebar-active: #4C1D95;
+  --color-canvas:         #F8F7FF;
 
   /* Semantic Colors */
   --color-success:        #10B981;
@@ -30,46 +41,49 @@
   --color-info-light:     #EFF6FF;
 
   /* Text */
-  --color-text:           #1E293B;
-  --color-text-secondary: #475569;
-  --color-muted:          #94A3B8;
-  --color-border:         #E2E8F0;
-  --color-border-focus:   #4F46E5;
+  --color-text:           #0F0A1E;
+  --color-text-secondary: #4A4565;
+  --color-muted:          #9790B0;
+  --color-border:         #E8E4F5;
+  --color-border-focus:   #7C3AED;
 
   /* Chart */
-  --chart-indigo:         #4F46E5;
-  --chart-teal:           #14B8A6;
-  --chart-amber:          #F59E0B;
+  --chart-indigo:  #7C3AED;
+  --chart-pink:    #DB2777;
+  --chart-teal:    #06B6D4;
+  --chart-amber:   #F59E0B;
 
   /* Typography */
-  --font-sans:            'DM Sans', system-ui, sans-serif;
-  --font-display:         'Sora', system-ui, sans-serif;
-  --font-mono:            'JetBrains Mono', monospace;
+  --font-sans:     'DM Sans', system-ui, sans-serif;
+  --font-display:  'Sora', system-ui, sans-serif;
+  --font-mono:     'JetBrains Mono', monospace;
 
   /* Spacing */
-  --sidebar-width:        240px;
-  --sidebar-collapsed:    64px;
-  --topbar-height:        60px;
+  --sidebar-width:      240px;
+  --sidebar-collapsed:  64px;
+  --topbar-height:      60px;
 
   /* Radius */
-  --radius-sm:            6px;
-  --radius-md:            10px;
-  --radius-card:          12px;
-  --radius-lg:            16px;
-  --radius-xl:            20px;
-  --radius-full:          9999px;
+  --radius-sm:    6px;
+  --radius-md:    10px;
+  --radius-card:  14px;
+  --radius-lg:    18px;
+  --radius-xl:    24px;
+  --radius-full:  9999px;
 
   /* Shadows */
-  --shadow-xs:  0 1px 2px rgba(0,0,0,0.05);
-  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md:  0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
-  --shadow-lg:  0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.04);
-  --shadow-modal: 0 20px 60px rgba(0,0,0,0.15);
+  --shadow-xs:    0 1px 2px rgba(0,0,0,0.05);
+  --shadow-sm:    0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:    0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg:    0 10px 25px rgba(124,58,237,0.12), 0 4px 8px rgba(0,0,0,0.06);
+  --shadow-glow:  0 0 40px rgba(124,58,237,0.3);
+  --shadow-modal: 0 24px 60px rgba(15,10,30,0.2);
 
   /* Transitions */
-  --transition-fast:   150ms ease;
-  --transition-base:   200ms ease;
-  --transition-slow:   300ms ease;
+  --transition-fast:  150ms ease;
+  --transition-base:  220ms ease;
+  --transition-slow:  350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* --- Reset --- */
@@ -98,7 +112,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.2;
   color: var(--color-text);
 }
 
@@ -106,7 +120,6 @@ h1 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
 h2 { font-size: clamp(1.4rem, 3vw, 2rem); }
 h3 { font-size: clamp(1.1rem, 2vw, 1.375rem); }
 h4 { font-size: 1.125rem; }
-h5 { font-size: 1rem; }
 
 p {
   color: var(--color-text-secondary);
@@ -140,7 +153,7 @@ input, textarea, select {
   font-size: 0.9375rem;
 }
 
-/* --- Scrollbar Styling --- */
+/* --- Scrollbar --- */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
@@ -149,7 +162,7 @@ input, textarea, select {
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
 
-/* --- Focus Styles (Accessibility) --- */
+/* --- Focus --- */
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
@@ -162,10 +175,23 @@ input, textarea, select {
   color: var(--color-primary);
 }
 
-/* --- Global Animations --- */
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.94) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 @keyframes slideInLeft {
@@ -178,24 +204,97 @@ input, textarea, select {
   to   { transform: translateX(0); }
 }
 
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.95); }
+  from { opacity: 0; transform: scale(0.92); }
   to   { opacity: 1; transform: scale(1); }
 }
 
 @keyframes pulseDot {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.8); }
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33%       { transform: translateY(-8px) rotate(1deg); }
+  66%       { transform: translateY(-4px) rotate(-1deg); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes orb1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(30px, -20px) scale(1.05); }
+  66%  { transform: translate(-20px, 15px) scale(0.95); }
+}
+
+@keyframes orb2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40%  { transform: translate(-25px, 20px) scale(1.08); }
+  70%  { transform: translate(15px, -10px) scale(0.92); }
+}
+
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes phoneFloat {
+  0%, 100% { transform: translateY(0px) rotate(2deg); }
+  50%       { transform: translateY(-16px) rotate(2deg); }
+}
+
+@keyframes typingDot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30%            { transform: translateY(-4px); opacity: 1; }
+}
+
+@keyframes messagePop {
+  from { opacity: 0; transform: scale(0.85) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
 /* --- Utility Classes --- */
-.animate-fade-in    { animation: fadeIn 0.2s ease-out both; }
-.animate-scale-in   { animation: scaleIn 0.2s ease-out both; }
-.animate-slide-left { animation: slideInLeft 0.25s ease-out both; }
+.animate-fade-in      { animation: fadeIn 0.25s ease-out both; }
+.animate-fade-in-up   { animation: fadeInUp 0.4s ease-out both; }
+.animate-scale-in     { animation: scaleIn 0.25s ease-out both; }
+.animate-slide-left   { animation: slideInLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.animate-float        { animation: float 4s ease-in-out infinite; }
+.animate-float-slow   { animation: floatSlow 6s ease-in-out infinite; }
+.animate-spin         { animation: spin 1s linear infinite; }
+
+.reveal-item {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.reveal-item.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 .sr-only {
   position: absolute;
