@@ -61,7 +61,7 @@ const RulesPage: React.FC = () => {
   const pausedCount = Math.max(0, rules.length - activeCount);
 
   return (
-    <div className="page-wrapper rules-page">
+    <div className="page-wrapper">
       {/* Header */}
       <div className="page-header flex items-start justify-between">
         <div>
