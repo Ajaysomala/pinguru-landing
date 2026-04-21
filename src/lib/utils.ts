@@ -33,18 +33,50 @@ export function formatDate(dateStr: string): string {
   });
 }
 
-export function formatRelativeTime(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
+export function formatRelativeTime(value: string | number | null | undefined): string {
+  if (value === null || value === undefined || value === '') return 'Unknown';
+  // Handle unix timestamp in seconds (e.g. 1700000000) vs milliseconds
+  let date: Date;
+  if (typeof value === 'number') {
+    // If number is suspiciously small, treat as seconds
+    date = value < 1e12 ? new Date(value * 1000) : new Date(value);
+  } else {
+    date = new Date(value);
+  }
+  if (isNaN(date.getTime())) return 'Unknown';
+
+  const diff = Date.now() - date.getTime();
+
+  // Future date = token expiry in the future → show "in X days"
+  if (diff < 0) {
+    const future = Math.abs(diff);
+    const fDays = Math.floor(future / 86400000);
+    if (fDays > 0) return `in ${fDays}d`;
+    const fHours = Math.floor(future / 3600000);
+    if (fHours > 0) return `in ${fHours}h`;
+    return `in ${Math.floor(future / 60000)}m`;
+  }
+
   const minutes = Math.floor(diff / 60000);
   if (minutes < 60) return `${minutes}m ago`;
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days}d ago`;
+  return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
 }
 
-export function isTokenExpired(expiresAt?: string): boolean {
+export function formatExpiryRelative(expiresAt?: string | number | null): string {
+  return formatRelativeTime(expiresAt);
+}
+
+export function isTokenExpired(expiresAt?: string | number | null): boolean {
   if (!expiresAt) return true;
-  return new Date(expiresAt) < new Date();
+  const date = typeof expiresAt === 'number'
+    ? (expiresAt < 1e12 ? new Date(expiresAt * 1000) : new Date(expiresAt))
+    : new Date(expiresAt);
+  if (isNaN(date.getTime())) return true;
+  return date < new Date();
 }
 
 // Login attempt lockout helpers (localStorage)
@@ -113,10 +145,9 @@ export function classNames(...classes: (string | undefined | false | null)[]): s
 export function sanitizeApiError(err: unknown, fallback = 'Something went wrong. Please try again.'): string {
   if (!err) return fallback;
   const msg = err instanceof Error ? err.message : String(err);
-  // Raw HTML from 502/504 — strip it
-  if (msg.includes('<!DOCTYPE') || msg.includes('<html') || msg.includes('502') || msg.includes('504')) {
+  if (msg.includes('<!DOCTYPE') || msg.includes('<html') || msg.includes('<body') || msg.includes('502') || msg.includes('503') || msg.includes('504')) {
     return 'Service temporarily unavailable. Please refresh and try again.';
   }
-  if (msg.length > 200) return fallback; // suspiciously long = raw response
-  return msg || fallback;
+  if (msg.length > 240) return fallback;
+  return msg;
 }

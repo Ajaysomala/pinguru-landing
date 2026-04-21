@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
 interface ModalProps {
@@ -21,7 +22,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   if (!open) return null;
 
-  return (
+  const content = (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(4px)' }}
@@ -49,4 +50,6 @@ export const Modal: React.FC<ModalProps> = ({
       </div>
     </div>
   );
+
+  return createPortal(content, document.body);
 };

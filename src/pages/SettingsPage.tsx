@@ -13,6 +13,10 @@ import {
   BriefcaseBusiness,
   BadgeCheck,
   PencilLine,
+  Sparkles,
+  Clock3,
+  ShieldCheck,
+  ExternalLink,
 } from 'lucide-react';
 import { getProfile, requestDataDeletion } from '../lib/api';
 import type { User as UserType } from '../lib/types';
@@ -112,214 +116,193 @@ const SettingsPage: React.FC = () => {
   }
 
   const fullName = user?.display_name || [user?.first_name, user?.last_name].filter(Boolean).join(' ') || 'Your profile';
+  const instagramStatus = user?.instagram_connected
+    ? (user.instagram_username ? `Connected as @${user.instagram_username}` : 'Connected')
+    : 'Not connected';
 
   return (
-    <div className="page-wrapper settings-page">
-      <div className="page-header settings-hero">
-        <div>
-          <p className="settings-eyebrow">Account Settings</p>
-          <h1 className="page-title">Settings</h1>
-          <p className="page-subtitle">Manage your profile, automation preferences, and data controls from one place.</p>
-        </div>
-        <div className="settings-hero-card">
-          <div className="settings-hero-avatar">{user?.first_name?.[0] || user?.display_name?.[0] || 'P'}</div>
-          <div>
-            <p className="settings-hero-name">{fullName}</p>
-            <p className="settings-hero-meta">{user?.email}</p>
+    <div className="page-wrapper settings-v2-page">
+      <section className="settings-v2-hero">
+        <div className="settings-v2-hero-copy">
+          <p className="settings-v2-kicker"><Sparkles size={12} /> Account Control Center</p>
+          <h1 className="settings-v2-title">Settings</h1>
+          <p className="settings-v2-subtitle">A cleaner workspace for profile details, automation preferences, and privacy controls.</p>
+          <div className="settings-v2-chip-row">
+            <span className="settings-v2-chip"><BadgeCheck size={12} /> Plan: {toTitleCase(user?.plan ?? 'free')}</span>
+            <span className="settings-v2-chip"><AtSign size={12} /> {instagramStatus}</span>
           </div>
         </div>
-      </div>
+        <div className="settings-v2-identity-card">
+          <div className="settings-v2-avatar">{user?.first_name?.[0] || user?.display_name?.[0] || 'P'}</div>
+          <div>
+            <p className="settings-v2-name">{fullName}</p>
+            <p className="settings-v2-meta">{user?.email}</p>
+          </div>
+          <Link to="/settings/profile" className="settings-v2-edit-link">
+            <PencilLine size={13} /> Edit Profile
+          </Link>
+        </div>
+      </section>
 
       {error && (
-        <div className="flex items-center gap-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl px-4 py-3 mb-5 text-sm">
+        <div className="settings-v2-alert error">
           <AlertTriangle size={15} className="flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
       {success && (
-        <div className="flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-3 mb-5 text-sm">
+        <div className="settings-v2-alert success">
           <CheckCircle size={15} className="flex-shrink-0" />
           <span>{success}</span>
         </div>
       )}
 
-      <div className="settings-grid">
-        <div className="settings-section settings-section-wide">
-          <div className="settings-section-header">
-            <div className="flex items-center justify-between gap-3">
+      <div className="settings-v2-layout">
+        <div className="settings-v2-main-col">
+          <section className="settings-v2-card">
+            <header className="settings-v2-card-head">
               <div>
-                <div className="flex items-center gap-2">
-                  <User size={15} className="text-primary" />
-                  <h3 className="settings-section-title">Account Profile</h3>
-                </div>
-                <p className="settings-section-desc">Your personal details and business info</p>
+                <p className="settings-v2-card-eyebrow"><User size={14} /> Profile Snapshot</p>
+                <h3>Account Profile</h3>
               </div>
-              <Link to="/settings/profile" className="settings-edit-button">
-                <PencilLine size={14} />
-                Edit Profile
+              <Link to="/settings/profile" className="settings-v2-inline-action">
+                <PencilLine size={13} /> Edit
               </Link>
-            </div>
-          </div>
-          <div className="settings-section-body">
-            <div className="settings-summary-grid">
-              <div className="settings-summary-card settings-summary-card-primary">
-                <div className="settings-summary-icon"><Mail size={16} /></div>
+            </header>
+            <div className="settings-v2-profile-grid">
+              <div className="settings-v2-profile-tile">
+                <Mail size={15} />
                 <div>
-                  <p className="settings-summary-label">Email</p>
-                  <p className="settings-summary-value">{user?.email}</p>
+                  <p className="label">Email</p>
+                  <p className="value">{user?.email}</p>
                 </div>
               </div>
-              <div className="settings-summary-card">
-                <div className="settings-summary-icon"><AtSign size={16} /></div>
+              <div className="settings-v2-profile-tile">
+                <AtSign size={15} />
                 <div>
-                  <p className="settings-summary-label">Instagram</p>
-                  <p className="settings-summary-value">
-                    {user?.instagram_connected ? (user.instagram_username ? `@${user.instagram_username}` : 'Connected') : 'Not connected'}
-                  </p>
+                  <p className="label">Instagram</p>
+                  <p className="value">{user?.instagram_connected ? (user.instagram_username ? `@${user.instagram_username}` : 'Connected') : 'Not connected'}</p>
                 </div>
               </div>
-              <div className="settings-summary-card">
-                <div className="settings-summary-icon"><BadgeCheck size={16} /></div>
+              <div className="settings-v2-profile-tile">
+                <BadgeCheck size={15} />
                 <div>
-                  <p className="settings-summary-label">Plan</p>
-                  <p className="settings-summary-value">{toTitleCase(user?.plan ?? 'free')}</p>
+                  <p className="label">Plan</p>
+                  <p className="value">{toTitleCase(user?.plan ?? 'free')}</p>
                 </div>
               </div>
-              <div className="settings-summary-card">
-                <div className="settings-summary-icon"><BriefcaseBusiness size={16} /></div>
+              <div className="settings-v2-profile-tile">
+                <BriefcaseBusiness size={15} />
                 <div>
-                  <p className="settings-summary-label">Business Category</p>
-                  <p className="settings-summary-value">{user?.business_category || 'Not set'}</p>
+                  <p className="label">Business Category</p>
+                  <p className="value">{user?.business_category || 'Not set'}</p>
                 </div>
               </div>
             </div>
+          </section>
 
-            <div className="profile-row">
-              <span className="profile-row-label">First name</span>
-              <span className="profile-row-value">{user?.first_name || 'Not set'}</span>
-            </div>
-            <div className="profile-row">
-              <span className="profile-row-label">Last name</span>
-              <span className="profile-row-value">{user?.last_name || 'Not set'}</span>
-            </div>
-            <div className="profile-row">
-              <span className="profile-row-label">Business category</span>
-              <span className="profile-row-value">{user?.business_category || 'Not set'}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="settings-section">
-          <div className="settings-section-header">
-            <div className="flex items-center gap-2">
-              <Bell size={15} className="text-amber-500" />
-              <h3 className="settings-section-title">Automation Preferences</h3>
-            </div>
-            <p className="settings-section-desc">Control when and how automations fire</p>
-          </div>
-          <div className="settings-section-body">
-            <label className="pref-item">
-              <input
-                type="checkbox"
-                className="pref-checkbox"
-                checked={pauseHours}
-                onChange={(e) => setPauseHours(e.target.checked)}
-              />
+          <section className="settings-v2-card">
+            <header className="settings-v2-card-head">
               <div>
-                <p className="pref-label">Pause outside working hours</p>
-                <p className="pref-desc">Stop automations between 10 PM - 8 AM IST</p>
+                <p className="settings-v2-card-eyebrow"><Bell size={14} /> Automation Preferences</p>
+                <h3>Flow Controls</h3>
               </div>
-            </label>
-
-            <label className="pref-item">
-              <input
-                type="checkbox"
-                className="pref-checkbox"
-                checked={usageAlert}
-                onChange={(e) => setUsageAlert(e.target.checked)}
-              />
-              <div>
-                <p className="pref-label">Email me at 80% usage</p>
-                <p className="pref-desc">Get notified before you hit your DM limit</p>
-              </div>
-            </label>
-
-            <div className="settings-note-inline">Preferences are stored locally in your browser for now.</div>
-
-            <button onClick={savePrefs} className="w-full py-2.5 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
-              Save Preferences
-            </button>
-          </div>
-        </div>
-
-        <div className="settings-section">
-          <div className="settings-section-header">
-            <div className="flex items-center gap-2">
-              <Shield size={15} className="text-emerald-500" />
-              <h3 className="settings-section-title">Security & Access</h3>
+            </header>
+            <div className="settings-v2-toggle-list">
+              <label className="settings-v2-toggle-item">
+                <div>
+                  <p className="toggle-title">Pause outside working hours</p>
+                  <p className="toggle-desc">Stop automations between 10 PM and 8 AM IST.</p>
+                </div>
+                <input type="checkbox" checked={pauseHours} onChange={(e) => setPauseHours(e.target.checked)} />
+              </label>
+              <label className="settings-v2-toggle-item">
+                <div>
+                  <p className="toggle-title">Email me at 80% usage</p>
+                  <p className="toggle-desc">Get a heads-up before you hit your monthly DM threshold.</p>
+                </div>
+                <input type="checkbox" checked={usageAlert} onChange={(e) => setUsageAlert(e.target.checked)} />
+              </label>
             </div>
-            <p className="settings-section-desc">Password and login security</p>
-          </div>
-          <div className="settings-section-body">
-            <p className="text-sm text-slate-500 mb-3">Password and login security are managed through your authentication flow.</p>
-            <div className="flex flex-col gap-2.5">
-              <button
-                onClick={() => navigate('/login')}
-                className="flex items-center gap-2 py-2.5 px-4 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
-              >
-                <RefreshCw size={14} />
-                Re-authenticate
+            <p className="settings-v2-note">Preferences are saved locally in this browser.</p>
+            <button onClick={savePrefs} className="settings-v2-primary-btn">Save Preferences</button>
+          </section>
+
+          <section className="settings-v2-card">
+            <header className="settings-v2-card-head">
+              <div>
+                <p className="settings-v2-card-eyebrow"><Shield size={14} /> Security & Access</p>
+                <h3>Session & Support</h3>
+              </div>
+            </header>
+            <div className="settings-v2-action-stack">
+              <button onClick={() => navigate('/login')} className="settings-v2-neutral-btn">
+                <RefreshCw size={14} /> Re-authenticate
               </button>
-              <a href="/support" className="flex items-center gap-2 py-2.5 px-4 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
-                <Shield size={14} />
-                Open Support Center
+              <a href="/support" className="settings-v2-neutral-btn">
+                <ShieldCheck size={14} /> Open Support Center
               </a>
-              <a href="mailto:support@pinguru.me" className="flex items-center gap-2 py-2.5 px-4 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors">
-                <Shield size={14} />
-                Email Support
+              <a href="mailto:support@pinguru.me" className="settings-v2-neutral-btn">
+                <ExternalLink size={14} /> Email Support
               </a>
             </div>
-          </div>
+          </section>
         </div>
 
-        <div className="settings-section danger-zone">
-          <div className="settings-section-header">
-            <div className="flex items-center gap-2">
-              <Trash2 size={15} className="text-danger" />
-              <h3 className="settings-section-title">Data & Privacy</h3>
+        <aside className="settings-v2-side-col">
+          <section className="settings-v2-card settings-v2-health-card">
+            <header className="settings-v2-card-head">
+              <div>
+                <p className="settings-v2-card-eyebrow"><Clock3 size={14} /> Account Health</p>
+                <h3>Status Overview</h3>
+              </div>
+            </header>
+            <div className="settings-v2-health-list">
+              <div className="settings-v2-health-item">
+                <span>Instagram</span>
+                <strong>{user?.instagram_connected ? 'Connected' : 'Disconnected'}</strong>
+              </div>
+              <div className="settings-v2-health-item">
+                <span>Plan</span>
+                <strong>{toTitleCase(user?.plan ?? 'free')}</strong>
+              </div>
+              <div className="settings-v2-health-item">
+                <span>Business Category</span>
+                <strong>{user?.business_category || 'Not set'}</strong>
+              </div>
             </div>
-            <p className="settings-section-desc">GDPR / Meta Platform Policy compliance</p>
-          </div>
-          <div className="settings-section-body">
-            <p className="text-sm text-slate-600 mb-1">Request permanent deletion of all your data including your account, automation rules, and DM logs.</p>
-            <p className="text-xs text-slate-400 mb-4">Required by Meta's Platform Policy. This action cannot be undone.</p>
+          </section>
 
+          <section className="settings-v2-card settings-v2-danger-card">
+            <header className="settings-v2-card-head">
+              <div>
+                <p className="settings-v2-card-eyebrow"><Trash2 size={14} /> Data & Privacy</p>
+                <h3>Danger Zone</h3>
+              </div>
+            </header>
+            <p className="settings-v2-danger-text">Request permanent deletion of your account, automation rules, and DM logs. This action is irreversible.</p>
             {!confirmDelete ? (
-              <button
-                onClick={() => setConfirmDelete(true)}
-                className="flex items-center gap-2 py-2.5 px-4 text-sm font-semibold text-danger bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition-colors"
-              >
-                <Trash2 size={14} />
-                Delete My Data
+              <button onClick={() => setConfirmDelete(true)} className="settings-v2-danger-btn">
+                <Trash2 size={14} /> Delete My Data
               </button>
             ) : (
-              <div className="bg-rose-50 border border-rose-200 rounded-xl p-4">
-                <div className="flex items-start gap-2.5 mb-3">
-                  <AlertTriangle size={15} className="text-danger flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-rose-700 font-medium">Type DELETE to confirm permanent data deletion.</p>
+              <div className="settings-v2-danger-confirm">
+                <div className="settings-v2-danger-warning">
+                  <AlertTriangle size={15} className="text-danger flex-shrink-0" />
+                  <p>Type DELETE to confirm permanent deletion.</p>
                 </div>
                 <input
                   type="text"
-                  className="settings-field-input mb-3"
+                  className="settings-field-input"
                   value={deleteInput}
                   onChange={(e) => setDeleteInput(e.target.value)}
                   placeholder="Type DELETE"
                 />
-                <div className="flex gap-2.5">
+                <div className="settings-v2-danger-actions">
                   <button
                     onClick={handleDataDeletion}
                     disabled={deleting || deleteInput !== 'DELETE'}
-                    className="flex-1 py-2 text-sm font-bold text-white bg-danger hover:bg-rose-600 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="settings-v2-danger-confirm-btn"
                   >
                     {deleting ? (
                       <>
@@ -330,7 +313,7 @@ const SettingsPage: React.FC = () => {
                         Deleting...
                       </>
                     ) : (
-                      'Yes, delete everything'
+                      'Confirm Delete'
                     )}
                   </button>
                   <button
@@ -338,15 +321,15 @@ const SettingsPage: React.FC = () => {
                       setConfirmDelete(false);
                       setDeleteInput('');
                     }}
-                    className="flex-1 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+                    className="settings-v2-cancel-btn"
                   >
                     Cancel
                   </button>
                 </div>
               </div>
             )}
-          </div>
-        </div>
+          </section>
+        </aside>
       </div>
     </div>
   );

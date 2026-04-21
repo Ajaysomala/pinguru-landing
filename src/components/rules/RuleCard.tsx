@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trash2, Zap } from 'lucide-react';
+import { PencilLine, Trash2, Zap } from 'lucide-react';
 import type { Rule } from '../../lib/types';
 import { TRIGGER_LABELS } from '../../lib/types';
 import { Badge } from '../ui/Badge';
@@ -11,6 +11,7 @@ interface RuleCardProps {
 	isDeleting?: boolean;
 	confirmingDelete?: boolean;
 	onToggle: (rule: Rule) => void;
+	onEdit: (rule: Rule) => void;
 	onRequestDelete: (ruleId: string) => void;
 	onCancelDelete: () => void;
 	onDelete: (ruleId: string) => void;
@@ -23,6 +24,7 @@ export const RuleCard: React.FC<RuleCardProps> = ({
 	isDeleting = false,
 	confirmingDelete = false,
 	onToggle,
+	onEdit,
 	onRequestDelete,
 	onCancelDelete,
 	onDelete,
@@ -51,6 +53,14 @@ export const RuleCard: React.FC<RuleCardProps> = ({
 			</div>
 
 			<div className="rule-actions">
+				<button
+					onClick={() => onEdit(rule)}
+					className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+					title="Edit rule"
+				>
+					<PencilLine size={14} />
+				</button>
+
 				<Toggle
 					checked={rule.is_active}
 					onChange={() => onToggle(rule)}

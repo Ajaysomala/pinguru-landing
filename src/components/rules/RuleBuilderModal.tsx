@@ -3,7 +3,7 @@ import {
   AlertCircle, ArrowLeft, Check, X, RefreshCw, Lock,
   Smartphone, Zap, MessageSquare, ArrowRight, Eye, EyeOff,
 } from 'lucide-react';
-import { createRule, getInstagramMedia } from '../../lib/api';
+import { createRule, getInstagramMedia, updateRule } from '../../lib/api';
 import type { InstagramMediaItem, Rule, RuleCreatePayload, TriggerType } from '../../lib/types';
 import { Modal } from '../ui/Modal';
 import { useAuth } from '../../App';
@@ -12,6 +12,8 @@ interface RuleBuilderModalProps {
   open: boolean;
   onClose: () => void;
   onCreated: (rule: Rule) => void;
+  onUpdated?: (rule: Rule) => void;
+  initialRule?: Rule | null;
 }
 
 const TRIGGER_OPTIONS: { value: TriggerType; label: string; desc: string; icon: React.ReactNode }[] = [
@@ -39,7 +41,54 @@ const COMMENT_MEDIA_PREVIEW: InstagramMediaItem[] = [
   { id: 'preview-4', media_type: 'reel', caption: 'Reel' },
 ];
 
-const TEMPLATE_VARS = ['{{name}}', '{{username}}', '{{keyword}}'];
+const RULE_GUIDES: Record<TriggerType, {
+  theme: 'keyword' | 'story' | 'comment' | 'newdm';
+  subtitle: string;
+  cards: Array<{ title: string; desc: string }>;
+}> = {
+  keyword: {
+    theme: 'keyword',
+    subtitle: 'Best for intent-based messages like pricing, delivery, or product questions.',
+    cards: [
+      { title: 'How to set', desc: 'Add the exact words your audience sends, then write a focused DM reply with variable inserts.' },
+      { title: 'How to use', desc: 'Use this for recurring questions so replies are fast and consistent across all DMs.' },
+      { title: 'When to use', desc: 'Use when users ask specific questions where one clear automated answer works well.' },
+    ],
+  },
+  story_mention: {
+    theme: 'story',
+    subtitle: 'Ideal for fast follow-up when someone engages with your story content.',
+    cards: [
+      { title: 'How to set', desc: 'Choose Story Reply, then craft a short personalized DM that feels conversational and timely.' },
+      { title: 'How to use', desc: 'Use it to move story interactions into direct conversations with a clear next step.' },
+      { title: 'When to use', desc: 'Use during launches, offers, and content campaigns where story engagement is high.' },
+    ],
+  },
+  comment: {
+    theme: 'comment',
+    subtitle: 'Perfect for converting post comments into private DM conversations.',
+    cards: [
+      { title: 'How to set', desc: 'Select Any Post or Specific Post, optionally add comment keywords, then create your DM response.' },
+      { title: 'How to use', desc: 'Use comment-triggered DMs to share links, details, or offers without cluttering comment threads.' },
+      { title: 'When to use', desc: 'Use when posts invite comments like LINK, PRICE, INFO, or giveaway participation.' },
+    ],
+  },
+  new_dm: {
+    theme: 'newdm',
+    subtitle: 'Great for instant first response so every incoming DM gets acknowledged immediately.',
+    cards: [
+      { title: 'How to set', desc: 'Write a warm first-touch message and include what users should do next.' },
+      { title: 'How to use', desc: 'Use as your default welcome flow before handing off to manual follow-up or another rule.' },
+      { title: 'When to use', desc: 'Use when speed matters and you want every new message to receive a reliable first reply.' },
+    ],
+  },
+};
+
+const TEMPLATE_VARIABLES = [
+  { label: 'Name', token: '{{name}}', hint: 'Customer name' },
+  { label: 'Username', token: '{{username}}', hint: 'Instagram handle' },
+  { label: 'Keyword', token: '{{keyword}}', hint: 'Matched phrase' },
+] as const;
 
 const PREVIEW_VALUES: Record<string, string> = {
   '{{name}}': 'Rahul',
@@ -146,7 +195,7 @@ const PhonePreview: React.FC<{
 };
 
 // ── Main Modal ────────────────────────────────────────────────────
-export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClose, onCreated }) => {
+export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClose, onCreated, onUpdated, initialRule = null }) => {
   const { user } = useAuth();
   const [step, setStep] = useState<'choose'|'details'>('choose');
   const [name, setName] = useState('');
@@ -176,8 +225,54 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
   const isPro = plan==='pro';
   const kwInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editing = Boolean(initialRule);
 
-  useEffect(()=>{ if(open){ setStep('choose'); setShowPreview(false); } },[open]);
+  useEffect(() => {
+    if (!open) return;
+
+    setShowPreview(false);
+    setError('');
+
+    if (!initialRule) {
+      setStep('choose');
+      setName('');
+      setTriggerType(null);
+      setCommentTarget('specific');
+      setCommentFilter('all');
+      setSelectedMediaId('');
+      setMediaItems([]);
+      setMediaLimit(24);
+      setAnyCommentKeyword(true);
+      setPublicCommentReplyEnabled(false);
+      setPublicCommentReplyTemplate('Thanks for your comment! Check your DM for details.');
+      setAskFollowBeforeDm(false);
+      setSendFollowUpMessage(false);
+      setDmAttachmentUrl('');
+      setShowAttachmentInput(false);
+      setKeywords([]);
+      setKwInput('');
+      setTemplate('');
+      return;
+    }
+
+    setStep('details');
+    setName(initialRule.name || '');
+    setTriggerType(initialRule.trigger_type);
+    setCommentTarget(initialRule.comment_target_type ?? 'specific');
+    setCommentFilter(initialRule.comment_media_filter ?? 'all');
+    setSelectedMediaId(initialRule.comment_media_id ?? '');
+    setAnyCommentKeyword(initialRule.any_comment_keyword ?? true);
+    setPublicCommentReplyEnabled(Boolean(initialRule.public_comment_reply_enabled));
+    setPublicCommentReplyTemplate(initialRule.public_comment_reply_template || 'Thanks for your comment! Check your DM for details.');
+    setAskFollowBeforeDm(Boolean(initialRule.ask_follow_before_dm));
+    setSendFollowUpMessage(Boolean(initialRule.send_follow_up_message));
+    setDmAttachmentUrl(initialRule.dm_attachment_url || '');
+    setShowAttachmentInput(Boolean(initialRule.dm_attachment_url));
+    setKeywords(Array.isArray(initialRule.keywords) ? initialRule.keywords : []);
+    setKwInput('');
+    setTemplate(initialRule.response_template || '');
+  }, [open, initialRule]);
+
   useEffect(()=>{
     if(!isStarterOrPro&&askFollowBeforeDm) setAskFollowBeforeDm(false);
     if(!isPro&&publicCommentReplyEnabled) setPublicCommentReplyEnabled(false);
@@ -246,6 +341,8 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
     return true;
   };
 
+  const currentGuide = RULE_GUIDES[triggerType ?? 'keyword'];
+
   const handleSubmit=async()=>{
     if(!triggerType||!canSubmit()) return;
     setLoading(true); setError('');
@@ -266,14 +363,21 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
       dm_attachment_url:dmAttachmentUrl.trim()||undefined,
     };
     try {
-      const rule=await createRule(payload);
-      onCreated(rule); onClose(); reset();
+      if (editing && initialRule) {
+        const rule = await updateRule(initialRule.id, payload);
+        onUpdated?.(rule);
+      } else {
+        const rule = await createRule(payload);
+        onCreated(rule);
+      }
+      onClose();
+      reset();
     } catch(err) { setError(getErrorText(err)); }
     finally { setLoading(false); }
   };
 
   return (
-    <Modal open={open} onClose={()=>{onClose();reset();}} title={step==='choose'?'Create Automation Rule':'Configure Rule'} maxWidth={step==='details' ? 'max-w-5xl' : 'max-w-2xl'}>
+    <Modal open={open} onClose={()=>{onClose();reset();}} title={editing ? 'Edit Automation Rule' : (step==='choose'?'Create Automation Rule':'Configure Rule')} maxWidth={step==='details' ? 'max-w-5xl' : 'max-w-2xl'}>
 
       {/* STEP 1 */}
       {step==='choose'&&(
@@ -325,19 +429,19 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
                 <ArrowLeft size={15}/> Change trigger type
               </button>
 
-                <div style={{ display:'inline-flex',alignItems:'center',gap:7,padding:'6px 14px',background:'linear-gradient(135deg,rgba(124,58,237,0.1),rgba(219,39,119,0.05))',border:'1px solid rgba(124,58,237,0.2)',borderRadius:999,fontSize:'0.8rem',fontWeight:700,color:'var(--color-primary)',marginBottom:20 }}>
+              <div style={{ display:'inline-flex',alignItems:'center',gap:7,padding:'6px 14px',background:'linear-gradient(135deg,rgba(124,58,237,0.1),rgba(219,39,119,0.05))',border:'1px solid rgba(124,58,237,0.2)',borderRadius:999,fontSize:'0.8rem',fontWeight:700,color:'var(--color-primary)',marginBottom:20 }}>
                 <Zap size={13}/>{TRIGGER_OPTIONS.find(t=>t.value===triggerType)?.label}
               </div>
 
               {/* Rule Name */}
-              <div style={{ marginBottom:18 }}>
+              <div className="rb-field-shell" style={{ marginBottom:18 }}>
                 <label className="form-label">Rule Name</label>
                 <input type="text" className="form-input" placeholder="e.g. Reply to pricing inquiries" value={name} onChange={e=>setName(e.target.value)}/>
               </div>
 
               {/* Keywords */}
               {triggerType==='keyword'&&(
-                <div style={{ marginBottom:18 }}>
+                <div className="rb-field-shell" style={{ marginBottom:18 }}>
                   <label className="form-label">Keywords <span style={{ fontWeight:400,color:'var(--color-muted)',marginLeft:8,fontSize:'0.75rem' }}>Press Enter or comma to add</span></label>
                   <div className="keywords-container" onClick={()=>kwInputRef.current?.focus()}>
                     {keywords.map(kw=>(
@@ -350,7 +454,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
 
               {/* Comment config */}
               {triggerType==='comment'&&(
-                <div style={{ marginBottom:18 }}>
+                <div className="rb-field-shell" style={{ marginBottom:18 }}>
                   <label className="form-label">Post Target</label>
                   <div style={{ display:'flex',flexDirection:'column',gap:8,marginBottom:12 }}>
                     {COMMENT_TARGET_OPTIONS.map(opt=>(
@@ -391,16 +495,24 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
               )}
 
               {/* Response Template */}
-              <div style={{ marginBottom:16 }}>
+              <div className="rb-field-shell rb-template-shell" style={{ marginBottom:16 }}>
                 <label className="form-label">Response Template</label>
                 <div className="rb-var-chips">
-                  <span style={{ fontSize:'0.75rem',color:'var(--color-muted)',flexShrink:0 }}>Insert variables</span>
-                  {TEMPLATE_VARS.map(v=>(
-                    <button key={v} type="button" onClick={()=>insertVar(v)} className="rb-var-chip">{v}</button>
+                  <span style={{ fontSize:'0.75rem',color:'var(--color-muted)',flexShrink:0 }}>Quick inserts</span>
+                  {TEMPLATE_VARIABLES.map((variable)=>(
+                    <button
+                      key={variable.token}
+                      type="button"
+                      onClick={()=>insertVar(variable.token)}
+                      className="rb-var-chip"
+                      title={`Insert ${variable.token}`}
+                    >
+                      <span>{variable.label}</span>
+                    </button>
                   ))}
                 </div>
                 <p style={{ fontSize:'0.75rem', color:'var(--color-muted)', marginBottom: 8 }}>
-                  Tap a chip to insert a variable without typing braces manually.
+                  Tap a button to insert the full placeholder automatically.
                 </p>
                 <textarea ref={textareaRef} className="template-textarea" placeholder="Hi {{name}}! Thanks for reaching out. Here's what you need to know..." value={template} onChange={e=>setTemplate(e.target.value)} rows={4}/>
                 <p style={{ fontSize:'0.75rem',color:'var(--color-muted)',textAlign:'right',marginTop:4 }}>{template.length} / 1000</p>
@@ -418,7 +530,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
               )}
 
               {/* Toggles */}
-              <div style={{ display:'flex',flexDirection:'column',gap:2,marginBottom:20 }}>
+              <div className="rb-field-shell" style={{ display:'flex',flexDirection:'column',gap:2,marginBottom:20 }}>
                 <div className="wizard-toggle-row compact">
                   <span className="wizard-toggle-label">Ask to follow before DM {lockBadge(isStarterOrPro,'starter')}</span>
                   <button type="button" onClick={()=>isStarterOrPro&&setAskFollowBeforeDm(p=>!p)} className={`wizard-switch ${askFollowBeforeDm?'on':''}`} disabled={!isStarterOrPro}><span/></button>
@@ -429,23 +541,19 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
                 </div>
               </div>
 
-              <div style={{ marginBottom: 16, borderRadius: 16, border: '1px solid rgba(148,163,184,0.24)', background: 'linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)', padding: '16px' }}>
+              <div className={`rb-guide-shell rb-guide-${currentGuide.theme}`} style={{ marginBottom: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                   <div style={{ width: 34, height: 34, borderRadius: 12, background: 'linear-gradient(135deg, rgba(124,58,237,0.1), rgba(219,39,119,0.08))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)' }}>
                     <Zap size={15} />
                   </div>
                   <div>
                     <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-text)' }}>How this rule works</p>
-                    <p style={{ fontSize: '0.78rem', color: 'var(--color-muted)' }}>Keep the trigger, message, and optional follow-up in sync.</p>
+                    <p style={{ fontSize: '0.78rem', color: 'var(--color-muted)' }}>{currentGuide.subtitle}</p>
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10 }}>
-                  {[
-                    { title: 'Choose trigger', desc: 'Pick the event that starts the automation, like a keyword, story reply, comment, or new DM.' },
-                    { title: 'Write response', desc: 'Build the DM with the variable chips so names and keywords are filled automatically.' },
-                    { title: 'Set extras', desc: 'Use follow-up and follow-before-DM options to shape the experience.' },
-                  ].map((item) => (
-                    <div key={item.title} style={{ borderRadius: 14, border: '1px solid rgba(226,232,240,0.9)', background: '#fff', padding: '12px' }}>
+                <div className="rb-guide-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10 }}>
+                  {currentGuide.cards.map((item) => (
+                    <div key={item.title} className="rb-guide-card" style={{ borderRadius: 14, border: '1px solid rgba(226,232,240,0.9)', background: '#fff', padding: '12px' }}>
                       <p style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--color-text)', marginBottom: 4 }}>{item.title}</p>
                       <p style={{ fontSize: '0.75rem', lineHeight: 1.55, color: 'var(--color-muted)' }}>{item.desc}</p>
                     </div>
@@ -462,7 +570,11 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
 
               <button type="button" onClick={handleSubmit} disabled={loading||!canSubmit()}
                 style={{ width:'100%',padding:'13px',background:canSubmit()?'linear-gradient(135deg,#7C3AED,#DB2777)':'#E2E8F0',color:canSubmit()?'white':'#94A3B8',border:'none',borderRadius:12,fontFamily:'var(--font-display)',fontWeight:700,fontSize:'0.9375rem',cursor:canSubmit()?'pointer':'not-allowed',transition:'all 200ms',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:canSubmit()?'0 8px 24px rgba(124,58,237,0.3)':'none' }}>
-                {loading?<><RefreshCw size={16} className="animate-spin"/> Creating rule...</>:<><Check size={16}/> Create Rule</>}
+                {loading ? (
+                  <><RefreshCw size={16} className="animate-spin"/> {editing ? 'Saving...' : 'Creating rule...'}</>
+                ) : (
+                  <><Check size={16}/> {editing ? 'Save & Publish' : 'Create Rule'}</>
+                )}
               </button>
             </div>
 

@@ -471,6 +471,13 @@ export async function refreshInstagramToken() {
   throw new Error('Automatic refresh is unavailable. Please reconnect Instagram.');
 }
 
+export async function disconnectInstagram() {
+  const res = await authFetch('/auth/instagram/disconnect', { method: 'POST' });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(asErrorMessage(data, 'Failed to disconnect Instagram'));
+  return data;
+}
+
 export async function injectInstagramToken(token: string, igUserId: string) {
   void token;
   void igUserId;
