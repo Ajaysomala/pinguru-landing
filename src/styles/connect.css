@@ -3,9 +3,10 @@
    ============================================================ */
 
 .connect-page {
-  max-width: 1280px;
+  max-width: 1180px;
   margin: 0 auto;
   position: relative;
+  overflow-x: hidden;
 }
 
 .connect-page::before {
@@ -354,7 +355,7 @@
 /* Responsive grid fix */
 .connect-grid-responsive {
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: minmax(0, 1fr) 300px;
   gap: 20px;
   align-items: start;
 }
@@ -362,5 +363,47 @@
 @media (max-width: 900px) {
   .connect-grid-responsive {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .connect-page {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .connect-hero {
+    padding: 18px 18px 20px;
+    border-radius: 18px;
+  }
+
+  .connect-grid-responsive {
+    gap: 14px;
+  }
+
+  .connect-main-col,
+  .connect-side-col {
+    width: 100%;
+  }
+
+  .connect-main-card .card-header,
+  .connect-permissions-card .card-header,
+  .connect-side-card .card-header {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .connect-main-card .card-body,
+  .connect-permissions-list {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .connect-permission-item {
+    padding: 12px;
+  }
+
+  .connect-policy-content {
+    padding: 12px 14px;
   }
 }

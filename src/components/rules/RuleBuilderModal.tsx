@@ -16,7 +16,7 @@ interface RuleBuilderModalProps {
 
 const TRIGGER_OPTIONS: { value: TriggerType; label: string; desc: string; icon: React.ReactNode }[] = [
   { value: 'keyword',       label: 'Keyword Match',   desc: 'Trigger when a DM contains specific keywords', icon: <MessageSquare size={16}/> },
-  { value: 'story_mention', label: 'Story Mention',   desc: 'Trigger when someone mentions you in a story', icon: <Zap size={16}/> },
+  { value: 'story_mention', label: 'Story Reply',     desc: 'Trigger when someone replies to or mentions your story', icon: <Zap size={16}/> },
   { value: 'comment',       label: 'Comment Reply',   desc: 'Trigger when someone comments on your post',   icon: <MessageSquare size={16}/> },
   { value: 'new_dm',        label: 'New DM Received', desc: 'Trigger on every new incoming DM',             icon: <MessageSquare size={16}/> },
 ];
@@ -325,7 +325,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
                 <ArrowLeft size={15}/> Change trigger type
               </button>
 
-              <div style={{ display:'inline-flex',alignItems:'center',gap:7,padding:'6px 14px',background:'linear-gradient(135deg,rgba(124,58,237,0.1),rgba(219,39,119,0.05))',border:'1px solid rgba(124,58,237,0.2)',borderRadius:999,fontSize:'0.8rem',fontWeight:700,color:'var(--color-primary)',marginBottom:20 }}>
+                <div style={{ display:'inline-flex',alignItems:'center',gap:7,padding:'6px 14px',background:'linear-gradient(135deg,rgba(124,58,237,0.1),rgba(219,39,119,0.05))',border:'1px solid rgba(124,58,237,0.2)',borderRadius:999,fontSize:'0.8rem',fontWeight:700,color:'var(--color-primary)',marginBottom:20 }}>
                 <Zap size={13}/>{TRIGGER_OPTIONS.find(t=>t.value===triggerType)?.label}
               </div>
 
@@ -394,11 +394,14 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
               <div style={{ marginBottom:16 }}>
                 <label className="form-label">Response Template</label>
                 <div className="rb-var-chips">
-                  <span style={{ fontSize:'0.75rem',color:'var(--color-muted)',flexShrink:0 }}>Insert:</span>
+                  <span style={{ fontSize:'0.75rem',color:'var(--color-muted)',flexShrink:0 }}>Insert variables</span>
                   {TEMPLATE_VARS.map(v=>(
                     <button key={v} type="button" onClick={()=>insertVar(v)} className="rb-var-chip">{v}</button>
                   ))}
                 </div>
+                <p style={{ fontSize:'0.75rem', color:'var(--color-muted)', marginBottom: 8 }}>
+                  Tap a chip to insert a variable without typing braces manually.
+                </p>
                 <textarea ref={textareaRef} className="template-textarea" placeholder="Hi {{name}}! Thanks for reaching out. Here's what you need to know..." value={template} onChange={e=>setTemplate(e.target.value)} rows={4}/>
                 <p style={{ fontSize:'0.75rem',color:'var(--color-muted)',textAlign:'right',marginTop:4 }}>{template.length} / 1000</p>
               </div>
@@ -423,6 +426,30 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
                 <div className="wizard-toggle-row compact">
                   <span className="wizard-toggle-label">Send follow-up message {lockBadge(isPro,'pro')}</span>
                   <button type="button" onClick={()=>isPro&&setSendFollowUpMessage(p=>!p)} className={`wizard-switch ${sendFollowUpMessage?'on':''}`} disabled={!isPro}><span/></button>
+                </div>
+              </div>
+
+              <div style={{ marginBottom: 16, borderRadius: 16, border: '1px solid rgba(148,163,184,0.24)', background: 'linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)', padding: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                  <div style={{ width: 34, height: 34, borderRadius: 12, background: 'linear-gradient(135deg, rgba(124,58,237,0.1), rgba(219,39,119,0.08))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)' }}>
+                    <Zap size={15} />
+                  </div>
+                  <div>
+                    <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-text)' }}>How this rule works</p>
+                    <p style={{ fontSize: '0.78rem', color: 'var(--color-muted)' }}>Keep the trigger, message, and optional follow-up in sync.</p>
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10 }}>
+                  {[
+                    { title: 'Choose trigger', desc: 'Pick the event that starts the automation, like a keyword, story reply, comment, or new DM.' },
+                    { title: 'Write response', desc: 'Build the DM with the variable chips so names and keywords are filled automatically.' },
+                    { title: 'Set extras', desc: 'Use follow-up and follow-before-DM options to shape the experience.' },
+                  ].map((item) => (
+                    <div key={item.title} style={{ borderRadius: 14, border: '1px solid rgba(226,232,240,0.9)', background: '#fff', padding: '12px' }}>
+                      <p style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--color-text)', marginBottom: 4 }}>{item.title}</p>
+                      <p style={{ fontSize: '0.75rem', lineHeight: 1.55, color: 'var(--color-muted)' }}>{item.desc}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
 

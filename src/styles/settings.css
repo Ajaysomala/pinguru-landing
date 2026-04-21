@@ -10,6 +10,8 @@
 
 .settings-page {
   position: relative;
+  max-width: 1180px;
+  margin: 0 auto;
 }
 
 .settings-page::before {

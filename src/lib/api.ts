@@ -79,7 +79,8 @@ function asErrorMessage(input: unknown, fallback: string): string {
     const nested = obj.detail ?? obj.message ?? obj.error;
     if (nested && nested !== input) return asErrorMessage(nested, fallback);
     try {
-      return JSON.stringify(input);
+      const serialized = JSON.stringify(input);
+      return serialized || fallback;
     } catch {
       return fallback;
     }
@@ -87,10 +88,22 @@ function asErrorMessage(input: unknown, fallback: string): string {
   return fallback;
 }
 
+function sanitizeErrorText(message: string, fallback: string): string {
+  if (!message) return fallback;
+  if (message.includes('<!DOCTYPE') || message.includes('<html') || message.includes('<body') || message.includes('via_upstream')) {
+    return fallback;
+  }
+  if (message.includes('502') || message.includes('503') || message.includes('504')) {
+    return fallback;
+  }
+  if (message.length > 500) return fallback;
+  return message;
+}
+
 type ApiRequestError = Error & { status?: number };
 
 function createApiRequestError(status: number, detail: unknown, fallback: string): ApiRequestError {
-  const err = new Error(asErrorMessage(detail, fallback)) as ApiRequestError;
+  const err = new Error(sanitizeErrorText(asErrorMessage(detail, fallback), fallback)) as ApiRequestError;
   err.status = status;
   return err;
 }

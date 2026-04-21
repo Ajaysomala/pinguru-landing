@@ -133,7 +133,7 @@ export type TriggerType = 'keyword' | 'story_mention' | 'comment' | 'new_dm';
 
 export const TRIGGER_LABELS: Record<TriggerType, string> = {
   keyword:       'Keyword Match',
-  story_mention: 'Story Mention',
+  story_mention: 'Story Reply',
   comment:       'Comment Reply',
   new_dm:        'New DM Received',
 };
