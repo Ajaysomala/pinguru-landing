@@ -309,51 +309,48 @@ const BillingPage: React.FC = () => {
     }
   };
 
+  const bannerClass = banner
+    ? banner.kind === 'success'
+      ? 'billing-v6-banner success'
+      : banner.kind === 'processing'
+        ? 'billing-v6-banner processing'
+        : 'billing-v6-banner timeout'
+    : '';
+
   return (
-    <div className="page-wrapper">
-      <div className="page-header">
+    <div className="page-wrapper billing-v6-page">
+      <div className="page-header billing-v6-header">
         <h1 className="page-title">Billing & Plans</h1>
-        <p className="page-subtitle">Manage your subscription and usage limits</p>
+        <p className="page-subtitle">Choose your plan and manage subscription status</p>
       </div>
 
       {error && (
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 10,
-          background: '#FFF1F2', border: '1px solid #FDA4AF',
-          borderRadius: 12, padding: '12px 16px', marginBottom: 20,
-          fontSize: '0.875rem', color: '#9F1239'
-        }}>
-          <AlertCircle size={15} style={{ flexShrink: 0 }} /> {error}
+        <div className="billing-v6-error">
+          <AlertCircle size={15} /> {error}
         </div>
       )}
 
       {banner && (
-        <div className={`flex items-center gap-2.5 rounded-xl px-4 py-3 mb-6 text-sm border ${
-          banner.kind === 'success'
-            ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-            : banner.kind === 'processing'
-              ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
-              : 'bg-amber-50 border-amber-200 text-amber-800'
-        }`}>
-          {banner.kind === 'success' ? <Check size={15} className="flex-shrink-0" /> : <AlertCircle size={15} className="flex-shrink-0" />}
+        <div className={bannerClass}>
+          {banner.kind === 'success' ? <Check size={15} /> : <AlertCircle size={15} />}
           <span>{banner.message}</span>
         </div>
       )}
 
       {/* Current plan + backend status */}
       {!loading && planStatus && (
-        <div className="billing-info-card mb-6">
-          <div className="w-11 h-11 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
-            <CreditCard size={18} className="text-primary" />
+        <div className="billing-info-card billing-v6-info-card">
+          <div className="billing-v6-info-icon">
+            <CreditCard size={18} />
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs uppercase tracking-wide text-slate-500 font-semibold">Active subscription</p>
-            <p className="text-base font-semibold text-slate-800 mt-0.5">
-              <span className="text-primary capitalize">{planStatus.current_plan}</span>
-              <span className="text-slate-500"> · {planStatus.current_billing_cycle || 'monthly'}</span>
-              {planStatus.pending_plan && <span className="text-amber-700"> · Pending: {planStatus.pending_plan}</span>}
+          <div className="billing-v6-info-copy">
+            <p className="eyebrow">Active subscription</p>
+            <p className="headline">
+              <span className="plan">{planStatus.current_plan}</span>
+              <span> · {planStatus.current_billing_cycle || 'monthly'}</span>
+              {planStatus.pending_plan && <span className="pending"> · Pending: {planStatus.pending_plan}</span>}
             </p>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="meta">
               Provider: {formatProvider(planStatus.payment_provider)} · Subscription: {planStatus.subscription_id || 'none'}
               {planStatus.pending_billing_cycle ? ` · Pending cycle: ${planStatus.pending_billing_cycle}` : ''}
             </p>
@@ -361,7 +358,7 @@ const BillingPage: React.FC = () => {
           <button
             onClick={handleManagePortal}
             disabled={portalLoading}
-            className="flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold text-primary bg-white border border-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors disabled:opacity-50"
+            className="billing-v6-info-btn"
           >
             {portalLoading ? (
               <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
@@ -372,7 +369,7 @@ const BillingPage: React.FC = () => {
             <button
               onClick={handleCancelPending}
               disabled={cancelLoading}
-              className="ml-2 flex-shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 bg-white border border-rose-200 px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors disabled:opacity-50"
+              className="billing-v6-info-btn danger"
             >
               {cancelLoading ? (
                 <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
@@ -383,13 +380,13 @@ const BillingPage: React.FC = () => {
         </div>
       )}
 
-      <div className="mb-6 inline-flex rounded-xl border border-slate-200 bg-white p-1 gap-1">
+      <div className="billing-v6-cycle-switch">
         {(Object.keys(BILLING_CYCLE_META) as BillingCycle[]).map((cycle) => (
           <button
             key={cycle}
             type="button"
             onClick={() => setBillingCycle(cycle)}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${billingCycle === cycle ? 'bg-primary text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+            className={billingCycle === cycle ? 'active' : ''}
           >
             {BILLING_CYCLE_META[cycle].label}
           </button>
@@ -485,17 +482,17 @@ const BillingPage: React.FC = () => {
         })}
       </div>
 
-      <div className="mt-8 p-5 bg-slate-50 border border-slate-200 rounded-xl">
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">All plans include</p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="billing-v6-common">
+        <p className="title">All plans include</p>
+        <div className="billing-v6-common-grid">
           {[
             '24-hour messaging window compliance',
             '200 messages/hour rate limiting',
             'Meta webhook integration',
             'Real-time analytics',
           ].map(f => (
-            <div key={f} className="flex items-center gap-1.5 text-xs text-slate-600">
-              <Check size={12} className="text-success flex-shrink-0" />
+            <div key={f} className="billing-v6-common-item">
+              <Check size={12} />
               {f}
             </div>
           ))}

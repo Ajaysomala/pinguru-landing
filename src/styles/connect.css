@@ -4,8 +4,9 @@
    ============================================================ */
 
 .connect-v5-page {
-  max-width: 1220px;
-  margin: 0 auto;
+  max-width: none;
+  width: 100%;
+  margin: 0;
   position: relative;
   overflow-x: clip;
 }

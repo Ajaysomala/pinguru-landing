@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, AlertCircle, Lock } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, Lock, Mail, KeyRound, ArrowRight } from 'lucide-react';
 import { loginUser } from '../lib/api';
 import { recordLoginAttempt, isLockedOut, resetLoginAttempts, formatLockoutTime } from '../lib/utils';
 import { useAuth } from '../App';
@@ -59,82 +59,121 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="auth-layout">
-      <div className="auth-card">
-        <Link to="/" className="auth-logo">
-          <div className="auth-logo-mark">PG</div>
-          <span className="auth-logo-name">PinGuru</span>
-        </Link>
-
-        <h1 className="auth-title">Welcome back</h1>
-        <p className="auth-subtitle">Sign in to your account to continue</p>
-
-        {lockoutMsg && (
-          <div className="auth-alert error mb-4">
-            <Lock size={15} className="flex-shrink-0 mt-0.5" />
-            <span>{lockoutMsg}</span>
-          </div>
-        )}
-
-        {error && !lockoutMsg && (
-          <div className="auth-alert error mb-4">
-            <AlertCircle size={15} className="flex-shrink-0 mt-0.5" />
-            <div>
-              <span>{error}</span>
-              {remaining !== null && remaining <= 3 && (
-                <p className="text-xs mt-0.5 opacity-80">{remaining} attempt{remaining !== 1 ? 's' : ''} remaining before lockout</p>
-              )}
-            </div>
-          </div>
-        )}
-
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label" htmlFor="email">Email</label>
-            <input
-              id="email" type="email" className="form-input"
-              placeholder="you@example.com" required autoComplete="email"
-              value={email} onChange={e => setEmail(e.target.value)}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label" htmlFor="password">Password</label>
-            <div className="relative">
-              <input
-                id="password" type={showPwd ? 'text' : 'password'}
-                className="form-input pr-10"
-                placeholder="Min. 8 characters" required autoComplete="current-password"
-                value={password} onChange={e => setPassword(e.target.value)}
-              />
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                onClick={() => setShowPwd(v => !v)}
-              >
-                {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading || !!lockoutMsg}
-            className="w-full mt-1 bg-primary text-white font-semibold py-2.5 rounded-xl hover:bg-indigo-700 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+    <div className="auth-screen auth-screen-split">
+      <section className="auth-showcase">
+        <div className="auth-showcase-video-layer" aria-hidden="true">
+          <video
+            className="auth-showcase-video"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
           >
-            {loading ? (
-              <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>Signing in...</>
-            ) : 'Sign In'}
-          </button>
-        </form>
+            <source src="/auth-showcase.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div className="auth-showcase-orb auth-showcase-orb-a" />
+        <div className="auth-showcase-orb auth-showcase-orb-b" />
+        <div className="auth-showcase-inner">
+          <div className="auth-showcase-brand-mark">PG</div>
+          <h2 className="auth-showcase-brand">PinGuru</h2>
+          <p className="auth-showcase-copy">Turn every comment &amp; DM into a conversion. Automate your Instagram on autopilot.</p>
 
-        <p className="auth-footer">
-          Don't have an account? <Link to="/register">Create one free</Link>
-        </p>
-        <p className="auth-footer" style={{ marginTop: 8 }}>
-          Forgot your password? <Link to="/forgot-password">Reset it here</Link>
-        </p>
-      </div>
+          <div className="auth-feature-stack">
+            <div className="auth-feature-item"><span>⚡</span><p>Auto-reply to DMs &amp; comments instantly</p></div>
+            <div className="auth-feature-item"><span>📊</span><p>Analytics dashboard to track performance</p></div>
+            <div className="auth-feature-item"><span>🎯</span><p>Smart keyword matching with Hinglish support</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section className="auth-pane">
+        <div className="auth-panel">
+          <Link to="/" className="auth-panel-brand">
+            <div className="auth-panel-brand-mark">PG</div>
+            <span>PinGuru</span>
+          </Link>
+
+          <h1 className="auth-panel-title">Welcome back 👋</h1>
+          <p className="auth-panel-subtitle">Sign in to your account to continue</p>
+
+          <button type="button" className="auth-google-btn">Continue with Google</button>
+
+          <div className="auth-divider-row">
+            <div className="line" />
+            <span>or sign in with email</span>
+            <div className="line" />
+          </div>
+
+          {lockoutMsg && (
+            <div className="auth-alert error" style={{ marginBottom: 12 }}>
+              <Lock size={15} className="flex-shrink-0" />
+              <span>{lockoutMsg}</span>
+            </div>
+          )}
+
+          {error && !lockoutMsg && (
+            <div className="auth-alert error" style={{ marginBottom: 12 }}>
+              <AlertCircle size={15} className="flex-shrink-0" />
+              <div>
+                <span>{error}</span>
+                {remaining !== null && remaining <= 3 && (
+                  <p style={{ fontSize: '0.75rem', marginTop: 4, opacity: 0.8 }}>{remaining} attempt{remaining !== 1 ? 's' : ''} remaining before lockout</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          <form className="auth-panel-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="email">Email address</label>
+              <div className="auth-input-wrap">
+                <Mail size={16} className="auth-input-icon" />
+                <input
+                  id="email"
+                  type="email"
+                  className="form-input"
+                  placeholder="you@example.com"
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <div className="auth-field-row">
+                <label className="form-label" htmlFor="password">Password</label>
+                <Link to="/forgot-password" className="auth-link-inline">Forgot password?</Link>
+              </div>
+              <div className="auth-input-wrap">
+                <KeyRound size={16} className="auth-input-icon" />
+                <input
+                  id="password"
+                  type={showPwd ? 'text' : 'password'}
+                  className="form-input"
+                  placeholder="Min. 8 characters"
+                  required
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                />
+                <button type="button" className="auth-input-action" onClick={() => setShowPwd(v => !v)}>
+                  {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" disabled={loading || !!lockoutMsg} className="auth-gradient-btn">
+              {loading ? 'Signing in...' : <>Sign In <ArrowRight size={16} /></>}
+            </button>
+          </form>
+
+          <p className="auth-panel-footer">Don't have an account? <Link to="/register">Create one free</Link></p>
+        </div>
+      </section>
     </div>
   );
 };

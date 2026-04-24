@@ -213,16 +213,27 @@ export async function getDashboardStats(): Promise<DashboardStats | null> {
   if (res.status === 401) { window.location.href = '/login'; return null; }
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'Failed to get stats');
+  const dmLimit = typeof data.dm_limit === 'number' ? data.dm_limit : null;
+  const dmRemaining = typeof data.dm_remaining === 'number' ? data.dm_remaining : null;
+  const apiSent = typeof data.dms_sent_this_month === 'number'
+    ? data.dms_sent_this_month
+    : typeof data.dm_sent_this_month === 'number'
+      ? data.dm_sent_this_month
+      : null;
+  const derivedSent = apiSent ?? ((typeof dmLimit === 'number' && dmLimit > 0 && typeof dmRemaining === 'number') ? Math.max(0, dmLimit - dmRemaining) : 0);
   return {
-    dms_sent_this_month: data.dms_sent_this_month ?? data.dm_sent_this_month ?? 0,
+    dms_sent_this_month: derivedSent,
     active_rules: data.active_rules ?? 0,
-    dm_limit: data.dm_limit ?? 0,
+    dm_limit: dmLimit,
+    dm_remaining: dmRemaining,
     plan: String(data.plan ?? 'free').toLowerCase(),
+    total_dms_sent: typeof data.total_dms_sent === 'number' ? data.total_dms_sent : undefined,
     success_rate: typeof data.success_rate === 'number' ? data.success_rate : null,
     analytics_tier: data.analytics_tier === 'premium' ? 'premium' : 'basic',
     premium_analytics_enabled: Boolean(data.premium_analytics_enabled),
     avg_dms_per_day_30d: typeof data.avg_dms_per_day_30d === 'number' ? data.avg_dms_per_day_30d : null,
     best_day_30d: data.best_day_30d && typeof data.best_day_30d === 'object' ? data.best_day_30d : null,
+    dm_failed_this_month: typeof data.dm_failed_this_month === 'number' ? data.dm_failed_this_month : undefined,
     peak_hour_utc: typeof data.peak_hour_utc === 'number' ? data.peak_hour_utc : null,
     busiest_weekday: typeof data.busiest_weekday === 'string' ? data.busiest_weekday : null,
   };

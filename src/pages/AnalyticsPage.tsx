@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, MessageSquare, Zap, Lock, Unlock } from 'lucide-react';
+import { TrendingUp, MessageSquare, Zap, Lock, Unlock, Sparkles } from 'lucide-react';
 import { getDashboardStats, getAnalytics } from '../lib/api';
 import type { DashboardStats, AnalyticsData } from '../lib/types';
 import { Badge } from '../components/ui/Badge';
@@ -46,78 +46,75 @@ const AnalyticsPage: React.FC = () => {
     : '—';
 
   return (
-    <div className="page-wrapper">
-      <div className="page-header">
+    <div className="page-wrapper analytics-v6-page">
+      <div className="page-header analytics-v6-header">
         <h1 className="page-title">Analytics</h1>
-        <p className="page-subtitle">Track your DM automation performance</p>
+        <p className="page-subtitle">Detailed performance insights for your DM automation</p>
+        <span className="analytics-v6-plan-chip">Current plan: {planName}</span>
       </div>
 
-      {/* Overview stats */}
-      <div className="analytics-stats">
-        <div className="analytics-stat-card">
-          <div className="flex items-center justify-between mb-2">
-            <p className="analytics-stat-label">Total DMs Sent</p>
-            <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-              <MessageSquare size={14} className="text-primary"/>
-            </div>
+      <div className="analytics-v6-stats-row">
+        <div className="analytics-v6-stat-card">
+          <div className="top">
+            <p>Total messages</p>
+            <span><MessageSquare size={15} /></span>
           </div>
-          <p className="analytics-stat-value">{stats?.dms_sent_this_month ?? 0}</p>
-          <p className="text-xs text-slate-400 mt-1">this month</p>
+          <h3>{stats?.dms_sent_this_month ?? 0}</h3>
+          <small>this month</small>
         </div>
 
-        <div className="analytics-stat-card">
-          <div className="flex items-center justify-between mb-2">
-            <p className="analytics-stat-label">Automation Success Rate</p>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
-              <TrendingUp size={14} className="text-success"/>
-            </div>
+        <div className="analytics-v6-stat-card success">
+          <div className="top">
+            <p>Success rate</p>
+            <span><TrendingUp size={15} /></span>
           </div>
-          <p className="analytics-stat-value success">{premiumEnabled ? `${successRate}%` : '—'}</p>
-          <p className="text-xs text-slate-400 mt-1 inline-flex items-center gap-1.5">{premiumEnabled ? <><Unlock size={12} />of automations succeeded</> : <><Lock size={12} />Upgrade to view</>}</p>
+          <h3>{premiumEnabled ? `${successRate}%` : '—'}</h3>
+          <small className="with-icon">{premiumEnabled ? <><Unlock size={12} /> unlocked</> : <><Lock size={12} /> locked on free</>}</small>
         </div>
 
-        <div className="analytics-stat-card">
-          <div className="flex items-center justify-between mb-2">
-            <p className="analytics-stat-label">Active Rules</p>
-            <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
-              <Zap size={14} className="text-warning"/>
-            </div>
+        <div className="analytics-v6-stat-card">
+          <div className="top">
+            <p>Active rules</p>
+            <span><Zap size={15} /></span>
           </div>
-          <p className="analytics-stat-value">{stats?.active_rules ?? 0}</p>
-          <p className="text-xs text-slate-400 mt-1">rules running</p>
+          <h3>{stats?.active_rules ?? 0}</h3>
+          <small>running now</small>
         </div>
       </div>
 
-      <DMVolumeChart
-        isLocked={!premiumEnabled}
-        loading={loading}
-        data={data}
-        days={days}
-        onDaysChange={setDays}
-      />
+      <section className="analytics-v6-chart-shell">
+        <DMVolumeChart
+          isLocked={!premiumEnabled}
+          loading={loading}
+          data={data}
+          days={days}
+          onDaysChange={setDays}
+        />
+      </section>
 
       {premiumEnabled && (
-        <div className="analytics-stats mt-5">
-          <div className="analytics-stat-card">
-            <p className="analytics-stat-label mb-2">Avg DMs / Day (30d)</p>
-            <p className="analytics-stat-value">{avgDmsPerDay ?? '—'}</p>
+        <div className="analytics-v6-insight-grid">
+          <div className="analytics-v6-insight-card">
+            <p>Average DMs per day</p>
+            <h4>{avgDmsPerDay ?? '—'}</h4>
           </div>
-          <div className="analytics-stat-card">
-            <p className="analytics-stat-label mb-2">Peak Hour</p>
-            <p className="analytics-stat-value">{peakHour}</p>
+          <div className="analytics-v6-insight-card">
+            <p>Peak hour</p>
+            <h4>{peakHour}</h4>
           </div>
-          <div className="analytics-stat-card">
-            <p className="analytics-stat-label mb-2">Best Day</p>
-            <p className="analytics-stat-value">{bestDay}</p>
+          <div className="analytics-v6-insight-card">
+            <p>Best day</p>
+            <h4>{bestDay}</h4>
           </div>
         </div>
       )}
 
-      {/* Meta compliance note for free */}
       {!premiumEnabled && (
-        <div className="mt-5 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500 flex items-start gap-2.5">
+        <div className="analytics-v6-upgrade">
+          <Sparkles size={18} />
           <Badge variant="indigo">{isFree ? 'Free Plan' : 'Upgrade Required'}</Badge>
-          <span>Basic analytics are visible on all plans. Upgrade to Starter or Pro for premium analytics: success rate, DM trend charts, peak-hour insights, and 30-day reporting.</span>
+          <span>Unlock success rate, trend chart details, peak-hour insights and best-day tracking.</span>
+          <Link to="/billing">Upgrade now</Link>
         </div>
       )}
     </div>

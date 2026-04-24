@@ -2,6 +2,97 @@
    support.css — Support center page tweaks
    ============================================================ */
 
+.support-page {
+  max-width: 1220px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.support-page::before {
+  content: '';
+  position: absolute;
+  left: -170px;
+  top: -150px;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, rgba(219, 39, 119, 0.1) 44%, transparent 74%);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+.support-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+.support-card,
+.support-faq,
+.support-contact-card {
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: linear-gradient(145deg, #ffffff 0%, color-mix(in srgb, var(--color-primary-light) 10%, #ffffff 90%) 100%);
+  box-shadow: var(--shadow-xs);
+}
+
+.support-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 16%, var(--color-border) 84%);
+  background: color-mix(in srgb, var(--color-primary-light) 72%, #ffffff 28%);
+  color: var(--color-text-secondary);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 6px 12px;
+}
+
+.support-title {
+  color: var(--color-text);
+  letter-spacing: -0.03em;
+}
+
+.support-subtitle,
+.support-meta,
+.support-card p {
+  color: var(--color-text-secondary);
+}
+
+.support-link,
+.support-card a {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.support-link:hover,
+.support-card a:hover {
+  color: var(--color-primary-hover);
+}
+
+.support-faq details {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: #fff;
+  padding: 10px 12px;
+}
+
+.support-faq details + details {
+  margin-top: 10px;
+}
+
+.support-faq summary {
+  list-style: none;
+  cursor: pointer;
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.support-faq details p {
+  margin-top: 8px;
+  color: var(--color-muted);
+}
+
 details > summary::-webkit-details-marker {
   display: none;
 }

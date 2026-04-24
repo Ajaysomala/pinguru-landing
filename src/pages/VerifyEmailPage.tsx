@@ -79,47 +79,38 @@ const VerifyEmailPage: React.FC = () => {
     } finally { setResending(false); }
   };
 
+  const progress = Math.min(100, Math.max(0, (otp.filter(Boolean).length / 6) * 100));
+
   return (
-    <div className="auth-layout">
-      <div className="auth-card">
-        <Link to="/" className="auth-logo">
-          <div className="auth-logo-mark">PG</div>
-          <span className="auth-logo-name">PinGuru</span>
-        </Link>
+    <div className="auth-screen auth-screen-verify">
+      <div className="auth-verify-card">
+        <div className="auth-verify-icon"><Mail size={24} /></div>
 
-        {/* Icon */}
-        <div className="flex justify-center mb-4">
-          <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center">
-            <Mail size={26} className="text-primary" />
-          </div>
-        </div>
-
-        <h1 className="auth-title">Check your email</h1>
-        <p className="auth-subtitle">
-          We sent a 6-digit code to<br />
-          <strong className="text-slate-700">{email}</strong>
-        </p>
+        <h1 className="auth-panel-title" style={{ textAlign: 'center', marginTop: 8 }}>Check your email</h1>
+        <p className="auth-panel-subtitle" style={{ textAlign: 'center', marginBottom: 6 }}>We sent a 6-digit code to</p>
+        <p className="auth-verify-email">{email}</p>
 
         {error && (
-          <div className="auth-alert error my-4">
+          <div className="auth-alert error" style={{ marginTop: 12 }}>
             <AlertCircle size={15} className="flex-shrink-0" />
             <span>{error}</span>
           </div>
         )}
         {success && (
-          <div className="auth-alert success my-4">
+          <div className="auth-alert success" style={{ marginTop: 12 }}>
             <CheckCircle size={15} className="flex-shrink-0" />
             <span>{success}</span>
           </div>
         )}
 
-        {/* OTP inputs */}
-        <div className="otp-container my-6" onPaste={handlePaste}>
+        <div className="otp-container verify" onPaste={handlePaste}>
           {otp.map((digit, i) => (
             <input
               key={i}
               ref={el => { inputRefs.current[i] = el; }}
-              type="text" inputMode="numeric" maxLength={1}
+              type="text"
+              inputMode="numeric"
+              maxLength={1}
               className={`otp-input ${digit ? 'filled' : ''} ${loading ? 'opacity-50' : ''}`}
               value={digit}
               onChange={e => handleChange(i, e.target.value)}
@@ -129,25 +120,30 @@ const VerifyEmailPage: React.FC = () => {
           ))}
         </div>
 
-        {loading && (
-          <div className="flex justify-center mb-4">
-            <svg className="animate-spin h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-            </svg>
-          </div>
-        )}
+        <div className="auth-verify-progress">
+          <div className="bar"><span style={{ width: `${progress}%` }} /></div>
+          <p>Code expires in <strong>4:32</strong></p>
+        </div>
+
+        <button
+          onClick={() => handleVerify(otp.join(''))}
+          disabled={loading || otp.some(d => !d)}
+          className="auth-gradient-btn"
+          style={{ marginTop: 10 }}
+        >
+          {loading ? 'Verifying...' : 'Verify Email ✓'}
+        </button>
 
         <button
           onClick={handleResend}
           disabled={resendCooldown > 0 || resending}
-          className="w-full flex items-center justify-center gap-2 py-2 text-sm text-slate-500 hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="auth-resend-btn"
         >
           <RefreshCw size={14} className={resending ? 'animate-spin' : ''} />
-          {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
+          {resendCooldown > 0 ? `Resend code (${resendCooldown}s)` : 'Resend code'}
         </button>
 
-        <p className="auth-footer mt-4">
+        <p className="auth-panel-footer" style={{ marginTop: 8 }}>
           Wrong email? <Link to="/register">Go back</Link>
         </p>
       </div>

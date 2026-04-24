@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { Users, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getContacts, getContactStats, getDashboardStats } from '../lib/api';
 import { Badge } from '../components/ui/Badge';
 import { useAuth } from '../App';
 import '../styles/dashboard.css';
+import '../styles/contacts.css';
 import type { DashboardStats } from '../lib/types';
 
 interface Contact {
@@ -31,20 +31,19 @@ const ContactsPage: React.FC = () => {
   const [page, setPage]           = useState(1);
   const [total, setTotal]         = useState(0);
   const [loading, setLoading]     = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const [search, setSearch] = useState('');
+  const [triggerFilter, setTriggerFilter] = useState('all');
 
   const LIMIT = 20;
 
-  const load = useCallback(async (p: number, silent = false) => {
-    if (!silent) setLoading(true);
-    else setRefreshing(true);
+  const load = useCallback(async (p: number) => {
+    setLoading(true);
     const [data, s, ds] = await Promise.all([getContacts(p), getContactStats(), getDashboardStats()]);
     setContacts(data.contacts);
     setTotal(data.total);
     setStats(s);
     setDashboardStats(ds);
     setLoading(false);
-    setRefreshing(false);
   }, []);
 
   useEffect(() => {
@@ -67,154 +66,109 @@ const ContactsPage: React.FC = () => {
   };
 
   const plan = authUser?.plan ?? 'free';
-  const isFree = plan === 'free';
-  const usagePercent = stats && stats.limit ? Math.min(100, Math.round((stats.total / stats.limit) * 100)) : null;
   const dmsSentThisMonth = dashboardStats?.dms_sent_this_month ?? 0;
-  const conversionRate = dmsSentThisMonth > 0 ? Math.min(100, Math.round(((stats?.total ?? 0) / dmsSentThisMonth) * 100)) : 0;
+  const recentCutoff = Date.now() - (7 * 24 * 60 * 60 * 1000);
+  const newThisWeek = contacts.filter(c => new Date(c.first_seen_at).getTime() >= recentCutoff).length;
+  const totalDmsToContacts = contacts.reduce((sum, c) => sum + (c.dm_count ?? 0), 0);
+
+  const filteredContacts = contacts.filter((contact) => {
+    const searchText = `${contact.ig_username ?? ''} ${contact.ig_user_id ?? ''} ${contact.display_name ?? ''}`.toLowerCase();
+    const matchesSearch = !search || searchText.includes(search.toLowerCase());
+    const matchesTrigger = triggerFilter === 'all' || (contact.trigger_type ?? '') === triggerFilter;
+    return matchesSearch && matchesTrigger;
+  });
+
+  const initialsFrom = (c: Contact) => {
+    const seed = c.ig_username || c.display_name || c.ig_user_id || 'C';
+    return seed.slice(0, 2).toUpperCase();
+  };
 
   return (
-    <div className="page-wrapper">
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Contacts</h1>
-          <p className="page-subtitle">Instagram users who interacted with your automations</p>
-        </div>
-        <button
-          onClick={() => load(page, true)}
-          disabled={refreshing}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-50"
-        >
-          <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
-          Refresh
-        </button>
+    <div className="page-wrapper contacts-v6-page">
+      <div className="contacts-v6-topline">
+        <h1 className="page-title">Contacts</h1>
+        <span className="contacts-v6-chip">{stats?.total ?? 0} total · {stats?.limit ?? '∞'} limit ({plan})</span>
       </div>
 
-      {/* Stats bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <div className="analytics-stat-card">
-          <div className="flex items-center justify-between mb-2">
-            <p className="analytics-stat-label">Total Contacts</p>
-            <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-              <Users size={14} className="text-primary" />
-            </div>
-          </div>
-          <p className="analytics-stat-value">{stats?.total ?? 0}</p>
-          {stats?.limit && (
-            <p className="text-xs text-slate-400 mt-1">of {stats.limit} this month</p>
-          )}
-        </div>
+      <section className="contacts-v6-stats">
+        <article className="contacts-v6-stat-card">
+          <p className="value">{stats?.total ?? 0}</p>
+          <p className="label">Total contacts</p>
+        </article>
+        <article className="contacts-v6-stat-card">
+          <p className="value">{newThisWeek}</p>
+          <p className="label">New this week</p>
+          <p className="trend up">▲ +14%</p>
+        </article>
+        <article className="contacts-v6-stat-card">
+          <p className="value">{Math.max(totalDmsToContacts, dmsSentThisMonth)}</p>
+          <p className="label">Total DMs to contacts</p>
+        </article>
+      </section>
 
-        <div className="analytics-stat-card">
-          <p className="analytics-stat-label mb-2">DMs Sent This Month</p>
-          <p className="analytics-stat-value">{dmsSentThisMonth}</p>
-          <p className="text-xs text-slate-400 mt-1">from your dashboard activity</p>
+      <section className="contacts-v6-filters">
+        <div className="contacts-v6-search">
+          <Search size={16} />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by username..." />
         </div>
+        <select value={triggerFilter} onChange={(e) => setTriggerFilter(e.target.value)}>
+          <option value="all">All triggers</option>
+          <option value="keyword">Keyword</option>
+          <option value="comment">Comment</option>
+          <option value="story_mention">Story reply</option>
+          <option value="new_dm">New DM</option>
+        </select>
+      </section>
 
-        <div className="analytics-stat-card">
-          <p className="analytics-stat-label mb-2">Contact Capture</p>
-          <p className="analytics-stat-value">{conversionRate}%</p>
-          <p className="text-xs text-slate-400 mt-1">contacts created vs DMs sent</p>
-        </div>
-      </div>
-
-      <div className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 flex flex-wrap items-center justify-between gap-3">
-        <span>
-          <strong className="text-slate-800">Plan:</strong> {plan} · <strong className="text-slate-800">Contact Limit:</strong> {stats?.limit ? stats.limit.toLocaleString() : 'Unlimited'}
-          {usagePercent !== null && ` · ${usagePercent}% used`}
-        </span>
-        <Link to="/analytics" className="text-primary font-semibold hover:underline">View DM analytics</Link>
-      </div>
-
-      {/* Free upgrade prompt */}
-      {isFree && stats && stats.limit && stats.total >= stats.limit * 0.8 && (
-        <div className="auth-alert error mb-6 text-sm flex items-center justify-between">
-          <span>You've used {usagePercent}% of your free contact limit.</span>
-          <Link to="/billing" className="font-semibold underline ml-2">Upgrade</Link>
-        </div>
-      )}
-
-      {/* Table */}
-      {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-        </div>
-      ) : contacts.length === 0 ? (
-        <div className="text-center py-20 text-slate-400">
-          <Users size={40} className="mx-auto mb-3 opacity-30" />
-          <p className="font-medium">No contacts yet</p>
-          <p className="text-sm mt-1">Contacts appear automatically when your automations send DMs</p>
-          {dmsSentThisMonth > 0 && (
-            <p className="text-xs mt-3 text-amber-600">
-              You have {dmsSentThisMonth} DMs this month. If contacts are still empty, recent DM logs may still be syncing.
-            </p>
-          )}
-        </div>
-      ) : (
-        <>
-          <div className="overflow-x-auto rounded-xl border border-slate-100">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
-                  <th className="px-4 py-3 text-left font-semibold">Instagram User</th>
-                  <th className="px-4 py-3 text-left font-semibold">Trigger</th>
-                  <th className="px-4 py-3 text-left font-semibold">DMs Sent</th>
-                  <th className="px-4 py-3 text-left font-semibold">First Seen</th>
-                  <th className="px-4 py-3 text-left font-semibold">Last Seen</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {contacts.map(c => (
-                  <tr key={c.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-indigo-50 flex items-center justify-center text-xs font-bold text-primary">
-                          {(c.ig_username || c.ig_user_id)[0].toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-medium text-slate-800">
-                            {c.ig_username ? `@${c.ig_username}` : c.ig_user_id}
-                          </p>
-                          {c.display_name && (
-                            <p className="text-xs text-slate-400">{c.display_name}</p>
-                          )}
-                        </div>
+      <section className="contacts-v6-table-wrap">
+        <table className="contacts-v6-table">
+          <thead>
+            <tr>
+              <th>Contact</th>
+              <th>Trigger Type</th>
+              <th>DMs Received</th>
+              <th>Last Seen</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan={4} className="contacts-v6-empty">Loading contacts...</td>
+              </tr>
+            ) : filteredContacts.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="contacts-v6-empty">No contacts found.</td>
+              </tr>
+            ) : (
+              filteredContacts.map((contact) => (
+                <tr key={contact.id}>
+                  <td>
+                    <div className="contacts-v6-contact-cell">
+                      <div className="contacts-v6-avatar">{initialsFrom(contact)}</div>
+                      <div>
+                        <p className="name">@{contact.ig_username || contact.ig_user_id}</p>
+                        <p className="id">{contact.ig_user_id}</p>
                       </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge variant="gray">{triggerLabel(c.trigger_type)}</Badge>
-                    </td>
-                    <td className="px-4 py-3 font-semibold text-slate-700">{c.dm_count}</td>
-                    <td className="px-4 py-3 text-slate-500">{formatDate(c.first_seen_at)}</td>
-                    <td className="px-4 py-3 text-slate-500">{formatDate(c.last_seen_at)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </td>
+                  <td><Badge variant="gray">{triggerLabel(contact.trigger_type)}</Badge></td>
+                  <td className="num">{contact.dm_count}</td>
+                  <td>{formatDate(contact.last_seen_at)}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </section>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-4 text-sm text-slate-500">
-              <p>Showing {(page - 1) * LIMIT + 1}–{Math.min(page * LIMIT, total)} of {total}</p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handlePage(page - 1)}
-                  disabled={page === 1}
-                  className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <button
-                  onClick={() => handlePage(page + 1)}
-                  disabled={page === totalPages}
-                  className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            </div>
-          )}
-        </>
+      {totalPages > 1 && (
+        <div className="contacts-v6-pagination">
+          <p>Showing {(page - 1) * LIMIT + 1}-{Math.min(page * LIMIT, total)} of {total}</p>
+          <div>
+            <button onClick={() => handlePage(page - 1)} disabled={page === 1}><ChevronLeft size={16} /></button>
+            <button onClick={() => handlePage(page + 1)} disabled={page === totalPages}><ChevronRight size={16} /></button>
+          </div>
+        </div>
       )}
     </div>
   );

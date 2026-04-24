@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, CheckCircle, Mail, KeyRound, ArrowRight } from 'lucide-react';
 import { registerUser } from '../lib/api';
 import '../styles/auth.css';
 
@@ -15,6 +15,9 @@ const RegisterPage: React.FC = () => {
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm]   = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [businessCategory, setBusinessCategory] = useState('');
   const [showPwd, setShowPwd]   = useState(false);
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState('');
@@ -38,86 +41,160 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="auth-layout">
-      <div className="auth-card">
-        <Link to="/" className="auth-logo">
-          <div className="auth-logo-mark">PG</div>
-          <span className="auth-logo-name">PinGuru</span>
-        </Link>
+    <div className="auth-screen auth-screen-split register">
+      <section className="auth-showcase">
+        <div className="auth-showcase-video-layer" aria-hidden="true">
+          <video
+            className="auth-showcase-video"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          >
+            <source src="/auth-showcase.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div className="auth-showcase-orb auth-showcase-orb-a" />
+        <div className="auth-showcase-orb auth-showcase-orb-b" />
+        <div className="auth-showcase-inner">
+          <div className="auth-showcase-brand-mark">PG</div>
+          <h2 className="auth-showcase-brand">PinGuru</h2>
+          <p className="auth-showcase-copy">Join 5,000+ Indian creators &amp; brands automating Instagram with PinGuru.</p>
 
-        <h1 className="auth-title">Create your account</h1>
-        <p className="auth-subtitle">Start automating your Instagram DMs today</p>
-
-        {error && (
-          <div className="auth-alert error mb-4">
-            <AlertCircle size={15} className="flex-shrink-0 mt-0.5" />
-            <span>{error}</span>
+          <div className="auth-testimonial-card">
+            <p className="stars">★★★★★</p>
+            <p className="quote">"PinGuru took us from manually answering 200 DMs/day to fully automated. Revenue up 3x."</p>
+            <div className="author-row">
+              <span className="avatar">AK</span>
+              <div>
+                <strong>Ananya K.</strong>
+                <small>Fashion brand, Mumbai</small>
+              </div>
+            </div>
           </div>
-        )}
+        </div>
+      </section>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">Email</label>
-            <input
-              type="email" className="form-input" placeholder="you@example.com"
-              required autoComplete="email"
-              value={email} onChange={e => setEmail(e.target.value)}
-            />
-          </div>
+      <section className="auth-pane">
+        <div className="auth-panel register-wide">
+          <Link to="/" className="auth-panel-brand">
+            <div className="auth-panel-brand-mark">PG</div>
+            <span>PinGuru</span>
+          </Link>
 
-          <div className="form-group">
-            <label className="form-label">Password</label>
-            <div className="relative">
-              <input
-                type={showPwd ? 'text' : 'password'}
-                className="form-input pr-10"
-                placeholder="Min. 8 characters" required
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                onFocus={() => setFocused(true)}
-              />
-              <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600" onClick={() => setShowPwd(v => !v)}>
-                {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
+          <h1 className="auth-panel-title">Create your account</h1>
+          <p className="auth-panel-subtitle">Free forever · No credit card required</p>
+
+          {error && (
+            <div className="auth-alert error" style={{ marginBottom: 12 }}>
+              <AlertCircle size={15} className="flex-shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          <form className="auth-panel-form" onSubmit={handleSubmit}>
+            <div className="auth-two-col">
+              <div className="form-group">
+                <label className="form-label">First name</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Ravi"
+                  value={firstName}
+                  onChange={e => setFirstName(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Last name</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Sharma"
+                  value={lastName}
+                  onChange={e => setLastName(e.target.value)}
+                />
+              </div>
             </div>
 
-            {/* Password strength checklist */}
-            {focused && password.length > 0 && (
-              <div className="mt-2 flex flex-col gap-1">
-                {rules.map(r => (
-                  <div key={r.id} className={`flex items-center gap-1.5 text-xs ${r.test(password) ? 'text-emerald-600' : 'text-slate-400'}`}>
-                    <CheckCircle size={12} className={r.test(password) ? 'opacity-100' : 'opacity-30'} />
-                    {r.label}
-                  </div>
-                ))}
+            <div className="form-group">
+              <label className="form-label">Email address</label>
+              <div className="auth-input-wrap">
+                <Mail size={16} className="auth-input-icon" />
+                <input
+                  type="email"
+                  className="form-input"
+                  placeholder="you@example.com"
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                />
               </div>
-            )}
-          </div>
+            </div>
 
-          <div className="form-group">
-            <label className="form-label">Confirm Password</label>
-            <input
-              type={showPwd ? 'text' : 'password'}
-              className={`form-input ${confirm.length > 0 ? (match ? 'border-emerald-400' : 'border-rose-400') : ''}`}
-              placeholder="Repeat your password" required
-              value={confirm} onChange={e => setConfirm(e.target.value)}
-            />
-          </div>
+            <div className="form-group">
+              <label className="form-label">Password</label>
+              <div className="auth-input-wrap">
+                <KeyRound size={16} className="auth-input-icon" />
+                <input
+                  type={showPwd ? 'text' : 'password'}
+                  className="form-input"
+                  placeholder="Min 8 chars, A-Z, 0-9, symbol"
+                  required
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  onFocus={() => setFocused(true)}
+                />
+                <button type="button" className="auth-input-action" onClick={() => setShowPwd(v => !v)}>
+                  {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              {focused && password.length > 0 && (
+                <div className="auth-rules-list">
+                  {rules.map(r => (
+                    <div key={r.id} className={`auth-rule-row ${r.test(password) ? 'ok' : ''}`}>
+                      <CheckCircle size={12} />
+                      <span>{r.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-          <button
-            type="submit" disabled={loading}
-            className="w-full mt-1 bg-primary text-white font-semibold py-2.5 rounded-xl hover:bg-indigo-700 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {loading ? (
-              <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>Creating account...</>
-            ) : 'Create Account'}
-          </button>
-        </form>
+            <div className="form-group">
+              <label className="form-label">Confirm password</label>
+              <input
+                type={showPwd ? 'text' : 'password'}
+                className={`form-input ${confirm.length > 0 ? (match ? 'auth-valid' : 'auth-invalid') : ''}`}
+                placeholder="Repeat your password"
+                required
+                value={confirm}
+                onChange={e => setConfirm(e.target.value)}
+              />
+            </div>
 
-        <p className="auth-footer">
-          Already have an account? <Link to="/login">Sign in</Link>
-        </p>
-      </div>
+            <div className="form-group">
+              <label className="form-label">Business category <span className="auth-mute">(optional)</span></label>
+              <select className="form-input" value={businessCategory} onChange={e => setBusinessCategory(e.target.value)}>
+                <option value="">Select a category</option>
+                <option>Fashion &amp; Clothing</option>
+                <option>Food &amp; Beverage</option>
+                <option>Education &amp; Courses</option>
+                <option>Fitness &amp; Wellness</option>
+                <option>E-commerce</option>
+              </select>
+            </div>
+
+            <button type="submit" disabled={loading} className="auth-gradient-btn">
+              {loading ? 'Creating account...' : <>Create Account Free <ArrowRight size={16} /></>}
+            </button>
+          </form>
+
+          <p className="auth-terms-line">By creating an account you agree to our <Link to="/terms">Terms</Link> &amp; <Link to="/privacy">Privacy Policy</Link></p>
+          <p className="auth-panel-footer">Already have an account? <Link to="/login">Sign in</Link></p>
+        </div>
+      </section>
     </div>
   );
 };

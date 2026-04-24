@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  MessageSquare, Zap, BarChart2, CreditCard, Camera, Plus,
+  MessageSquare, Zap, CreditCard, Camera, Plus,
   RefreshCw, TrendingUp, CheckCircle, Lock,
   ArrowUpRight, Sparkles, Clock, Target,
 } from 'lucide-react';
@@ -48,6 +48,8 @@ const DashboardPage: React.FC = () => {
   const premiumAnalytics = Boolean(stats?.premium_analytics_enabled);
   const planName = toTitleCase(stats?.plan ?? user?.plan ?? 'free');
   const isFree   = (stats?.plan ?? user?.plan) === 'free';
+
+  const recentRuleItems = rules.slice(0, 2);
 
   const handleRefreshToken = async () => {
     setRefreshing(true);
@@ -153,6 +155,27 @@ const DashboardPage: React.FC = () => {
 
       <div className="dashboard-v5-grid">
         <div className="dashboard-v5-main-col">
+          <section className="dashboard-v5-card dashboard-v5-chart-card">
+            <div className="dashboard-v5-card-head">
+              <h3>DM Volume - Last 7 days</h3>
+              <span className="dashboard-v5-live-badge"><span className="dashboard-v5-live-dot" /> Live</span>
+            </div>
+            <div className="dashboard-v5-bars">
+              {[40, 65, 50, 80, 60, 95, hasLimit ? Math.max(35, usagePct) : 75].map((barHeight, index) => (
+                <div
+                  key={index}
+                  className={`dashboard-v5-bar ${index === 6 ? 'accent' : ''}`}
+                  style={{ height: `${barHeight}%` }}
+                />
+              ))}
+            </div>
+            <div className="dashboard-v5-bar-labels">
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+                <span key={day}>{day}</span>
+              ))}
+            </div>
+          </section>
+
           <section className="dashboard-v5-card">
             <div className="dashboard-v5-card-head">
               <h3>Automation Rules</h3>
@@ -183,35 +206,6 @@ const DashboardPage: React.FC = () => {
                 ))}
               </div>
             )}
-          </section>
-
-          <section className="dashboard-v5-card">
-            <div className="dashboard-v5-card-head">
-              <h3>Quick Actions</h3>
-            </div>
-            <div className="dashboard-v5-action-grid">
-              <Link to="/rules" className="dashboard-v5-action-item">
-                <div className="icon"><Zap size={16} /></div>
-                <div>
-                  <p>Create automation rule</p>
-                  <span>Set up a new DM trigger flow</span>
-                </div>
-              </Link>
-              <Link to="/analytics" className="dashboard-v5-action-item">
-                <div className="icon"><BarChart2 size={16} /></div>
-                <div>
-                  <p>Open analytics</p>
-                  <span>Track sends and success trends</span>
-                </div>
-              </Link>
-              <Link to="/billing" className="dashboard-v5-action-item">
-                <div className="icon"><CreditCard size={16} /></div>
-                <div>
-                  <p>Manage billing</p>
-                  <span>{isFree ? 'Upgrade for premium features' : 'Review plans and invoices'}</span>
-                </div>
-              </Link>
-            </div>
           </section>
         </div>
 
@@ -270,6 +264,55 @@ const DashboardPage: React.FC = () => {
               <div className="dashboard-v5-upgrade-note">
                 <p>Upgrade to Starter or Pro to unlock success-rate tracking, peak-hour insights, and advanced trends.</p>
                 <Link to="/billing">View plans <ArrowUpRight size={12} /></Link>
+              </div>
+            )}
+          </section>
+
+          <section className="dashboard-v5-card">
+            <div className="dashboard-v5-card-head">
+              <h3>Setup checklist</h3>
+              <span className="dashboard-v5-step-count">{doneCount}/{steps.length} done</span>
+            </div>
+            <div className="dashboard-v5-setup-grid compact">
+              {steps.map((step) => (
+                <Link key={step.id} to={step.href} className={`dashboard-v5-setup-item ${step.done ? 'done' : ''}`}>
+                  <span className="dashboard-v5-setup-dot">{step.done ? <CheckCircle size={12} /> : <Clock size={12} />}</span>
+                  <span>{step.label}</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <section className="dashboard-v5-card">
+            <div className="dashboard-v5-card-head">
+              <h3>Recent rules</h3>
+              <Link to="/rules">View all <ArrowUpRight size={12} /></Link>
+            </div>
+            {loading ? (
+              <div className="dashboard-v5-skeleton-list">
+                {[1, 2].map((i) => <div key={i} className="dashboard-v5-skeleton" />)}
+              </div>
+            ) : recentRuleItems.length === 0 ? (
+              <div className="dashboard-v5-empty-state compact">
+                <div className="icon"><Zap size={20} /></div>
+                <p className="title">No recent rules</p>
+                <p className="desc">Create your first automation rule to see it here.</p>
+              </div>
+            ) : (
+              <div className="dashboard-v5-rule-list">
+                {recentRuleItems.map((rule) => (
+                  <div key={rule.id} className="dashboard-v5-rule-item">
+                    <div className="icon"><Zap size={14} /></div>
+                    <div className="copy">
+                      <p className="name">{rule.name}</p>
+                      <p className="meta">{TRIGGER_LABELS[rule.trigger_type]}{rule.keywords?.length ? ` · ${rule.keywords.slice(0, 2).join(', ')}` : ''}</p>
+                      <div className="dashboard-v5-rule-tags">
+                        <span className={`dashboard-v5-mini-badge ${rule.is_active ? 'active' : 'off'}`}>{rule.is_active ? 'Active' : 'Off'}</span>
+                        {rule.trigger_type && <span className="dashboard-v5-mini-badge muted">{rule.trigger_type}</span>}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </section>
