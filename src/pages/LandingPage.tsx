@@ -302,7 +302,7 @@ const PLANS = [
     price: 499,
     period: '/month',
     desc: 'Scale without limits',
-    features: ['Unlimited automation rules', 'Unlimited DMs', 'Unlimited contacts', 'Premium analytics', 'Ask-to-follow + follow-up DMs', 'No DM footer branding', '24/7 priority support'],
+    features: ['Unlimited automation rules', 'Unlimited DMs', 'Unlimited contacts', 'Premium analytics', 'Ask-to-follow before DM', 'No DM footer branding', '24/7 priority support'],
     cta: 'Start Pro',
     ctaTo: '/register',
     popular: false,

@@ -210,7 +210,6 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
   const [publicCommentReplyEnabled, setPublicCommentReplyEnabled] = useState(false);
   const [publicCommentReplyTemplate, setPublicCommentReplyTemplate] = useState('Thanks for your comment! Check your DM for details.');
   const [askFollowBeforeDm, setAskFollowBeforeDm] = useState(false);
-  const [sendFollowUpMessage, setSendFollowUpMessage] = useState(false);
   const [dmAttachmentUrl, setDmAttachmentUrl] = useState('');
   const [showAttachmentInput, setShowAttachmentInput] = useState(false);
   const [keywords, setKeywords] = useState<string[]>([]);
@@ -246,7 +245,6 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
       setPublicCommentReplyEnabled(false);
       setPublicCommentReplyTemplate('Thanks for your comment! Check your DM for details.');
       setAskFollowBeforeDm(false);
-      setSendFollowUpMessage(false);
       setDmAttachmentUrl('');
       setShowAttachmentInput(false);
       setKeywords([]);
@@ -265,7 +263,6 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
     setPublicCommentReplyEnabled(Boolean(initialRule.public_comment_reply_enabled));
     setPublicCommentReplyTemplate(initialRule.public_comment_reply_template || 'Thanks for your comment! Check your DM for details.');
     setAskFollowBeforeDm(Boolean(initialRule.ask_follow_before_dm));
-    setSendFollowUpMessage(Boolean(initialRule.send_follow_up_message));
     setDmAttachmentUrl(initialRule.dm_attachment_url || '');
     setShowAttachmentInput(Boolean(initialRule.dm_attachment_url));
     setKeywords(Array.isArray(initialRule.keywords) ? initialRule.keywords : []);
@@ -276,17 +273,16 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
   useEffect(()=>{
     if(!isStarterOrPro&&askFollowBeforeDm) setAskFollowBeforeDm(false);
     if(!isPro&&publicCommentReplyEnabled) setPublicCommentReplyEnabled(false);
-    if(!isPro&&sendFollowUpMessage) setSendFollowUpMessage(false);
     if(!isPro&&dmAttachmentUrl) setDmAttachmentUrl('');
     if(!isPro&&showAttachmentInput) setShowAttachmentInput(false);
-  },[askFollowBeforeDm,dmAttachmentUrl,isPro,isStarterOrPro,publicCommentReplyEnabled,sendFollowUpMessage,showAttachmentInput]);
+  },[askFollowBeforeDm,dmAttachmentUrl,isPro,isStarterOrPro,publicCommentReplyEnabled,showAttachmentInput]);
 
   const reset=()=>{
     setStep('choose');setName('');setTriggerType(null);setCommentTarget('specific');
     setCommentFilter('all');setSelectedMediaId('');setMediaItems([]);setMediaLimit(24);
     setAnyCommentKeyword(true);setPublicCommentReplyEnabled(false);
     setPublicCommentReplyTemplate('Thanks for your comment! Check your DM for details.');
-    setAskFollowBeforeDm(false);setSendFollowUpMessage(false);
+    setAskFollowBeforeDm(false);
     setDmAttachmentUrl('');setShowAttachmentInput(false);
     setKeywords([]);setKwInput('');setTemplate('');setError('');setShowPreview(false);
   };
@@ -359,7 +355,6 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
         public_comment_reply_template:publicCommentReplyEnabled?normalizeTemplateVariables(publicCommentReplyTemplate):undefined,
       }),
       ask_follow_before_dm:askFollowBeforeDm,
-      send_follow_up_message:sendFollowUpMessage,
       dm_attachment_url:dmAttachmentUrl.trim()||undefined,
     };
     try {
@@ -534,10 +529,6 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
                 <div className="wizard-toggle-row compact">
                   <span className="wizard-toggle-label">Ask to follow before DM {lockBadge(isStarterOrPro,'starter')}</span>
                   <button type="button" onClick={()=>isStarterOrPro&&setAskFollowBeforeDm(p=>!p)} className={`wizard-switch ${askFollowBeforeDm?'on':''}`} disabled={!isStarterOrPro}><span/></button>
-                </div>
-                <div className="wizard-toggle-row compact">
-                  <span className="wizard-toggle-label">Send follow-up message {lockBadge(isPro,'pro')}</span>
-                  <button type="button" onClick={()=>isPro&&setSendFollowUpMessage(p=>!p)} className={`wizard-switch ${sendFollowUpMessage?'on':''}`} disabled={!isPro}><span/></button>
                 </div>
               </div>
 

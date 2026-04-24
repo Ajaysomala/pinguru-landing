@@ -87,7 +87,7 @@ const TermsPage: React.FC = () => (
           <h3>Free Plan</h3>
           <p>The Free plan is provided at no cost and may be modified or discontinued at any time with reasonable notice.</p>
           <h3>Paid Plans</h3>
-          <p>Paid subscriptions (Starter at ₹199/mo, Pro at ₹399/mo) are billed monthly via Stripe. All prices are in Indian Rupees and include applicable taxes.</p>
+          <p>Paid subscriptions (Starter at ₹199/mo, Pro at ₹499/mo) are billed via Razorpay. Billing cycles may include monthly, quarterly, or yearly options where enabled. All prices are in Indian Rupees and include applicable taxes.</p>
           <h3>Refunds</h3>
           <p>We offer a 7-day refund for new paid subscriptions if you have not used the Service substantially during that period. Contact support@pinguru.me within 7 days of purchase. Subsequent months are non-refundable.</p>
           <h3>Cancellation</h3>

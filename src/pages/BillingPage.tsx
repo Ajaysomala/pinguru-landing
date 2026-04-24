@@ -144,6 +144,20 @@ const BillingPage: React.FC = () => {
     return status;
   }, []);
 
+  const syncStatusAfterReturn = useCallback(async () => {
+    try {
+      const latest = await fetchStatus();
+      if (latest.is_checkout_pending) {
+        setBanner({ kind: 'processing', message: 'Processing payment. Waiting for Razorpay confirmation...' });
+      }
+      if (!latest.is_checkout_pending && !latest.pending_plan) {
+        clearPaymentParams();
+      }
+    } catch {
+      // Keep existing UI state if refresh fails; periodic polling and user actions can retry.
+    }
+  }, [clearPaymentParams, fetchStatus]);
+
   useEffect(() => {
     const init = async () => {
       try {
@@ -157,6 +171,32 @@ const BillingPage: React.FC = () => {
 
     init();
   }, [fetchStatus]);
+
+  useEffect(() => {
+    const onFocus = () => {
+      void syncStatusAfterReturn();
+    };
+
+    const onPageShow = () => {
+      void syncStatusAfterReturn();
+    };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void syncStatusAfterReturn();
+      }
+    };
+
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('pageshow', onPageShow);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('pageshow', onPageShow);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, [syncStatusAfterReturn]);
 
   const shouldPoll = !isPollingSuppressed && (hasProcessingParam || Boolean(planStatus?.is_checkout_pending));
 
@@ -259,6 +299,7 @@ const BillingPage: React.FC = () => {
           modal: {
             ondismiss: () => {
               setError('Payment was cancelled. You can try again anytime.');
+              void syncStatusAfterReturn();
             },
           },
         });

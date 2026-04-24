@@ -25,7 +25,6 @@ type BackendRule = {
   public_comment_reply_enabled?: boolean;
   public_comment_reply_template?: string;
   ask_follow_before_dm?: boolean;
-  send_follow_up_message?: boolean;
 };
 
 function mapBackendTriggerToUi(trigger: string): Rule['trigger_type'] {
@@ -60,7 +59,6 @@ function mapRule(rule: BackendRule): Rule {
     public_comment_reply_enabled: rule.public_comment_reply_enabled,
     public_comment_reply_template: rule.public_comment_reply_template,
     ask_follow_before_dm: rule.ask_follow_before_dm,
-    send_follow_up_message: rule.send_follow_up_message,
     is_active: Boolean(rule.is_active),
     created_at: rule.created_at ?? new Date().toISOString(),
     dm_count: rule.sent_count,
@@ -102,6 +100,16 @@ function sanitizeErrorText(message: string, fallback: string): string {
 
 type ApiRequestError = Error & { status?: number };
 
+function readCookie(name: string): string {
+  if (typeof document === 'undefined') return '';
+  const found = document.cookie
+    .split(';')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${name}=`));
+  if (!found) return '';
+  return decodeURIComponent(found.slice(name.length + 1));
+}
+
 function createApiRequestError(status: number, detail: unknown, fallback: string): ApiRequestError {
   const err = new Error(sanitizeErrorText(asErrorMessage(detail, fallback), fallback)) as ApiRequestError;
   err.status = status;
@@ -109,10 +117,21 @@ function createApiRequestError(status: number, detail: unknown, fallback: string
 }
 
 async function authFetch(path: string, options: RequestInit = {}): Promise<Response> {
+  const method = (options.method || 'GET').toUpperCase();
+  const isStateChanging = !['GET', 'HEAD', 'OPTIONS', 'TRACE'].includes(method);
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...((options.headers as Record<string, string>) || {}),
+  };
+  if (isStateChanging) {
+    const csrfToken = readCookie('pg_csrf') || readCookie('pg_admin_csrf');
+    if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+  }
+
   return fetch(`${API}${path}`, {
     credentials: 'include',
     ...options,
-    headers: { 'Content-Type': 'application/json', ...(options.headers as Record<string, string> || {}) },
+    headers,
   });
 }
 
@@ -266,7 +285,6 @@ export async function createRule(payload: RuleCreatePayload): Promise<Rule> {
     public_comment_reply_enabled: payload.public_comment_reply_enabled,
     public_comment_reply_template: payload.public_comment_reply_template,
     ask_follow_before_dm: payload.ask_follow_before_dm,
-    send_follow_up_message: payload.send_follow_up_message,
   };
   const res = await authFetch('/automation/rules', { method: 'POST', body: JSON.stringify(backendPayload) });
   const data = await res.json();
@@ -292,7 +310,6 @@ export async function updateRule(ruleId: string, payload: Partial<RuleCreatePayl
   if (payload.public_comment_reply_enabled !== undefined) backendPayload.public_comment_reply_enabled = payload.public_comment_reply_enabled;
   if (payload.public_comment_reply_template !== undefined) backendPayload.public_comment_reply_template = payload.public_comment_reply_template;
   if (payload.ask_follow_before_dm !== undefined) backendPayload.ask_follow_before_dm = payload.ask_follow_before_dm;
-  if (payload.send_follow_up_message !== undefined) backendPayload.send_follow_up_message = payload.send_follow_up_message;
 
   const res = await authFetch(`/automation/rules/${ruleId}`, { method: 'PUT', body: JSON.stringify(backendPayload) });
   const data = await res.json();

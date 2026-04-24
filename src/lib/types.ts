@@ -52,7 +52,6 @@ export interface Rule {
   public_comment_reply_enabled?: boolean;
   public_comment_reply_template?: string;
   ask_follow_before_dm?: boolean;
-  send_follow_up_message?: boolean;
   is_active: boolean;
   created_at: string;
   dm_count?: number;
@@ -75,7 +74,6 @@ export interface RuleCreatePayload {
   public_comment_reply_enabled?: boolean;
   public_comment_reply_template?: string;
   ask_follow_before_dm?: boolean;
-  send_follow_up_message?: boolean;
 }
 
 export interface InstagramMediaItem {
