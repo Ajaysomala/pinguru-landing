@@ -179,9 +179,6 @@ export async function resetPassword(email: string, resetToken: string, newPasswo
 
 export async function logout() {
   try { await authFetch('/auth/logout', { method: 'POST' }); } catch {}
-  localStorage.removeItem('pg_user');
-  localStorage.removeItem('pg_login_attempts');
-  localStorage.removeItem('pg_lockout_until');
   window.location.href = '/login';
 }
 
@@ -494,9 +491,11 @@ export async function getInstagramAuthUrl(): Promise<string> {
   return data.auth_url as string;
 }
 
-export async function refreshInstagramToken() {
-  // Backend currently does not expose a dedicated refresh endpoint.
-  throw new Error('Automatic refresh is unavailable. Please reconnect Instagram.');
+export async function refreshInstagramToken(): Promise<{ refreshed: boolean; expires_at: string; message: string }> {
+  const res = await authFetch('/auth/instagram/refresh-token', { method: 'POST' });
+  const data = await res.json();
+  if (!res.ok) throw new Error(asErrorMessage(data, 'Failed to refresh Instagram token'));
+  return data;
 }
 
 export async function disconnectInstagram() {
@@ -506,18 +505,8 @@ export async function disconnectInstagram() {
   return data;
 }
 
-export async function injectInstagramToken(token: string, igUserId: string) {
-  void token;
-  void igUserId;
-  throw new Error('Direct token injection is disabled in this build. Use Instagram connect flow.');
-}
-
-export async function getInstagramStatusLegacy() {
-  const res = await authFetch('/instagram/status');
-  if (res.status === 401) return null;
-  const data = await res.json();
-  if (!res.ok) return null;
-  return data;
+export async function injectInstagramToken(_token: string, _igUserId: string) {
+  throw new Error('Direct token injection is disabled. Use the Instagram connect flow.');
 }
 
 export async function getContacts(page: number = 1): Promise<{ contacts: any[]; total: number }> {
