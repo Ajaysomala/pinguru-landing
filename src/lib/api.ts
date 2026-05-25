@@ -142,8 +142,17 @@ export async function loginUser(email: string, password: string) {
   return data;
 }
 
-export async function registerUser(email: string, password: string) {
-  const res = await authFetch('/auth/register', { method: 'POST', body: JSON.stringify({ email, password }) });
+export async function registerUser(
+  email: string,
+  password: string,
+  firstName: string = '',
+  lastName: string = '',
+  businessCategory: string = '',
+) {
+  const res = await authFetch('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({ email, password, first_name: firstName, last_name: lastName, business_category: businessCategory }),
+  });
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'Registration failed');
 }
@@ -190,6 +199,8 @@ export async function requireAuth(): Promise<boolean> {
     return false;
   }
 }
+
+export const getMe = async () => getProfile();
 
 export async function getProfile(): Promise<User | null> {
   const res = await authFetch('/auth/me');

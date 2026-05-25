@@ -1,22 +1,23 @@
-name: Deploy Vite Site to GitHub Pages
+name: Frontend Security Gate
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
+  pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 1"
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
+  pull-requests: read
 
 jobs:
-  build:
+  build-and-audit:
+    name: Build And Audit
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,46 +25,46 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: "24"
+          cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build
         run: npm run build
 
-      - name: Verify built entrypoints
-        run: |
-          if grep -q '/src/main.tsx' dist/index.html; then
-            echo "ERROR: dist/index.html still references /src/main.tsx"
-            exit 1
-          fi
-          if ! grep -Eq '/assets/index-[^"]+\.js' dist/index.html; then
-            echo "ERROR: dist/index.html is missing hashed JS bundle reference"
-            sed -n '1,120p' dist/index.html
-            exit 1
-          fi
-          if [ ! -f dist/404.html ]; then
-            echo "ERROR: dist/404.html is missing. SPA fallback is required for direct route loads on GitHub Pages."
-            exit 1
-          fi
+      - name: Audit dependencies (high+)
+        run: npm audit --audit-level=high
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./dist
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  dependency-review:
+    name: Dependency Review (PR)
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    needs: build
+
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: false
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

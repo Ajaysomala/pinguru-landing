@@ -38,9 +38,9 @@ const LoginPage: React.FC = () => {
     setLoading(true); setError('');
     try {
       const data = await loginUser(email, password);
+      void data; // session managed via HTTP-only cookie
       await refresh();
       resetLoginAttempts();
-      localStorage.setItem('pg_user', JSON.stringify({ plan: data.plan, instagram_connected: data.instagram_connected }));
       navigate('/dashboard');
     } catch (err: any) {
       const result = recordLoginAttempt();

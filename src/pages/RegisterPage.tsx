@@ -32,7 +32,7 @@ const RegisterPage: React.FC = () => {
     if (!match)     { setError('Passwords do not match'); return; }
     setLoading(true); setError('');
     try {
-      await registerUser(email, password);
+      await registerUser(email, password, firstName.trim(), lastName.trim(), businessCategory);
       localStorage.setItem('pg_verify_email', email);
       navigate(`/verify?email=${encodeURIComponent(email)}`);
     } catch (err: any) {

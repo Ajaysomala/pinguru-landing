@@ -9,16 +9,30 @@ const VerifyEmailPage: React.FC = () => {
   const [params]      = useSearchParams();
   const email         = params.get('email') || localStorage.getItem('pg_verify_email') || '';
 
+  const OTP_TTL = 4 * 60 + 32; // 4 min 32 sec — match your backend OTP expiry
   const [otp, setOtp]           = useState(['', '', '', '', '', '']);
   const [loading, setLoading]   = useState(false);
   const [resending, setResending] = useState(false);
   const [error, setError]       = useState('');
   const [success, setSuccess]   = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [otpSecondsLeft, setOtpSecondsLeft] = useState(OTP_TTL);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => { inputRefs.current[0]?.focus(); }, []);
+
+  // OTP expiry countdown
+  useEffect(() => {
+    if (otpSecondsLeft <= 0) return;
+    const t = setTimeout(() => setOtpSecondsLeft(v => v - 1), 1000);
+    return () => clearTimeout(t);
+  }, [otpSecondsLeft]);
+
+  const otpExpired = otpSecondsLeft <= 0;
+  const otpDisplay = otpExpired
+    ? 'Code expired'
+    : `${Math.floor(otpSecondsLeft / 60)}:${String(otpSecondsLeft % 60).padStart(2, '0')}`;
 
   useEffect(() => {
     if (resendCooldown > 0) {
@@ -73,6 +87,7 @@ const VerifyEmailPage: React.FC = () => {
       await resendEmailOtp(email);
       setSuccess('New OTP sent! Check your inbox.');
       setResendCooldown(60);
+      setOtpSecondsLeft(OTP_TTL); // reset expiry countdown
       setTimeout(() => setSuccess(''), 3000);
     } catch (err: any) {
       setError(err.message || 'Failed to resend OTP');
@@ -122,7 +137,9 @@ const VerifyEmailPage: React.FC = () => {
 
         <div className="auth-verify-progress">
           <div className="bar"><span style={{ width: `${progress}%` }} /></div>
-          <p>Code expires in <strong>4:32</strong></p>
+          <p style={{ color: otpExpired ? '#ef4444' : undefined }}>
+            Code expires in <strong>{otpDisplay}</strong>
+          </p>
         </div>
 
         <button

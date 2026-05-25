@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Briefcase, ArrowRight, CheckCircle } from 'lucide-react';
-import { updateOnboarding } from '../lib/api';
+import { updateOnboarding, getMe } from '../lib/api';
 import { BUSINESS_CATEGORIES } from '../lib/types';
 import '../styles/auth.css';
 
@@ -16,7 +16,16 @@ const OnboardingPage: React.FC = () => {
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState('');
 
+  // Pre-fill from registration data — skip name step if already set
   useEffect(() => {
+    getMe().then(user => {
+      if (user?.first_name) {
+        setFirstName(user.first_name);
+        setLastName(user.last_name || '');
+        setCategory(user.business_category || '');
+        setStep(1); // skip to Business step
+      }
+    }).catch(() => {});
   }, []);
 
   const handleNext = () => {

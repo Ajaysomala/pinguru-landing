@@ -36,9 +36,7 @@ const ForgotPasswordPage: React.FC = () => {
       const response = await requestPasswordReset(email.trim());
       setRequested(true);
       setMessage(response.message);
-      if (response.reset_url) {
-        setResetToken(new URL(response.reset_url).searchParams.get('token') || '');
-      }
+      // Token arrives only via the email link — never extract from response body
     } catch (err: any) {
       setError(err.message || 'Failed to request password reset');
     } finally {
