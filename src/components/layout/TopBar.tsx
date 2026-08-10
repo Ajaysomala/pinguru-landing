@@ -6,7 +6,6 @@ import { BrandLogo } from '../ui/BrandLogo';
 interface TopBarProps {
   onMenuClick: () => void;
   title?: string;
-  desktop?: boolean;
 }
 
 const QUICK_LINKS = [
@@ -17,7 +16,7 @@ const QUICK_LINKS = [
   { label: 'Support', href: '/support', icon: CircleHelp, keywords: 'help support faq' },
 ];
 
-export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, title, desktop = false }) => {
+export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, title }) => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
@@ -37,20 +36,19 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, title, desktop = fa
   };
 
   return (
-    <header className={`pg-topbar ${desktop ? 'pg-topbar-desktop' : 'pg-topbar-mobile'}`}>
+    <header className="pg-topbar">
       <div className="pg-topbar-left">
-        {!desktop && (
-          <button
-            type="button"
-            onClick={onMenuClick}
-            className="pg-topbar-icon-btn"
-            aria-label="Open menu"
-          >
-            <Menu size={20} />
-          </button>
-        )}
-        <BrandLogo to="/dashboard" size={desktop ? 'md' : 'sm'} />
-        {title && desktop && <span className="pg-topbar-page-title">{title}</span>}
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className="pg-topbar-icon-btn pg-topbar-menu-btn"
+          aria-label="Open menu"
+        >
+          <Menu size={20} />
+        </button>
+        <BrandLogo to="/dashboard" size="sm" className="pg-topbar-brand-sm" />
+        <BrandLogo to="/dashboard" size="md" className="pg-topbar-brand-md" />
+        {title && <span className="pg-topbar-page-title">{title}</span>}
       </div>
 
       <div className="pg-topbar-search-wrap">
@@ -66,7 +64,8 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, title, desktop = fa
             }}
             onFocus={() => setOpen(true)}
             onBlur={() => setTimeout(() => setOpen(false), 150)}
-            placeholder="Search pages, Instagram, rules..."
+            placeholder="Search..."
+            aria-label="Search pages"
             autoComplete="off"
           />
         </label>

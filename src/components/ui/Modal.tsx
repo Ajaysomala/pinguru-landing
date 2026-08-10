@@ -24,13 +24,13 @@ export const Modal: React.FC<ModalProps> = ({
 
   const content = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(4px)' }}
+      className="pg-modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      style={{ background: 'rgba(15,10,30,0.62)', backdropFilter: 'blur(6px)' }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className={`bg-white rounded-2xl shadow-2xl w-full ${maxWidth} max-h-[90vh] flex flex-col animate-[scaleIn_0.2s_ease-out]`}>
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-5 pb-0 flex-shrink-0">
+      <div className={`pg-modal-sheet bg-white shadow-2xl w-full ${maxWidth} max-h-[92dvh] sm:max-h-[90vh] flex flex-col animate-[scaleIn_0.2s_ease-out] rounded-t-3xl sm:rounded-2xl`}>
+        <div className="mx-auto mt-2 mb-1 h-1 w-10 rounded-full bg-slate-200 sm:hidden" aria-hidden="true" />
+        <div className="flex items-center justify-between px-5 sm:px-6 pt-3 sm:pt-5 pb-0 flex-shrink-0">
           <h2 className="font-display font-bold text-lg text-slate-900">{title}</h2>
           <button
             onClick={onClose}
@@ -39,11 +39,9 @@ export const Modal: React.FC<ModalProps> = ({
             <X size={18} />
           </button>
         </div>
-        {/* Body */}
-        <div className="px-6 py-5 overflow-y-auto flex-1">{children}</div>
-        {/* Footer */}
+        <div className="px-5 sm:px-6 py-4 sm:py-5 overflow-y-auto flex-1">{children}</div>
         {footer && (
-          <div className="px-6 py-4 border-t border-slate-100 flex justify-end gap-2.5 flex-shrink-0">
+          <div className="px-5 sm:px-6 py-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 flex-shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
             {footer}
           </div>
         )}

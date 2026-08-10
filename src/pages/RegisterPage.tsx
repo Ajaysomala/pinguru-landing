@@ -33,6 +33,10 @@ const RegisterPage: React.FC = () => {
   const match = password === confirm && confirm.length > 0;
 
   const handlePointer = (event: React.MouseEvent<HTMLElement>) => {
+    if (window.matchMedia('(hover: none), (pointer: coarse)').matches) {
+      if (tilt.x !== 0 || tilt.y !== 0) setTilt({ x: 0, y: 0 });
+      return;
+    }
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = (event.clientX - bounds.left) / bounds.width - 0.5;
     const y = (event.clientY - bounds.top) / bounds.height - 0.5;
