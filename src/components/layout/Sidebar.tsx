@@ -7,6 +7,7 @@ import {
 import { logout } from '../../lib/api';
 import { getInitial, getDisplayName, toTitleCase } from '../../lib/utils';
 import type { User } from '../../lib/types';
+import { BrandLogo } from '../ui/BrandLogo';
 
 interface SidebarProps {
   user: User | null;
@@ -29,12 +30,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ user }) => {
   return (
     <aside className="sidebar">
       {/* Logo */}
-      <NavLink to="/dashboard" className="sidebar-logo">
-        <div className="sidebar-logo-mark">
-          PG
-        </div>
-        <span className="sidebar-logo-text">PinGuru</span>
-      </NavLink>
+      <BrandLogo to="/dashboard" size="md" onDark className="sidebar-logo" />
 
       {/* Nav */}
       <nav className="sidebar-nav">

@@ -47,11 +47,14 @@ const AnalyticsPage: React.FC = () => {
 
   return (
     <div className="page-wrapper analytics-v6-page">
-      <div className="page-header analytics-v6-header">
-        <h1 className="page-title">Analytics</h1>
-        <p className="page-subtitle">Detailed performance insights for your DM automation</p>
+      <section className="pg-surface-hero analytics-v6-header">
+        <div>
+          <p className="pg-surface-kicker"><Sparkles size={12} /> Performance Intelligence</p>
+          <h1 className="pg-surface-title">Analytics</h1>
+          <p className="pg-surface-subtitle">Detailed performance insights for your DM automation, conversion health, and busiest engagement windows.</p>
+        </div>
         <span className="analytics-v6-plan-chip">Current plan: {planName}</span>
-      </div>
+      </section>
 
       <div className="analytics-v6-stats-row">
         <div className="analytics-v6-stat-card">

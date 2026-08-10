@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Check, Zap, Users, CreditCard, ExternalLink, AlertCircle, MessageSquare } from 'lucide-react';
+import { Check, Zap, Users, CreditCard, ExternalLink, AlertCircle, MessageSquare, Sparkles } from 'lucide-react';
 import { cancelPendingCheckout, createPlanCheckout, getCustomerPortalUrl, getPlanStatus } from '../lib/api';
 import type { PlanStatus } from '../lib/types';
 import { sanitizeApiError } from '../lib/utils';
@@ -291,7 +291,7 @@ const BillingPage: React.FC = () => {
           name: 'PinGuru',
           description: `${plan.name} Plan (${billingCycle})`,
           prefill: { email: session.prefill_email },
-          theme: { color: '#4F46E5' },
+          theme: { color: '#7C3AED' },
           handler: () => {
             setBanner({ kind: 'processing', message: 'Payment received. Activating your plan...' });
             navigate('/billing?payment=processing&provider=razorpay', { replace: true });
@@ -360,10 +360,13 @@ const BillingPage: React.FC = () => {
 
   return (
     <div className="page-wrapper billing-v6-page">
-      <div className="page-header billing-v6-header">
-        <h1 className="page-title">Billing & Plans</h1>
-        <p className="page-subtitle">Choose your plan and manage subscription status</p>
-      </div>
+      <section className="pg-surface-hero billing-v6-header">
+        <div>
+          <p className="pg-surface-kicker"><Sparkles size={12} /> Premium Growth Plans</p>
+          <h1 className="pg-surface-title">Billing &amp; Plans</h1>
+          <p className="pg-surface-subtitle">Choose your plan, manage subscription status, and unlock the workflows that match your growth stage.</p>
+        </div>
+      </section>
 
       {error && (
         <div className="billing-v6-error">
@@ -446,7 +449,7 @@ const BillingPage: React.FC = () => {
             >
               {isCurrent(plan.id) && <div className="plan-badge current-badge">Current Plan</div>}
               {plan.popular && !isCurrent(plan.id) && <div className="plan-badge">Most Popular</div>}
-              {pendingPlan === plan.id && <div className="plan-badge" style={{ top: 42, background: '#f59e0b' }}>Pending Confirmation</div>}
+              {pendingPlan === plan.id && <div className="plan-badge plan-badge-pending">Pending Confirmation</div>}
 
               <div className="plan-name">{plan.name}</div>
               <div className="plan-description">{plan.description}</div>
@@ -464,24 +467,24 @@ const BillingPage: React.FC = () => {
                       <span className="plan-price-amount">{cyclePrice}</span>
                       <span className="plan-price-period">{cycleMeta.periodLabel}</span>
                     </div>
-                    <span className="text-xs text-slate-500 mt-1">{cycleMeta.billedEvery}</span>
-                    {billingCycle !== 'monthly' && cycleMeta.discount > 0 && <span className="text-xs text-emerald-700 mt-0.5">Save {Math.round(cycleMeta.discount * 100)}% vs monthly</span>}
+                    <span className="billing-v6-price-note">{cycleMeta.billedEvery}</span>
+                    {billingCycle !== 'monthly' && cycleMeta.discount > 0 && <span className="billing-v6-savings-note">Save {Math.round(cycleMeta.discount * 100)}% vs monthly</span>}
                   </div>
                 )}
               </div>
 
-              <div className="flex flex-col gap-1.5 mb-4">
-                <div className="flex items-center gap-2 text-sm">
-                  <Zap size={13} className="text-primary flex-shrink-0" />
-                  <span className="font-medium text-slate-700">{plan.highlight.rules}</span>
+              <div className="billing-v6-highlight-list">
+                <div className="billing-v6-highlight-item primary">
+                  <Zap size={13} />
+                  <span>{plan.highlight.rules}</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <MessageSquare size={13} className="text-slate-400 flex-shrink-0" />
-                  <span className="text-slate-600">{plan.highlight.dms}</span>
+                <div className="billing-v6-highlight-item">
+                  <MessageSquare size={13} />
+                  <span>{plan.highlight.dms}</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Users size={13} className="text-slate-400 flex-shrink-0" />
-                  <span className="text-slate-600">{plan.highlight.contacts}</span>
+                <div className="billing-v6-highlight-item">
+                  <Users size={13} />
+                  <span>{plan.highlight.contacts}</span>
                 </div>
               </div>
 
@@ -497,14 +500,14 @@ const BillingPage: React.FC = () => {
               </ul>
 
               {isCurrent(plan.id) ? (
-                <button disabled className="w-full py-2.5 text-sm font-semibold text-slate-400 bg-slate-100 rounded-xl cursor-not-allowed">
+                <button disabled className="billing-v6-plan-btn disabled">
                   Current Plan
                 </button>
               ) : isUpgrade(plan.id) ? (
                 <button
                   onClick={() => handleUpgrade(plan)}
                   disabled={!!upgrading || planStatus?.is_checkout_pending}
-                  className="w-full py-2.5 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-indigo-700 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="billing-v6-plan-btn primary"
                 >
                   {upgrading === plan.id ? (
                     <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Redirecting...</>
@@ -513,7 +516,7 @@ const BillingPage: React.FC = () => {
               ) : (
                 <button
                   onClick={handleManagePortal}
-                  className="w-full py-2.5 text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                  className="billing-v6-plan-btn secondary"
                 >
                   Manage in Portal
                 </button>

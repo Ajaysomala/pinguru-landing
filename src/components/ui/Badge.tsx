@@ -14,7 +14,7 @@ const variantClasses: Record<BadgeVariant, string> = {
   green:  'bg-emerald-50 text-emerald-800',
   red:    'bg-rose-50 text-rose-800',
   amber:  'bg-amber-50 text-amber-800',
-  indigo: 'bg-indigo-50 text-indigo-700',
+  indigo: 'bg-primary-light text-primary',
   gray:   'bg-slate-100 text-slate-600',
 };
 
@@ -22,7 +22,7 @@ const dotColors: Record<BadgeVariant, string> = {
   green:  'bg-emerald-500',
   red:    'bg-rose-500',
   amber:  'bg-amber-500',
-  indigo: 'bg-indigo-500',
+  indigo: 'bg-primary',
   gray:   'bg-slate-400',
 };
 

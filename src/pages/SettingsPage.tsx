@@ -122,11 +122,11 @@ const SettingsPage: React.FC = () => {
 
   return (
     <div className="page-wrapper settings-v2-page">
-      <section className="settings-v2-hero">
+      <section className="settings-v2-hero pg-surface-hero">
         <div className="settings-v2-hero-copy">
-          <p className="settings-v2-kicker"><Sparkles size={12} /> Account Control Center</p>
-          <h1 className="settings-v2-title">Settings</h1>
-          <p className="settings-v2-subtitle">A cleaner workspace for profile details, automation preferences, and privacy controls.</p>
+          <p className="settings-v2-kicker pg-surface-kicker"><Sparkles size={12} /> Account Control Center</p>
+          <h1 className="settings-v2-title pg-surface-title">Settings</h1>
+          <p className="settings-v2-subtitle pg-surface-subtitle">A cleaner workspace for profile details, automation preferences, and privacy controls.</p>
           <div className="settings-v2-chip-row">
             <span className="settings-v2-chip"><BadgeCheck size={12} /> Plan: {toTitleCase(user?.plan ?? 'free')}</span>
             <span className="settings-v2-chip"><AtSign size={12} /> {instagramStatus}</span>

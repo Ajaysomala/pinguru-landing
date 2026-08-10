@@ -44,6 +44,13 @@
   margin-bottom: 14px;
 }
 
+.contacts-v6-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 .contacts-v6-chip {
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--color-primary) 14%, var(--color-border) 86%);
@@ -52,6 +59,12 @@
   font-size: 0.78rem;
   font-weight: 700;
   padding: 6px 12px;
+}
+
+.contacts-v6-hero .contacts-v6-chip {
+  border-color: rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.82);
 }
 
 .contacts-v6-stats {
@@ -242,6 +255,11 @@
 }
 
 @media (max-width: 960px) {
+  .contacts-v6-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .contacts-v6-stats {
     grid-template-columns: 1fr;
   }

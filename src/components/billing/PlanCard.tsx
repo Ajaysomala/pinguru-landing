@@ -84,7 +84,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
 				<button
 					onClick={onUpgrade}
 					disabled={upgrading}
-					className="w-full py-2.5 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-indigo-700 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+					className="w-full py-2.5 text-sm font-semibold text-white bg-primary rounded-xl hover:bg-primary-hover active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
 				>
 					{upgrading ? (
 						<>

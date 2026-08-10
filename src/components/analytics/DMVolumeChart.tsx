@@ -26,7 +26,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 	return (
 		<div className="bg-white border border-slate-200 rounded-xl shadow-lg px-3 py-2.5 text-xs">
 			<p className="font-semibold text-slate-700 mb-1">{label}</p>
-			<p className="text-indigo-600 font-bold">{payload[0]?.value ?? 0} DMs sent</p>
+			<p className="text-primary font-bold">{payload[0]?.value ?? 0} DMs sent</p>
 			{payload[1] && <p className="text-emerald-600">{payload[1]?.value ?? 0} successful</p>}
 		</div>
 	);
@@ -62,7 +62,7 @@ export const DMVolumeChart: React.FC<DMVolumeChartProps> = ({
 				<div className="gated-overlay">
 					<div className="gated-blur h-56 flex items-end gap-1 px-4 pb-4">
 						{[40, 65, 35, 80, 50, 90, 45, 70, 55, 85, 30, 75, 60, 95].map((height, i) => (
-							<div key={i} className="flex-1 bg-indigo-200 rounded-t-sm" style={{ height: `${height}%` }} />
+							<div key={i} className="flex-1 bg-primary-light rounded-t-sm" style={{ height: `${height}%` }} />
 						))}
 					</div>
 					<div className="gated-message">
@@ -73,7 +73,7 @@ export const DMVolumeChart: React.FC<DMVolumeChartProps> = ({
 						<p className="gated-desc">Upgrade to Starter or Pro to see your DM volume charts and success rate.</p>
 						<Link
 							to="/billing"
-							className="inline-flex items-center gap-1 mt-2 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors"
+							className="inline-flex items-center gap-1 mt-2 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-primary-hover transition-colors"
 						>
 							Upgrade now <ChevronRight size={13} />
 						</Link>
