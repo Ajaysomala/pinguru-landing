@@ -3,9 +3,8 @@ import { Link } from 'react-router-dom';
 import {
   Zap, ShieldCheck, BarChart2, MessageSquare,
   Check, ArrowRight, Instagram, ChevronDown,
-  Menu, X, Star, TrendingUp, Globe, Users,
-  BookOpen, Mail, Twitter, Linkedin, Github,
-  Sparkles, Clock, Target, Bell, Lock,
+  Menu, X, Star, BookOpen, Mail, Twitter, Linkedin,
+  Sparkles, Clock, Target,
 } from 'lucide-react';
 import '../styles/landing.css';
 
@@ -702,7 +701,8 @@ const LandingPage: React.FC = () => {
               <div className="footer-col-links">
                 <Link to="/privacy" className="footer-col-link">Privacy Policy</Link>
                 <Link to="/terms"   className="footer-col-link">Terms of Service</Link>
-                <Link to="/refund"  className="footer-col-link">Refund Policy</Link>
+                <Link to="/cookies" className="footer-col-link">Cookie Policy</Link>
+                <Link to="/refund-policy" className="footer-col-link">Refund Policy</Link>
               </div>
 
               {/* Newsletter */}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Search, Zap, MessageSquare, Camera, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Plus, Search, Zap, MessageSquare, Camera, ToggleLeft, ToggleRight, Sparkles } from 'lucide-react';
 import { getRules, toggleRule, getInstagramStatus } from '../lib/api';
 import type { Rule, InstagramStatus } from '../lib/types';
 import { TRIGGER_LABELS } from '../lib/types';
@@ -82,13 +82,17 @@ const RulesPage: React.FC = () => {
 
   return (
     <div className="page-wrapper rules-v6-page">
-      <div className="rules-v6-topbar-row">
-        <h1 className="page-title">Automation Rules</h1>
+      <section className="pg-surface-hero rules-v6-hero">
+        <div>
+          <p className="pg-surface-kicker"><Sparkles size={12} /> Automation Studio</p>
+          <h1 className="pg-surface-title">Automation Rules</h1>
+          <p className="pg-surface-subtitle">Build premium Instagram DM workflows with triggers, follow gates, and performance-ready templates.</p>
+        </div>
         <div className="rules-v6-topbar-actions">
           <span className="rules-v6-usage-chip">{usageLabel}</span>
           <button onClick={openBuilder} className="rules-v6-primary-btn"><Plus size={15} /> New Rule</button>
         </div>
-      </div>
+      </section>
 
       {connectHint && (
         <div className="rules-v6-alert">

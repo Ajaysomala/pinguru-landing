@@ -46,6 +46,11 @@
   background: var(--color-success);
 }
 
+.plan-badge-pending {
+  top: 42px;
+  background: var(--color-warning);
+}
+
 .plan-name {
   font-family: var(--font-display);
   font-size: 1.125rem;
@@ -140,7 +145,7 @@
 }
 
 .billing-v6-header {
-  margin-bottom: 8px;
+  margin-bottom: 18px;
 }
 
 .billing-v6-error {
@@ -278,8 +283,91 @@
 }
 
 .billing-v6-cycle-switch button.active {
-  background: #7c3aed;
+  background: var(--gradient-brand);
   color: #fff;
+}
+
+.billing-v6-price-note,
+.billing-v6-savings-note {
+  display: block;
+  font-size: 0.75rem;
+  margin-top: 4px;
+}
+
+.billing-v6-price-note {
+  color: var(--color-muted);
+}
+
+.billing-v6-savings-note {
+  color: #047857;
+}
+
+.billing-v6-highlight-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.billing-v6-highlight-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.billing-v6-highlight-item svg {
+  color: var(--color-muted);
+  flex-shrink: 0;
+}
+
+.billing-v6-highlight-item.primary {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.billing-v6-highlight-item.primary svg {
+  color: var(--color-primary);
+}
+
+.billing-v6-plan-btn {
+  width: 100%;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform var(--transition-fast), background var(--transition-fast), opacity var(--transition-fast);
+}
+
+.billing-v6-plan-btn.primary {
+  color: #fff;
+  background: var(--gradient-brand);
+}
+
+.billing-v6-plan-btn.primary:hover {
+  transform: translateY(-1px);
+}
+
+.billing-v6-plan-btn.secondary {
+  color: var(--color-text-secondary);
+  background: color-mix(in srgb, var(--color-primary-light) 26%, #ffffff 74%);
+  border: 1px solid var(--color-border);
+}
+
+.billing-v6-plan-btn.disabled {
+  color: var(--color-muted);
+  background: color-mix(in srgb, var(--color-border) 58%, #ffffff 42%);
+  cursor: not-allowed;
+}
+
+.billing-v6-plan-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .billing-v6-common {

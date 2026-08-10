@@ -55,7 +55,7 @@ export const RuleCard: React.FC<RuleCardProps> = ({
 			<div className="rule-actions">
 				<button
 					onClick={() => onEdit(rule)}
-					className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+					className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-primary hover:bg-primary-light transition-all"
 					title="Edit rule"
 				>
 					<PencilLine size={14} />

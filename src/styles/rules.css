@@ -53,7 +53,7 @@
 
 .template-card:hover {
   transform: translateY(-1px);
-  border-color: #c7d2fe;
+  border-color: rgba(124, 58, 237, 0.28);
   box-shadow: var(--shadow-md);
 }
 
@@ -150,7 +150,7 @@
   width: 28px;
   height: 28px;
   border-radius: 999px;
-  background: #1e293b;
+  background: var(--gradient-brand);
   color: white;
   font-size: 0.8125rem;
   font-weight: 700;
@@ -190,9 +190,9 @@
 }
 
 .wizard-option.active {
-  border-color: #3b82f6;
-  background: #eff6ff;
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.1);
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  box-shadow: 0 0 0 1px var(--color-primary-ring);
 }
 
 .wizard-option-radio {
@@ -207,14 +207,14 @@
 }
 
 .wizard-option.active .wizard-option-radio {
-  border-color: #2563eb;
+  border-color: var(--color-primary);
 }
 
 .wizard-option.active .wizard-option-radio span {
   width: 10px;
   height: 10px;
   border-radius: 999px;
-  background: #2563eb;
+  background: var(--color-primary);
 }
 
 .wizard-option-title {
@@ -263,8 +263,8 @@
 
 .wizard-filter-pill.active {
   color: var(--color-primary);
-  border-color: #93c5fd;
-  background: #eff6ff;
+  border-color: rgba(124, 58, 237, 0.28);
+  background: var(--color-primary-light);
 }
 
 .wizard-media-grid {
@@ -286,9 +286,9 @@
 }
 
 .wizard-media-card.active {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.1);
-  background: #eff6ff;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary-ring);
+  background: var(--color-primary-light);
 }
 
 .wizard-media-thumb {
@@ -424,6 +424,13 @@
   margin: 0 auto;
 }
 
+.rules-v6-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 .rules-v6-topbar-row {
   display: flex;
   align-items: center;
@@ -446,6 +453,12 @@
   font-size: 0.76rem;
   font-weight: 700;
   padding: 6px 12px;
+}
+
+.rules-v6-hero .rules-v6-usage-chip {
+  border-color: rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.82);
 }
 
 .rules-v6-primary-btn {
@@ -676,6 +689,11 @@
 }
 
 @media (max-width: 980px) {
+  .rules-v6-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .rules-v6-filter-row {
     grid-template-columns: 1fr;
   }
@@ -1316,9 +1334,8 @@
   position: relative;
   overflow: hidden;
   padding: 22px;
-  background:
-    linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.96) 45%, rgba(8, 47, 73, 0.94) 100%);
-  border-color: rgba(59, 130, 246, 0.18);
+  background: var(--gradient-hero);
+  border-color: rgba(255,255,255,0.08);
   color: #f8fafc;
 }
 
@@ -1330,7 +1347,7 @@
   width: 240px;
   height: 240px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(34, 211, 238, 0.18), rgba(124, 58, 237, 0.16) 45%, transparent 72%);
+  background: radial-gradient(circle, rgba(219,39,119,0.24), rgba(124, 58, 237, 0.18) 45%, transparent 72%);
   pointer-events: none;
 }
 
@@ -1474,7 +1491,7 @@
   gap: 6px;
   font-size: 0.72rem;
   font-weight: 800;
-  color: #4c1d95;
+  color: var(--color-primary);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 6px;
@@ -1716,14 +1733,14 @@
 }
 
 .automation-v5-btn.secondary {
-  color: #312e81;
+  color: var(--color-primary);
   background: #ffffff;
-  border-color: #cbd5e1;
+  border-color: var(--color-border);
 }
 
 .automation-v5-btn.secondary:hover {
-  background: #eef2ff;
-  border-color: #c7d2fe;
+  background: var(--color-primary-light);
+  border-color: rgba(124, 58, 237, 0.28);
 }
 
 .automation-v5-btn.ghost {
@@ -1733,9 +1750,9 @@
 }
 
 .automation-v5-btn.ghost:hover {
-  background: #eef2ff;
-  border-color: #c7d2fe;
-  color: #312e81;
+  background: var(--color-primary-light);
+  border-color: rgba(124, 58, 237, 0.28);
+  color: var(--color-primary);
 }
 
 .automation-v5-hero-stats {
@@ -2024,9 +2041,9 @@
   gap: 6px;
   width: fit-content;
   border-radius: 999px;
-  border: 1px solid #c7d2fe;
-  background: #eef2ff;
-  color: #3730a3;
+  border: 1px solid rgba(124, 58, 237, 0.24);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
   font-size: 0.74rem;
   font-weight: 700;
   padding: 6px 10px;

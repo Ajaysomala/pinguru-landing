@@ -436,7 +436,7 @@
   width: 360px;
   height: 360px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(59, 130, 246, 0.1) 45%, transparent 72%);
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.16) 0%, rgba(219, 39, 119, 0.1) 45%, transparent 72%);
   filter: blur(4px);
   pointer-events: none;
   z-index: 0;
@@ -452,14 +452,12 @@
   grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
   gap: 16px;
   margin-bottom: 18px;
+  align-items: stretch;
 }
 
 .settings-v2-hero-copy {
-  border-radius: 22px;
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  background: linear-gradient(125deg, #0f172a 0%, #1e293b 50%, #0b3b5c 100%);
-  box-shadow: 0 20px 42px rgba(15, 23, 42, 0.24);
-  padding: 22px;
+  padding: 0;
+  align-self: center;
 }
 
 .settings-v2-kicker {
@@ -468,9 +466,9 @@
   gap: 6px;
   border-radius: 999px;
   padding: 5px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(226, 232, 240, 0.92);
-  background: rgba(15, 23, 42, 0.26);
+  border: 1px solid rgba(167,139,250,0.35);
+  color: #C4B5FD;
+  background: rgba(124,58,237,0.25);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.07em;
@@ -488,7 +486,7 @@
 
 .settings-v2-subtitle {
   margin-top: 6px;
-  color: rgba(226, 232, 240, 0.78);
+  color: rgba(255,255,255,0.68);
   font-size: 0.92rem;
   max-width: 560px;
 }
@@ -508,16 +506,17 @@
   padding: 6px 10px;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #e2e8f0;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background: rgba(15, 23, 42, 0.34);
+  color: rgba(255,255,255,0.82);
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.08);
 }
 
 .settings-v2-identity-card {
   border-radius: 22px;
-  border: 1px solid rgba(124, 58, 237, 0.2);
-  background: linear-gradient(145deg, #ffffff 0%, #f7f8ff 100%);
-  box-shadow: 0 16px 34px rgba(30, 41, 59, 0.1);
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.08);
+  box-shadow: none;
+  backdrop-filter: blur(10px);
   padding: 18px;
   display: flex;
   flex-direction: column;
@@ -541,12 +540,12 @@
 .settings-v2-name {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--color-text);
+  color: #fff;
 }
 
 .settings-v2-meta {
   font-size: 0.84rem;
-  color: var(--color-muted);
+  color: rgba(255,255,255,0.62);
   word-break: break-word;
 }
 
@@ -656,9 +655,9 @@
 }
 
 .settings-v2-inline-action:hover {
-  border-color: #bfdbfe;
-  color: #1e40af;
-  background: #eff6ff;
+  border-color: rgba(124, 58, 237, 0.28);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
 }
 
 .settings-v2-profile-grid {
@@ -782,9 +781,24 @@
 }
 
 .settings-v2-neutral-btn:hover {
-  background: #eef2ff;
-  border-color: #c7d2fe;
-  color: #312e81;
+  background: var(--color-primary-light);
+  border-color: rgba(124, 58, 237, 0.28);
+  color: var(--color-primary);
+}
+
+.settings-edit-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.settings-edit-hero .settings-back-link {
+  color: rgba(255,255,255,0.72);
+  margin-bottom: 14px;
+}
+
+.settings-edit-hero .settings-back-link:hover {
+  color: #fff;
 }
 
 .settings-v2-health-card {

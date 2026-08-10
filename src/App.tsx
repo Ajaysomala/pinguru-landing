@@ -1,8 +1,45 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { getProfile } from './lib/api';
 import { AppShell } from './components/layout/AppShell';
+import { CookieBanner } from './components/ui/CookieBanner';
 import type { User } from './lib/types';
+
+const TITLE_MAP: Record<string, string> = {
+  '/': 'PinGuru – Instagram DM Automation',
+  '/login': 'Sign in · PinGuru',
+  '/register': 'Create account · PinGuru',
+  '/verify': 'Verify email · PinGuru',
+  '/forgot-password': 'Reset password · PinGuru',
+  '/onboarding': 'Welcome · PinGuru',
+  '/dashboard': 'Dashboard · PinGuru',
+  '/connect': 'Connect Instagram · PinGuru',
+  '/rules': 'Automation Rules · PinGuru',
+  '/contacts': 'Contacts · PinGuru',
+  '/analytics': 'Analytics · PinGuru',
+  '/billing': 'Billing · PinGuru',
+  '/settings': 'Settings · PinGuru',
+  '/settings/profile': 'Edit profile · PinGuru',
+  '/refund': 'Request refund · PinGuru',
+  '/privacy': 'Privacy Policy · PinGuru',
+  '/terms': 'Terms of Service · PinGuru',
+  '/cookies': 'Cookie Policy · PinGuru',
+  '/refund-policy': 'Refund Policy · PinGuru',
+  '/support': 'Support · PinGuru',
+  '/blog': 'Blog · PinGuru',
+};
+
+const DocumentTitle: React.FC = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    if (pathname.startsWith('/blog/')) {
+      document.title = 'Blog · PinGuru';
+      return;
+    }
+    document.title = TITLE_MAP[pathname] || 'PinGuru – Instagram DM Automation';
+  }, [pathname]);
+  return null;
+};
 
 class AppErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; message: string }> {
   constructor(props: { children: React.ReactNode }) {
@@ -30,7 +67,7 @@ class AppErrorBoundary extends React.Component<{ children: React.ReactNode }, { 
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-indigo-700 transition-colors"
+            className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary-hover transition-colors"
           >
             Reload app
           </button>
@@ -74,7 +111,7 @@ const AuthContext = createContext<AuthContextValue>({
   refresh: async () => {},
 });
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => useContext(AuthContext); // eslint-disable-line react-refresh/only-export-components
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -117,11 +154,11 @@ const Spinner = () => (
   </div>
 );
 
-const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const RequireAuth: React.FC<{ children: React.ReactNode; shell?: boolean }> = ({ children, shell = true }) => {
   const { user, status } = useAuth();
   if (status === 'checking') return <Spinner />;
   if (status === 'fail') return <Navigate to="/login" replace />;
-  // Pass user down via AppShell — no extra fetch needed
+  if (!shell) return <>{children}</>;
   return <AppShell user={user}>{children}</AppShell>;
 };
 
@@ -152,6 +189,8 @@ const SettingsProfileEditPage = lazyWithRetry(() => import('./pages/SettingsProf
 const RefundPage     = lazyWithRetry(() => import('./pages/RefundPage'));
 const PrivacyPage    = lazyWithRetry(() => import('./pages/PrivacyPage'));
 const TermsPage      = lazyWithRetry(() => import('./pages/TermsPage'));
+const CookiePolicyPage = lazyWithRetry(() => import('./pages/CookiePolicyPage'));
+const RefundPolicyPage = lazyWithRetry(() => import('./pages/RefundPolicyPage'));
 const SupportPage    = lazyWithRetry(() => import('./pages/SupportPage'));
 
 const Page: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -164,12 +203,27 @@ const Page: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </React.Suspense>
 );
 
+const SupportRoute: React.FC = () => {
+  const { user, status } = useAuth();
+  if (status === 'checking') return <Spinner />;
+  if (status === 'ok') {
+    return (
+      <AppShell user={user}>
+        <Page><SupportPage /></Page>
+      </AppShell>
+    );
+  }
+  return <Page><SupportPage /></Page>;
+};
+
 // ── App ───────────────────────────────────────────────────────────────────────
 
 const App: React.FC = () => (
   <BrowserRouter>
     <AppErrorBoundary>
       <AuthProvider>
+        <DocumentTitle />
+        <CookieBanner />
         <Routes>
         {/* Public */}
         <Route path="/"         element={<PublicOnly><Page><LandingPage /></Page></PublicOnly>} />
@@ -179,15 +233,17 @@ const App: React.FC = () => (
         <Route path="/forgot-password" element={<Page><ForgotPasswordPage /></Page>} />
         <Route path="/privacy"  element={<Page><PrivacyPage /></Page>} />
         <Route path="/terms"    element={<Page><TermsPage /></Page>} />
-        <Route path="/support"  element={<Page><SupportPage /></Page>} />
+        <Route path="/cookies"  element={<Page><CookiePolicyPage /></Page>} />
+        <Route path="/refund-policy" element={<Page><RefundPolicyPage /></Page>} />
+        <Route path="/support"  element={<SupportRoute />} />
         <Route path="/blog"     element={<Page><BlogPage /></Page>} />
         <Route path="/blog/:slug" element={<Page><BlogPage /></Page>} />
 
-        {/* Onboarding */}
+        {/* Onboarding — authenticated, no app shell */}
         <Route path="/onboarding" element={
-          <React.Suspense fallback={null}>
-            <OnboardingPage />
-          </React.Suspense>
+          <RequireAuth shell={false}>
+            <Page><OnboardingPage /></Page>
+          </RequireAuth>
         } />
 
         {/* Protected — user prop flows from context through AppShell */}

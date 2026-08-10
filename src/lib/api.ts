@@ -187,7 +187,9 @@ export async function resetPassword(email: string, resetToken: string, newPasswo
 }
 
 export async function logout() {
-  try { await authFetch('/auth/logout', { method: 'POST' }); } catch {}
+  try { await authFetch('/auth/logout', { method: 'POST' }); } catch {
+    // Ignore network failures — still clear local session redirect.
+  }
   window.location.href = '/login';
 }
 
