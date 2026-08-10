@@ -14,20 +14,14 @@ export const AppShell: React.FC<AppShellProps> = ({ children, user }) => {
 
   return (
     <div className="pg-app-shell">
-      <div className="hidden lg:block">
+      <div className="pg-sidebar-desktop">
         <Sidebar user={user} />
       </div>
 
       <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} user={user} />
 
       <main className="pg-app-main">
-        <div className="lg:hidden">
-          <TopBar onMenuClick={() => setDrawerOpen(true)} />
-        </div>
-        <div className="hidden lg:block">
-          <TopBar onMenuClick={() => setDrawerOpen(true)} desktop />
-        </div>
-
+        <TopBar onMenuClick={() => setDrawerOpen(true)} />
         <div className="pg-app-content animate-[fadeIn_0.2s_ease-out]">
           {children}
         </div>

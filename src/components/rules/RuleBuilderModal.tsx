@@ -8,12 +8,15 @@ import type { InstagramMediaItem, Rule, RuleCreatePayload, TriggerType } from '.
 import { Modal } from '../ui/Modal';
 import { useAuth } from '../../App';
 
+export type RuleSeed = Partial<RuleCreatePayload> & { name?: string };
+
 interface RuleBuilderModalProps {
   open: boolean;
   onClose: () => void;
   onCreated: (rule: Rule) => void;
   onUpdated?: (rule: Rule) => void;
   initialRule?: Rule | null;
+  seed?: RuleSeed | null;
 }
 
 const TRIGGER_OPTIONS: { value: TriggerType; label: string; desc: string; icon: React.ReactNode }[] = [
@@ -195,7 +198,14 @@ const PhonePreview: React.FC<{
 };
 
 // ── Main Modal ────────────────────────────────────────────────────
-export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClose, onCreated, onUpdated, initialRule = null }) => {
+export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
+  open,
+  onClose,
+  onCreated,
+  onUpdated,
+  initialRule = null,
+  seed = null,
+}) => {
   const { user } = useAuth();
   const [step, setStep] = useState<'choose'|'details'>('choose');
   const [name, setName] = useState('');
@@ -233,6 +243,25 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
     setError('');
 
     if (!initialRule) {
+      if (seed?.trigger_type) {
+        setStep('details');
+        setName(seed.name || '');
+        setTriggerType(seed.trigger_type);
+        setCommentTarget(seed.comment_target_type ?? 'specific');
+        setCommentFilter(seed.comment_media_filter ?? 'all');
+        setSelectedMediaId(seed.comment_media_id ?? '');
+        setAnyCommentKeyword(seed.any_comment_keyword ?? true);
+        setPublicCommentReplyEnabled(Boolean(seed.public_comment_reply_enabled));
+        setPublicCommentReplyTemplate(seed.public_comment_reply_template || 'Thanks for your comment! Check your DM for details.');
+        setAskFollowBeforeDm(Boolean(seed.ask_follow_before_dm));
+        setDmAttachmentUrl(seed.dm_attachment_url || '');
+        setShowAttachmentInput(Boolean(seed.dm_attachment_url));
+        setKeywords(Array.isArray(seed.keywords) ? seed.keywords : []);
+        setKwInput('');
+        setTemplate(seed.response_template || '');
+        return;
+      }
+
       setStep('choose');
       setName('');
       setTriggerType(null);
@@ -268,7 +297,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({ open, onClos
     setKeywords(Array.isArray(initialRule.keywords) ? initialRule.keywords : []);
     setKwInput('');
     setTemplate(initialRule.response_template || '');
-  }, [open, initialRule]);
+  }, [open, initialRule, seed]);
 
   useEffect(()=>{
     if(!isStarterOrPro&&askFollowBeforeDm) setAskFollowBeforeDm(false);
