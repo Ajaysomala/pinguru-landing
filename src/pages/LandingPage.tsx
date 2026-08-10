@@ -3,9 +3,8 @@ import { Link } from 'react-router-dom';
 import {
   Zap, ShieldCheck, BarChart2, MessageSquare,
   Check, ArrowRight, Instagram, ChevronDown,
-  Menu, X, Star, TrendingUp, Globe, Users,
-  BookOpen, Mail, Twitter, Linkedin, Github,
-  Sparkles, Clock, Target, Bell, Lock,
+  Menu, X, Star, BookOpen, Mail, Twitter, Linkedin,
+  Sparkles, Clock, Target,
 } from 'lucide-react';
 import '../styles/landing.css';
 

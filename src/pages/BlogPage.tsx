@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowRight, Clock, Search, BookOpen, Zap, TrendingUp, ShieldCheck, Tag, ChevronRight } from 'lucide-react';
+import { ArrowRight, Clock, Search, BookOpen, Tag, ChevronRight } from 'lucide-react';
 import '../styles/landing.css';
 
 const CATEGORIES = ['All', 'Tutorial', 'Strategy', 'Compliance', 'Case Study', 'Product'];

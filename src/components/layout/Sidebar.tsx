@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Zap, Camera, BarChart2,
   CreditCard, Settings, LogOut, Users, LifeBuoy
