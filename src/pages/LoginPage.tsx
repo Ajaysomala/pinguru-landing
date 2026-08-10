@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, AlertCircle, Lock, Mail, KeyRound, ArrowRight, MessageCircle, BarChart3, Target } from 'lucide-react';
+import {
+  Eye, EyeOff, AlertCircle, Lock, Mail, KeyRound, ArrowRight,
+  Sparkles, Instagram, ShieldCheck, Zap,
+} from 'lucide-react';
 import { loginUser } from '../lib/api';
 import { recordLoginAttempt, isLockedOut, resetLoginAttempts, formatLockoutTime } from '../lib/utils';
 import { useAuth } from '../App';
@@ -9,13 +12,14 @@ import '../styles/auth.css';
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { refresh } = useAuth();
-  const [email, setEmail]       = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPwd, setShowPwd]   = useState(false);
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState('');
+  const [showPwd, setShowPwd] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [lockoutMsg, setLockoutMsg] = useState('');
-  const [remaining, setRemaining]   = useState<number | null>(null);
+  const [remaining, setRemaining] = useState<number | null>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const { locked, remainingMs } = isLockedOut();
@@ -23,137 +27,161 @@ const LoginPage: React.FC = () => {
       setLockoutMsg(`Too many attempts. Try again in ${formatLockoutTime(remainingMs)}.`);
       const timer = setInterval(() => {
         const { locked: still, remainingMs: ms } = isLockedOut();
-        if (!still) { setLockoutMsg(''); clearInterval(timer); }
-        else setLockoutMsg(`Too many attempts. Try again in ${formatLockoutTime(ms)}.`);
+        if (!still) {
+          setLockoutMsg('');
+          clearInterval(timer);
+        } else {
+          setLockoutMsg(`Too many attempts. Try again in ${formatLockoutTime(ms)}.`);
+        }
       }, 10000);
       return () => clearInterval(timer);
     }
   }, []);
 
+  const handlePointer = (event: React.MouseEvent<HTMLElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+    setTilt({ x: x * 10, y: y * -8 });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const { locked, remainingMs } = isLockedOut();
-    if (locked) { setLockoutMsg(`Try again in ${formatLockoutTime(remainingMs)}.`); return; }
+    if (locked) {
+      setLockoutMsg(`Try again in ${formatLockoutTime(remainingMs)}.`);
+      return;
+    }
 
-    setLoading(true); setError('');
+    setLoading(true);
+    setError('');
     try {
       const data = await loginUser(email, password);
-      void data; // session managed via HTTP-only cookie
+      void data;
       await refresh();
       resetLoginAttempts();
       navigate('/dashboard');
-    } catch (err: any) {
+    } catch (err: unknown) {
       const result = recordLoginAttempt();
       if (result.locked) {
-        setLockoutMsg(`Too many attempts. Locked for 15 minutes.`);
+        setLockoutMsg('Too many attempts. Locked for 15 minutes.');
       } else {
         setRemaining(result.remaining);
-        const msg = err.message || 'Invalid credentials';
+        const msg = err instanceof Error ? err.message : 'Invalid credentials';
         setError(msg);
         if (msg.toLowerCase().includes('not verified')) {
           localStorage.setItem('pg_verify_email', email);
           setTimeout(() => navigate(`/verify?email=${encodeURIComponent(email)}`), 1500);
         }
       }
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="auth-screen auth-screen-split">
-      <section className="auth-showcase">
-        <div className="auth-showcase-orb auth-showcase-orb-a" />
-        <div className="auth-showcase-orb auth-showcase-orb-b" />
-        <div className="auth-showcase-inner">
-          <div className="auth-showcase-brand-mark">PG</div>
-          <h2 className="auth-showcase-brand">PinGuru</h2>
-          <p className="auth-showcase-copy">Premium Instagram automation for teams that convert every comment and DM into revenue.</p>
+    <div className="pg-auth-stage" onMouseMove={handlePointer} onMouseLeave={() => setTilt({ x: 0, y: 0 })}>
+      <div className="pg-auth-mesh" aria-hidden="true" />
+      <div className="pg-auth-orb pg-auth-orb-a" aria-hidden="true" />
+      <div className="pg-auth-orb pg-auth-orb-b" aria-hidden="true" />
+      <div className="pg-auth-orb pg-auth-orb-c" aria-hidden="true" />
+      <div className="pg-auth-ring pg-auth-ring-a" aria-hidden="true" />
+      <div className="pg-auth-ring pg-auth-ring-b" aria-hidden="true" />
+      <div className="pg-auth-sparkles" aria-hidden="true">
+        <span /><span /><span /><span /><span /><span />
+      </div>
 
-          <div className="auth-feature-stack">
-            <div className="auth-feature-item"><span><MessageCircle size={18} /></span><p>Instant replies for high-intent DMs and comments</p></div>
-            <div className="auth-feature-item"><span><BarChart3 size={18} /></span><p>Conversion analytics for every automation flow</p></div>
-            <div className="auth-feature-item"><span><Target size={18} /></span><p>Smart keyword matching with Hinglish support</p></div>
+      <div className="pg-auth-float pg-auth-float-a auth-float-in">
+        <Instagram size={14} /> Live Instagram OAuth
+      </div>
+      <div className="pg-auth-float pg-auth-float-b auth-float-in delay-1">
+        <Zap size={14} /> Instant DM rules
+      </div>
+      <div className="pg-auth-float pg-auth-float-c auth-float-in delay-2">
+        <ShieldCheck size={14} /> Meta-policy ready
+      </div>
+
+      <div
+        className="pg-auth-shell auth-rise-in"
+        style={{ transform: `perspective(1200px) rotateY(${tilt.x}deg) rotateX(${tilt.y}deg)` }}
+      >
+        <Link to="/" className="pg-auth-brand">
+          <span className="pg-auth-brand-mark">PG</span>
+          <span className="pg-auth-brand-text">PinGuru</span>
+        </Link>
+
+        <div className="pg-auth-kicker">
+          <Sparkles size={13} /> Welcome back
+        </div>
+        <h1 className="pg-auth-title">Sign in to your command center</h1>
+        <p className="pg-auth-subtitle">
+          Continue automating Instagram DMs with the same premium energy as your landing page.
+        </p>
+
+        {(lockoutMsg || error) && (
+          <div className="pg-auth-alert">
+            {lockoutMsg ? <Lock size={15} /> : <AlertCircle size={15} />}
+            <div>
+              <span>{lockoutMsg || error}</span>
+              {!lockoutMsg && remaining !== null && remaining <= 3 && (
+                <small>{remaining} attempt{remaining !== 1 ? 's' : ''} left before lockout</small>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        )}
 
-      <section className="auth-pane">
-        <div className="auth-panel">
-          <Link to="/" className="auth-panel-brand">
-            <div className="auth-panel-brand-mark">PG</div>
-            <span>PinGuru</span>
-          </Link>
-
-          <h1 className="auth-panel-title">Welcome back</h1>
-          <p className="auth-panel-subtitle">Sign in to manage automations, replies, and campaign performance.</p>
-
-          {lockoutMsg && (
-            <div className="auth-alert error" style={{ marginBottom: 12 }}>
-              <Lock size={15} className="flex-shrink-0" />
-              <span>{lockoutMsg}</span>
+        <form className="pg-auth-form" onSubmit={handleSubmit}>
+          <label className="pg-auth-field auth-field-in delay-1">
+            <span>Email</span>
+            <div className="pg-auth-input">
+              <Mail size={16} />
+              <input
+                type="email"
+                required
+                autoComplete="email"
+                placeholder="you@brand.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
-          )}
+          </label>
 
-          {error && !lockoutMsg && (
-            <div className="auth-alert error" style={{ marginBottom: 12 }}>
-              <AlertCircle size={15} className="flex-shrink-0" />
-              <div>
-                <span>{error}</span>
-                {remaining !== null && remaining <= 3 && (
-                  <p style={{ fontSize: '0.75rem', marginTop: 4, opacity: 0.8 }}>{remaining} attempt{remaining !== 1 ? 's' : ''} remaining before lockout</p>
-                )}
-              </div>
+          <label className="pg-auth-field auth-field-in delay-2">
+            <span className="pg-auth-field-top">
+              Password
+              <Link to="/forgot-password">Forgot?</Link>
+            </span>
+            <div className="pg-auth-input">
+              <KeyRound size={16} />
+              <input
+                type={showPwd ? 'text' : 'password'}
+                required
+                autoComplete="current-password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button type="button" onClick={() => setShowPwd((v) => !v)} aria-label="Toggle password">
+                {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
-          )}
+          </label>
 
-          <form className="auth-panel-form" onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label className="form-label" htmlFor="email">Email address</label>
-              <div className="auth-input-wrap">
-                <Mail size={16} className="auth-input-icon" />
-                <input
-                  id="email"
-                  type="email"
-                  className="form-input"
-                  placeholder="you@example.com"
-                  required
-                  autoComplete="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                />
-              </div>
-            </div>
+          <button type="submit" className="pg-auth-cta auth-field-in delay-3" disabled={loading || !!lockoutMsg}>
+            {loading ? (
+              <span className="pg-auth-spinner" />
+            ) : (
+              <>
+                Enter PinGuru <ArrowRight size={16} />
+              </>
+            )}
+          </button>
+        </form>
 
-            <div className="form-group">
-              <div className="auth-field-row">
-                <label className="form-label" htmlFor="password">Password</label>
-                <Link to="/forgot-password" className="auth-link-inline">Forgot password?</Link>
-              </div>
-              <div className="auth-input-wrap">
-                <KeyRound size={16} className="auth-input-icon" />
-                <input
-                  id="password"
-                  type={showPwd ? 'text' : 'password'}
-                  className="form-input"
-                  placeholder="Min. 8 characters"
-                  required
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                />
-                <button type="button" className="auth-input-action" onClick={() => setShowPwd(v => !v)}>
-                  {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
-
-            <button type="submit" disabled={loading || !!lockoutMsg} className="auth-gradient-btn">
-              {loading ? 'Signing in...' : <>Sign In <ArrowRight size={16} /></>}
-            </button>
-          </form>
-
-          <p className="auth-panel-footer">Don't have an account? <Link to="/register">Create one free</Link></p>
-        </div>
-      </section>
+        <p className="pg-auth-switch">
+          New here? <Link to="/register">Create a free account</Link>
+        </p>
+      </div>
     </div>
   );
 };
