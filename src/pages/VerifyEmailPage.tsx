@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Mail, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
+import { Mail, AlertCircle, CheckCircle, RefreshCw, ArrowRight } from 'lucide-react';
 import { verifyEmailOtp, resendEmailOtp } from '../lib/api';
 import '../styles/auth.css';
 
@@ -98,7 +98,14 @@ const VerifyEmailPage: React.FC = () => {
 
   return (
     <div className="auth-screen auth-screen-verify">
+      <div className="auth-showcase-orb auth-showcase-orb-a" />
+      <div className="auth-showcase-orb auth-showcase-orb-b" />
       <div className="auth-verify-card">
+        <Link to="/" className="auth-panel-brand auth-card-brand">
+          <div className="auth-panel-brand-mark">PG</div>
+          <span>PinGuru</span>
+        </Link>
+
         <div className="auth-verify-icon"><Mail size={24} /></div>
 
         <h1 className="auth-panel-title" style={{ textAlign: 'center', marginTop: 8 }}>Check your email</h1>
@@ -148,7 +155,7 @@ const VerifyEmailPage: React.FC = () => {
           className="auth-gradient-btn"
           style={{ marginTop: 10 }}
         >
-          {loading ? 'Verifying...' : 'Verify Email ✓'}
+          {loading ? 'Verifying...' : <>Verify email <ArrowRight size={16} /></>}
         </button>
 
         <button

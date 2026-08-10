@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Clock, Search, BookOpen, Zap, TrendingUp, ShieldCheck, Tag, ChevronRight } from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
+import { ArrowRight, Clock, Search, BookOpen, Tag, ChevronRight } from 'lucide-react';
 import '../styles/landing.css';
 
 const CATEGORIES = ['All', 'Tutorial', 'Strategy', 'Compliance', 'Case Study', 'Product'];
@@ -15,6 +15,12 @@ const POSTS = [
     bg: 'linear-gradient(135deg, #EDE9FE, #DDD6FE)',
     title: 'How to set up your first Instagram DM automation in 5 minutes',
     excerpt: 'A step-by-step walkthrough for creators who want instant DM responses without any coding. We cover trigger types, template variables, and going live.',
+    body: [
+      'Your first automation should be simple enough to launch confidently and useful enough to prove the channel. Start with one clear intent, such as sending a product link when someone comments a keyword or replying with a lead magnet when a follower DMs "guide". This keeps testing focused and makes it easy to understand what happened after the rule goes live.',
+      'Inside PinGuru, create a new rule, choose the trigger that matches the behavior you want, and write a response that sounds like your brand. The best first templates are short, friendly, and direct: greet the person, acknowledge the trigger, then deliver the promised next step. If you are using template variables, preview the message before activating so names, links, and fallback text read naturally.',
+      'Before turning the rule on, test the exact keyword or comment path with a secondary Instagram account. Confirm that the Instagram connection is healthy, the rule is active, and the message respects Meta messaging windows. A few minutes of testing prevents duplicate rules, confusing replies, or missed leads once your audience starts interacting.',
+      'After launch, watch the dashboard for message volume and early replies. You do not need a complicated funnel on day one. Once the first rule reliably delivers value, duplicate the pattern for your next offer and improve based on the questions people actually ask in DMs.',
+    ],
     date: 'Apr 10, 2025',
     readTime: '4 min read',
     featured: true,
@@ -28,6 +34,12 @@ const POSTS = [
     bg: 'linear-gradient(135deg, #CFFAFE, #A5F3FC)',
     title: 'The Instagram DM funnel: how top creators convert followers into customers',
     excerpt: 'Real case studies from creators earning 6 figures using automated DM sequences — from first touch to sale.',
+    body: [
+      'A strong Instagram DM funnel starts before the automation fires. Top creators make a specific promise in a reel, story, or caption, then invite followers to reply with a precise keyword. That public prompt sets context, so the first automated message feels expected instead of random.',
+      'The first DM should deliver the promised value immediately. From there, the funnel can ask one lightweight qualifying question, send a relevant link, or route the person to a human follow-up. The key is sequencing: every message should make the next step easier, not add friction.',
+      'Creators who convert consistently also segment intent. Someone asking for a free checklist should not receive the same follow-up as someone asking for pricing. Use separate keywords or rules for each campaign so your reporting and message tone stay aligned with the user journey.',
+      'Measure the funnel by outcomes, not just message count. Track which triggers generate replies, which templates earn clicks, and where people stop responding. Those signals help you refine the public call to action and the private DM path together.',
+    ],
     date: 'Mar 28, 2025',
     readTime: '7 min read',
     featured: false,
@@ -41,6 +53,12 @@ const POSTS = [
     bg: 'linear-gradient(135deg, #FEF3C7, #FDE68A)',
     title: "Meta's Instagram Messaging Policy: what every creator needs to know",
     excerpt: "A plain-English breakdown of the 24-hour window rule, broadcast restrictions, and how PinGuru keeps you 100% compliant.",
+    body: [
+      'Meta messaging rules are designed to keep Instagram DMs conversational and user-initiated. For automation, the most important idea is that messages should respond to a real action from the user, such as a DM, comment, or story mention, instead of behaving like unsolicited broadcasts.',
+      'The 24-hour messaging window matters because it defines when follow-up messages are appropriate. If someone interacts with your account, you can reply within the allowed window with relevant information. Outside of that context, avoid promotional sequences that the user did not request.',
+      'PinGuru is built around compliant triggers, rate limits, and account controls so creators can automate useful replies without turning DMs into spam. You should still write messages that match the original user intent and avoid misleading keywords, surprise promotions, or excessive follow-ups.',
+      'Compliance is also a trust strategy. When followers receive the link, answer, or resource they asked for, they are more likely to reply, buy, and keep engaging. Treat policy rules as guardrails for a better customer experience, not just a technical requirement.',
+    ],
     date: 'Mar 14, 2025',
     readTime: '5 min read',
     featured: false,
@@ -54,6 +72,12 @@ const POSTS = [
     bg: 'linear-gradient(135deg, #F3E8FF, #E9D5FF)',
     title: 'Keyword triggers deep dive: build flows that actually convert',
     excerpt: 'Learn how to pick the right keywords, use negative keywords, and structure responses that guide users toward purchase.',
+    body: [
+      'Keyword triggers work best when the keyword is memorable, campaign-specific, and unlikely to appear by accident. Words like "price", "guide", or "demo" are easy for followers to type, but you should connect each one to a clear public prompt so the automation has context.',
+      'Avoid using too many keywords in one rule. A broad rule may catch more messages, but it can also send generic replies to people with different intentions. Separate your lead magnet, product, and support keywords so every automated response feels tailored.',
+      'Your response should mirror the promise that created the trigger. If the caption says "comment GUIDE for the checklist", the first DM should send or link to that checklist before introducing anything else. Conversion improves when the user receives value before the ask.',
+      'Review keyword performance after each campaign. If a keyword brings in volume but few replies, update the public call to action or simplify the DM. If a lower-volume keyword produces better buyers, build more content around that intent.',
+    ],
     date: 'Feb 20, 2025',
     readTime: '6 min read',
     featured: false,
@@ -67,6 +91,12 @@ const POSTS = [
     bg: 'linear-gradient(135deg, #E0F2FE, #BAE6FD)',
     title: 'Story mention automation: the fastest way to grow your DM list',
     excerpt: 'When someone tags you in their story, it\'s a high-intent signal. Here\'s how to automate a follow-up DM that drives real results.',
+    body: [
+      'A story mention is one of the warmest signals on Instagram because the follower is publicly associating with your brand. Responding quickly helps you turn that moment into a conversation while the interaction is still fresh.',
+      'The best automated story mention reply sounds personal even when it is structured. Thank the person for the tag, acknowledge the context, and offer a natural next step such as a discount link, a resource, or a question that invites a human reply.',
+      'Use story mention automations for community flywheels. For launches, ask customers to tag you when they share results. For creator campaigns, reward mentions with a helpful follow-up. The automation makes sure no warm interaction disappears in the inbox.',
+      'Keep the message concise and avoid over-selling. A story mention already signals interest; your job is to make the person feel seen and guide them toward the next useful action.',
+    ],
     date: 'Feb 8, 2025',
     readTime: '5 min read',
     featured: false,
@@ -80,6 +110,12 @@ const POSTS = [
     bg: 'linear-gradient(135deg, #FCE7F3, #FBCFE8)',
     title: 'Understanding your PinGuru analytics: a complete guide',
     excerpt: 'Success rate, peak hours, DM volume trends — here\'s how to read your analytics dashboard and actually improve your automations.',
+    body: [
+      'Analytics are most useful when they answer a specific operating question. Instead of checking charts passively, look for patterns: which campaigns create spikes, which days produce replies, and whether your active rules are driving the behavior you expected.',
+      'DM volume shows demand, but success rate helps you understand quality. If messages are being sent but replies or completions are low, revisit the trigger promise and response template. The automation may be working technically while the offer needs clearer positioning.',
+      'Peak-hour and best-day insights help you schedule content around when followers are most likely to engage. Pair those signals with campaign notes so you can distinguish normal audience behavior from one-off launches, collaborations, or viral posts.',
+      'Use analytics as a weekly feedback loop. Keep the rules that create qualified conversations, pause the ones that no longer serve a campaign, and test one improvement at a time so you know what actually changed performance.',
+    ],
     date: 'Jan 25, 2025',
     readTime: '4 min read',
     featured: false,
@@ -87,16 +123,73 @@ const POSTS = [
 ];
 
 const BlogPage: React.FC = () => {
+  const { slug } = useParams();
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
 
   const featuredPost = POSTS.find(p => p.featured);
+  const articlePost = slug ? POSTS.find(p => p.slug === slug) : undefined;
   const filteredPosts = POSTS.filter(p => {
     const matchesSearch = p.title.toLowerCase().includes(search.toLowerCase()) ||
                           p.excerpt.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = activeCategory === 'All' || p.tag === activeCategory;
     return matchesSearch && matchesCategory && !p.featured;
   });
+
+  if (slug) {
+    if (!articlePost) {
+      return (
+        <div className="landing-page blog-detail-page">
+          <section className="blog-detail-hero">
+            <div className="blog-detail-hero-inner">
+              <span className="blog-detail-kicker"><BookOpen size={12} /> Article not found</span>
+              <h1>We could not find that guide.</h1>
+              <p>The article may have moved. Return to the blog to browse the latest Instagram automation resources.</p>
+              <Link to="/blog" className="blog-detail-back">Back to blog <ArrowRight size={15} /></Link>
+            </div>
+          </section>
+        </div>
+      );
+    }
+
+    return (
+      <div className="landing-page blog-detail-page">
+        <section className="blog-detail-hero">
+          <div className="blog-detail-hero-inner">
+            <Link to="/blog" className="blog-detail-back muted"><ChevronRight size={14} /> Blog</Link>
+            <span className="blog-detail-kicker" style={{ background: articlePost.tagBg, color: articlePost.tagColor }}>
+              <Tag size={12} /> {articlePost.tag}
+            </span>
+            <h1>{articlePost.title}</h1>
+            <p>{articlePost.excerpt}</p>
+            <div className="blog-detail-meta">
+              <Clock size={14} /> {articlePost.readTime}
+              <span>·</span>
+              {articlePost.date}
+            </div>
+          </div>
+        </section>
+
+        <main className="blog-detail-shell">
+          <div className="blog-detail-cover" style={{ background: articlePost.bg }}>
+            <span>{articlePost.emoji}</span>
+          </div>
+          <article className="blog-detail-article">
+            {articlePost.body.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </article>
+          <div className="blog-detail-cta">
+            <div>
+              <h2>Ready to turn this into a live workflow?</h2>
+              <p>Start with a free PinGuru account and launch your first compliant Instagram DM automation.</p>
+            </div>
+            <Link to="/register" className="btn-primary">Get started free <ArrowRight size={16} /></Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="landing-page">

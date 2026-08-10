@@ -22,7 +22,7 @@ export const StepChecklist: React.FC<StepChecklistProps> = ({ steps }) => (
         className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
           step.done
             ? 'opacity-60 cursor-default'
-            : 'hover:bg-indigo-50 cursor-pointer group'
+            : 'hover:bg-primary-light cursor-pointer group'
         }`}
       >
         {step.done ? (

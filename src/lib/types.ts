@@ -95,7 +95,7 @@ export interface Plan {
   dm_limit: number | null;
   rule_limit: number | 'Unlimited';
   features: string[];
-  stripe_price_id?: string;
+  razorpay_plan_id?: string;
 }
 
 export interface AnalyticsData {

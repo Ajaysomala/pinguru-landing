@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { getContacts, getContactStats, getDashboardStats } from '../lib/api';
 import { Badge } from '../components/ui/Badge';
 import { useAuth } from '../App';
@@ -85,10 +85,14 @@ const ContactsPage: React.FC = () => {
 
   return (
     <div className="page-wrapper contacts-v6-page">
-      <div className="contacts-v6-topline">
-        <h1 className="page-title">Contacts</h1>
+      <section className="pg-surface-hero contacts-v6-hero">
+        <div>
+          <p className="pg-surface-kicker"><Sparkles size={12} /> Audience Intelligence</p>
+          <h1 className="pg-surface-title">Contacts</h1>
+          <p className="pg-surface-subtitle">Track every Instagram conversation your automations create and understand where your best leads enter.</p>
+        </div>
         <span className="contacts-v6-chip">{stats?.total ?? 0} total · {stats?.limit ?? '∞'} limit ({plan})</span>
-      </div>
+      </section>
 
       <section className="contacts-v6-stats">
         <article className="contacts-v6-stat-card">

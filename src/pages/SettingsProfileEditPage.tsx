@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, AlertTriangle, Save, User, BriefcaseBusiness } from 'lucide-react';
+import { ArrowLeft, CheckCircle, AlertTriangle, Save, User, BriefcaseBusiness, Sparkles } from 'lucide-react';
 import { getProfile, updateProfile } from '../lib/api';
 import { BUSINESS_CATEGORIES } from '../lib/types';
 import type { User as UserType } from '../lib/types';
@@ -97,23 +97,24 @@ const SettingsProfileEditPage: React.FC = () => {
 
   return (
     <div className="page-wrapper settings-edit-page">
-      <div className="page-header mb-5">
+      <section className="pg-surface-hero settings-edit-hero">
         <Link to="/settings" className="settings-back-link">
           <ArrowLeft size={14} />
           Back to Settings
         </Link>
-        <h1 className="page-title mt-2">Edit Profile</h1>
-        <p className="page-subtitle">Update your account details and business category.</p>
-      </div>
+        <p className="pg-surface-kicker"><Sparkles size={12} /> Profile Studio</p>
+        <h1 className="pg-surface-title">Edit Profile</h1>
+        <p className="pg-surface-subtitle">Update your account details and business category so onboarding and account health stay accurate.</p>
+      </section>
 
       {error && (
-        <div className="flex items-center gap-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl px-4 py-3 mb-5 text-sm">
+        <div className="settings-v2-alert error">
           <AlertTriangle size={15} className="flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
       {success && (
-        <div className="flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-3 mb-5 text-sm">
+        <div className="settings-v2-alert success">
           <CheckCircle size={15} className="flex-shrink-0" />
           <span>{success}</span>
         </div>

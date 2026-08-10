@@ -32,8 +32,9 @@ const DashboardPage: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  const profileComplete = Boolean(user?.onboarding_complete || user?.first_name?.trim());
   const steps = [
-    { id: 'profile', label: 'Complete your profile',          done: true,                href: '/settings' },
+    { id: 'profile', label: 'Complete your profile',          done: profileComplete,     href: '/settings' },
     { id: 'connect', label: 'Connect Instagram account',      done: !!igStatus?.connected, href: '/connect' },
     { id: 'rule',    label: 'Create your first automation rule', done: rules.length > 0,  href: '/rules' },
   ];
@@ -78,9 +79,9 @@ const DashboardPage: React.FC = () => {
         <div className="dashboard-v5-orb dashboard-v5-orb-b" />
 
         <div className="dashboard-v5-hero-copy">
-          <p className="dashboard-v5-kicker"><Sparkles size={12} /> Automation Performance Center</p>
-          <h1 className="dashboard-v5-title">{greeting()}, {userFirstName}</h1>
-          <p className="dashboard-v5-subtitle">
+          <p className="dashboard-v5-kicker pg-surface-kicker"><Sparkles size={12} /> Automation Performance Center</p>
+          <h1 className="dashboard-v5-title pg-surface-title">{greeting()}, {userFirstName}</h1>
+          <p className="dashboard-v5-subtitle pg-surface-subtitle">
             {loading ? 'Loading your workspace...' : `You are on ${planName} · ${stats?.active_rules ?? 0} active rule${(stats?.active_rules ?? 0) !== 1 ? 's' : ''}`}
           </p>
 

@@ -1,30 +1,31 @@
 import React from 'react';
+import { ArrowLeft, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { FileText, ArrowLeft } from 'lucide-react';
 import '../styles/landing.css';
 import '../styles/legal.css';
 
-const LAST_UPDATED = 'January 1, 2025';
+const LAST_UPDATED = 'August 10, 2026';
+const SUPPORT_EMAIL = 'support@pinguru.me';
+const LEGAL_EMAIL = 'legal@pinguru.me';
 
 const TermsPage: React.FC = () => (
   <div className="landing-page">
-
-    {/* Minimal nav */}
     <nav className="landing-nav">
-      <Link to="/" className="landing-nav-logo">
-        <div className="landing-nav-logo-mark">PG</div>
-        <span className="landing-nav-logo-text">PinGuru</span>
-      </Link>
-      <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors">
-        <ArrowLeft size={14}/> Back to home
-      </Link>
+      <div className="landing-nav-inner">
+        <Link to="/" className="landing-nav-logo" aria-label="PinGuru home">
+          <div className="landing-nav-logo-mark">PG</div>
+          <span className="landing-nav-logo-text">PinGuru</span>
+        </Link>
+        <Link to="/" className="landing-nav-link inline-flex items-center gap-1.5">
+          <ArrowLeft size={14} /> Back to home
+        </Link>
+      </div>
     </nav>
 
-    <div className="legal-page">
-      {/* Header */}
+    <main className="legal-page">
       <div className="legal-header">
         <div className="legal-header-icon">
-          <FileText size={24} className="text-primary"/>
+          <FileText size={24} className="text-primary" />
         </div>
         <div>
           <h1 className="legal-title">Terms of Service</h1>
@@ -32,128 +33,141 @@ const TermsPage: React.FC = () => (
         </div>
       </div>
 
-      {/* Intro */}
       <div className="legal-intro">
-        By creating an account or using PinGuru ("the Service"), you agree to these Terms of Service. Please read them carefully. If you do not agree, do not use the Service.
+        These Terms govern your use of PinGuru, an Instagram DM automation SaaS available at pinguru.me. By creating an account, connecting Instagram, or using the service, you agree to these Terms.
       </div>
 
       <div className="legal-body">
-
         <section className="legal-section">
-          <h2>1. Description of Service</h2>
-          <p>PinGuru provides an Instagram DM automation platform that allows users to create rules that automatically respond to incoming direct messages based on triggers such as keywords, story mentions, and comment activity.</p>
-          <p>The Service is intended for business and professional use on Instagram Business or Creator accounts. Use with personal accounts may not be supported.</p>
+          <h2>1. The service</h2>
+          <p>PinGuru helps businesses and creators configure rules that respond to Instagram direct messages and related Instagram events, subject to Meta's platform capabilities and policies.</p>
+          <p>The service is operated from Bengaluru, Karnataka, India and is intended for professional or business use by users who are at least 18 years old.</p>
         </section>
 
         <section className="legal-section">
-          <h2>2. Eligibility & Account Registration</h2>
+          <h2>2. Account registration</h2>
           <ul>
-            <li>You must be at least 18 years old to use PinGuru.</li>
-            <li>You must have a valid Instagram Business or Creator account.</li>
-            <li>You are responsible for maintaining the security of your account credentials.</li>
-            <li>You must provide accurate information when registering. False information may result in account termination.</li>
-            <li>You may not create more than one account per Instagram account.</li>
+            <li>You must provide accurate account, billing, and business information.</li>
+            <li>You are responsible for your login credentials and all activity under your account.</li>
+            <li>You must have the right to connect and manage each Instagram Business or Creator account you add to PinGuru.</li>
+            <li>You must promptly update account information and notify us of unauthorized access or suspected compromise.</li>
           </ul>
         </section>
 
         <section className="legal-section">
-          <h2>3. Acceptable Use</h2>
-          <p>You agree to use PinGuru only for lawful purposes and in compliance with Meta's Platform Policy and Instagram's Community Guidelines. You must not:</p>
+          <h2>3. Plans, billing, and subscription cycles</h2>
+          <p>PinGuru currently offers a Free plan, Starter at ₹199/month, and Pro at ₹499/month. Paid plans may be billed monthly, quarterly, or yearly where those cycles are available at checkout.</p>
+          <p>Payments are processed through Razorpay in Indian Rupees (INR). Taxes, payment method charges, bank fees, currency conversion fees, or other charges may apply depending on your payment method and location.</p>
+          <p>Subscription access continues until cancellation, non-payment, termination, or plan expiry. If payment fails, we may downgrade, pause, or suspend paid features after reasonable notice where practical.</p>
+        </section>
+
+        <section className="legal-section">
+          <h2>4. Cancellations and refunds</h2>
+          <p>You may cancel a paid subscription from the billing area where available or by contacting support. Cancellation stops future renewals, but access generally continues until the end of the current paid billing period.</p>
+          <p>We offer a 7-day refund for new paid subscriptions if the service has not been substantially used during that period. Subsequent renewals, partial months, add-ons, and substantially used subscriptions are generally non-refundable unless required by law or approved by us.</p>
+          <p>For the full process, see our <Link to="/refund-policy">Refund Policy</Link>.</p>
+        </section>
+
+        <section className="legal-section">
+          <h2>5. Acceptable use</h2>
+          <p>You agree to use PinGuru only for lawful, consent-based, policy-compliant messaging. You must not:</p>
           <ul>
-            <li>Use the Service to send spam, unsolicited messages, or bulk promotional DMs</li>
-            <li>Automate messages that harass, threaten, or abuse other Instagram users</li>
-            <li>Use the Service to violate Meta's 24-hour messaging window rules for promotional content</li>
-            <li>Attempt to circumvent Meta's rate limits or API restrictions</li>
-            <li>Use the Service to collect personal data from Instagram users without their consent</li>
-            <li>Reverse-engineer, scrape, or otherwise misuse the PinGuru API or platform</li>
-            <li>Share your account credentials with third parties or use automated scripts to access your account</li>
+            <li>Send spam, deceptive, abusive, harassing, discriminatory, or illegal messages.</li>
+            <li>Use automation to evade Meta rate limits, messaging windows, consent requirements, review requirements, or account restrictions.</li>
+            <li>Collect, infer, or process personal data from Instagram users without a valid basis and required notices.</li>
+            <li>Transmit malware, phishing content, scams, regulated goods offers, or content that violates Instagram Community Guidelines.</li>
+            <li>Reverse engineer, scrape, overload, probe, or interfere with PinGuru, Meta, Instagram, Razorpay, or connected infrastructure.</li>
+            <li>Share account access in a way that compromises security or impersonates another person or business.</li>
           </ul>
-          <p>Violation of these terms may result in immediate account suspension and reporting to Meta.</p>
+          <p>We may suspend automations or accounts that appear to violate these Terms, law, user safety, or platform policy.</p>
         </section>
 
         <section className="legal-section">
-          <h2>4. Meta Platform Policy</h2>
-          <p>Your use of PinGuru is subject to Meta's Platform Policy and Instagram's Terms of Use. By connecting your Instagram account, you acknowledge that:</p>
+          <h2>6. Meta Platform Policy and Instagram terms</h2>
+          <p>Your use of PinGuru must comply with Meta Platform Terms, Meta Platform Policy, Instagram Terms of Use, Instagram Community Guidelines, and all rules that apply to Instagram messaging automation.</p>
           <ul>
-            <li>Meta may revoke your access token at any time, which will pause your automations</li>
-            <li>Automated messaging is subject to Meta's 24-hour messaging window rules</li>
-            <li>Meta may change API capabilities or access at any time, which may affect Service functionality</li>
-            <li>You are solely responsible for ensuring your use of DM automation complies with applicable laws and Meta's policies in your jurisdiction</li>
+            <li>Meta may change APIs, permissions, messaging windows, rate limits, review status, or access tokens at any time.</li>
+            <li>Meta or Instagram outages, policy changes, review requirements, or enforcement actions may limit or stop PinGuru functionality.</li>
+            <li>You are responsible for the content and compliance of your automated replies, triggers, templates, offers, and business practices.</li>
+            <li>You must honor opt-outs, deletion requests, privacy rights, and applicable messaging laws in your jurisdiction.</li>
           </ul>
         </section>
 
         <section className="legal-section">
-          <h2>5. Plans, Billing & Refunds</h2>
-          <h3>Free Plan</h3>
-          <p>The Free plan is provided at no cost and may be modified or discontinued at any time with reasonable notice.</p>
-          <h3>Paid Plans</h3>
-          <p>Paid subscriptions (Starter at ₹199/mo, Pro at ₹499/mo) are billed via Razorpay. Billing cycles may include monthly, quarterly, or yearly options where enabled. All prices are in Indian Rupees and include applicable taxes.</p>
-          <h3>Refunds</h3>
-          <p>We offer a 7-day refund for new paid subscriptions if you have not used the Service substantially during that period. Contact support@pinguru.me within 7 days of purchase. Subsequent months are non-refundable.</p>
-          <h3>Cancellation</h3>
-          <p>You may cancel your subscription at any time via the Billing portal. You will retain access until the end of your current billing period. No partial refunds are issued for unused days.</p>
-          <h3>Plan Limits</h3>
-          <p>DM sending limits are enforced per calendar month. Unused DMs do not roll over. If you exceed your limit, automations will pause until the next billing cycle or until you upgrade.</p>
+          <h2>7. Your content and data</h2>
+          <p>You retain rights to your automation rules, message templates, brand content, and customer relationship data. You grant PinGuru a limited license to host, process, transmit, display, and use that content only as needed to provide, secure, support, and improve the service.</p>
+          <p>Our data practices are described in the <Link to="/privacy">Privacy Policy</Link> and <Link to="/cookies">Cookie Policy</Link>.</p>
         </section>
 
         <section className="legal-section">
-          <h2>6. Intellectual Property</h2>
-          <p>PinGuru and its original content, features, and functionality are owned by the Company and are protected by copyright, trademark, and other intellectual property laws. You may not copy, modify, distribute, or create derivative works from any part of the Service without written permission.</p>
-          <p>Your automation rules and response templates remain your intellectual property. By creating them, you grant us a limited license to store and execute them as part of providing the Service.</p>
+          <h2>8. PinGuru intellectual property</h2>
+          <p>PinGuru, including our software, interface, workflows, documentation, graphics, trademarks, and service design, is owned by us or our licensors. These Terms do not transfer ownership of PinGuru intellectual property to you.</p>
+          <p>You may not copy, modify, resell, sublicense, or create derivative works from PinGuru except as expressly allowed by us in writing.</p>
         </section>
 
         <section className="legal-section">
-          <h2>7. Disclaimers & Limitation of Liability</h2>
-          <p>THE SERVICE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. WE DO NOT GUARANTEE THAT THE SERVICE WILL BE UNINTERRUPTED, ERROR-FREE, OR THAT AUTOMATION RULES WILL TRIGGER IN ALL CASES.</p>
-          <p>In particular, we are not responsible for:</p>
-          <ul>
-            <li>DMs that fail to send due to Instagram API downtime or policy changes</li>
-            <li>Changes to Meta's API that reduce or eliminate functionality</li>
-            <li>Account actions taken by Meta against your Instagram account</li>
-            <li>Loss of revenue or business opportunities resulting from automation failures</li>
-          </ul>
-          <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW, OUR TOTAL LIABILITY TO YOU FOR ANY CLAIMS ARISING FROM YOUR USE OF THE SERVICE SHALL NOT EXCEED THE AMOUNT YOU PAID US IN THE THREE MONTHS PRECEDING THE CLAIM.</p>
+          <h2>9. Availability and changes</h2>
+          <p>We aim to operate PinGuru reliably, but the service is provided on an "as is" and "as available" basis. Features may depend on Meta, Instagram, Razorpay, hosting providers, and other third-party services.</p>
+          <p>We may add, change, suspend, or discontinue features, plans, limits, or integrations. Where changes materially affect paid subscriptions, we will provide reasonable notice when practical.</p>
         </section>
 
         <section className="legal-section">
-          <h2>8. Indemnification</h2>
-          <p>You agree to indemnify and hold harmless PinGuru and its officers, directors, employees, and agents from any claims, liabilities, damages, or expenses (including legal fees) arising from your use of the Service, your violation of these Terms, or your violation of any third-party rights.</p>
+          <h2>10. Suspension and termination</h2>
+          <p>You may stop using PinGuru at any time. We may suspend or terminate access if you breach these Terms, create risk for users or platforms, fail to pay, violate law or Meta policy, or misuse the service.</p>
+          <p>After termination, we may retain or delete data according to our <Link to="/privacy">Privacy Policy</Link>, legal obligations, security needs, and backup practices.</p>
         </section>
 
         <section className="legal-section">
-          <h2>9. Termination</h2>
-          <p>We may suspend or terminate your account if you violate these Terms, engage in fraudulent activity, or if required by Meta's policies. We will provide reasonable notice except where immediate action is required.</p>
-          <p>You may terminate your account at any time via Settings → Data &amp; Privacy → Delete My Data.</p>
+          <h2>11. Disclaimers</h2>
+          <p>To the maximum extent permitted by law, PinGuru disclaims warranties of merchantability, fitness for a particular purpose, non-infringement, uninterrupted availability, error-free operation, and guaranteed delivery of automated messages.</p>
+          <p>We do not control Meta, Instagram, Razorpay, your internet provider, recipient devices, or user behavior, and we are not responsible for their acts, omissions, outages, policies, or enforcement decisions.</p>
         </section>
 
         <section className="legal-section">
-          <h2>10. Governing Law</h2>
-          <p>These Terms are governed by the laws of India. Any disputes arising from the use of the Service shall be subject to the exclusive jurisdiction of courts in Bengaluru, Karnataka, India.</p>
+          <h2>12. Limitation of liability</h2>
+          <p>To the maximum extent permitted by law, PinGuru will not be liable for indirect, incidental, special, consequential, exemplary, punitive, or lost-profit damages.</p>
+          <p>Our aggregate liability for claims relating to the service will not exceed the amount you paid to PinGuru in the three months before the event giving rise to the claim, or INR 1,000 if you used only the Free plan.</p>
         </section>
 
         <section className="legal-section">
-          <h2>11. Changes to Terms</h2>
-          <p>We may update these Terms from time to time. We will notify you of material changes via email at least 14 days before they take effect. Continued use of the Service after the effective date constitutes acceptance of the updated Terms.</p>
+          <h2>13. Indemnity</h2>
+          <p>You agree to indemnify and hold PinGuru harmless from claims, losses, liabilities, damages, penalties, and expenses arising from your content, automations, business practices, connected Instagram accounts, breach of these Terms, or violation of law or third-party rights.</p>
         </section>
 
         <section className="legal-section">
-          <h2>12. Contact</h2>
-          <p>For questions about these Terms, contact us at <a href="mailto:legal@pinguru.me">legal@pinguru.me</a> or <a href="mailto:support@pinguru.me">support@pinguru.me</a>.</p>
+          <h2>14. Governing law and courts</h2>
+          <p>These Terms are governed by the laws of India. Subject to applicable law, courts located in Bengaluru, Karnataka, India will have exclusive jurisdiction over disputes arising from or relating to these Terms or PinGuru.</p>
+        </section>
+
+        <section className="legal-section">
+          <h2>15. Changes to these Terms</h2>
+          <p>We may update these Terms from time to time. If changes are material, we will provide notice by updating this page and, where appropriate, by email or in-product notice. Continued use after an update means you accept the updated Terms.</p>
+        </section>
+
+        <section className="legal-section">
+          <h2>16. Contact</h2>
+          <p>For legal questions, email <a href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a>. For billing, refunds, or account support, email <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.</p>
         </section>
       </div>
 
-      {/* Footer links */}
       <div className="legal-footer-links">
         <Link to="/privacy" className="text-sm text-primary hover:underline">Privacy Policy</Link>
-        <Link to="/"        className="text-sm text-slate-500 hover:underline">Back to PinGuru</Link>
+        <Link to="/cookies" className="text-sm text-primary hover:underline">Cookie Policy</Link>
+        <Link to="/refund-policy" className="text-sm text-primary hover:underline">Refund Policy</Link>
       </div>
-    </div>
+    </main>
 
     <footer className="landing-footer">
-      <p className="landing-footer-text">© {new Date().getFullYear()} PinGuru. All rights reserved.</p>
-      <div className="landing-footer-links">
-        <Link to="/privacy" className="landing-footer-link">Privacy Policy</Link>
-        <Link to="/terms"   className="landing-footer-link">Terms of Service</Link>
+      <div className="footer-inner">
+        <div className="footer-bottom">
+          <p className="footer-copyright">© {new Date().getFullYear()} PinGuru. All rights reserved.</p>
+          <div className="footer-bottom-links">
+            <Link to="/privacy" className="footer-bottom-link">Privacy</Link>
+            <Link to="/terms" className="footer-bottom-link">Terms</Link>
+            <Link to="/cookies" className="footer-bottom-link">Cookies</Link>
+            <Link to="/refund-policy" className="footer-bottom-link">Refunds</Link>
+          </div>
+        </div>
       </div>
     </footer>
   </div>

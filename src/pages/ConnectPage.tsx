@@ -112,9 +112,9 @@ const ConnectPage: React.FC = () => {
         <div className="connect-v5-orb connect-v5-orb-b" />
 
         <div className="connect-v5-hero-copy">
-          <p className="connect-v5-kicker"><Sparkles size={12} /> Instagram Integration</p>
-          <h1 className="connect-v5-title">Connect Instagram</h1>
-          <p className="connect-v5-subtitle">{heroSubtitle}</p>
+          <p className="connect-v5-kicker pg-surface-kicker"><Sparkles size={12} /> Instagram Integration</p>
+          <h1 className="connect-v5-title pg-surface-title">Connect Instagram</h1>
+          <p className="connect-v5-subtitle pg-surface-subtitle">{heroSubtitle}</p>
 
           <div className="connect-v5-hero-actions">
             {!isConnected ? (

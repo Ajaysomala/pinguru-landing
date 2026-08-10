@@ -6,29 +6,29 @@ import type { User } from '../../lib/types';
 
 interface AppShellProps {
   children: React.ReactNode;
-  user: User | null;  // passed from RequireAuth via AuthContext — no fetch here
+  user: User | null;
 }
 
 export const AppShell: React.FC<AppShellProps> = ({ children, user }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-canvas">
-      {/* Desktop sidebar */}
+    <div className="pg-app-shell">
       <div className="hidden lg:block">
         <Sidebar user={user} />
       </div>
 
-      {/* Mobile drawer */}
       <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} user={user} />
 
-      {/* Main content */}
-      <main className="flex-1 flex flex-col lg:ml-[240px] min-w-0">
-        {/* Mobile top bar */}
-        <TopBar onMenuClick={() => setDrawerOpen(true)} />
+      <main className="pg-app-main">
+        <div className="lg:hidden">
+          <TopBar onMenuClick={() => setDrawerOpen(true)} />
+        </div>
+        <div className="hidden lg:block">
+          <TopBar onMenuClick={() => setDrawerOpen(true)} desktop />
+        </div>
 
-        {/* Page content */}
-        <div className="flex-1 p-5 md:p-8 animate-[fadeIn_0.2s_ease-out]">
+        <div className="pg-app-content animate-[fadeIn_0.2s_ease-out]">
           {children}
         </div>
       </main>
