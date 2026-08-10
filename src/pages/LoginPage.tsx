@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, AlertCircle, Lock, Mail, KeyRound, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, Lock, Mail, KeyRound, ArrowRight, MessageCircle, BarChart3, Target } from 'lucide-react';
 import { loginUser } from '../lib/api';
 import { recordLoginAttempt, isLockedOut, resetLoginAttempts, formatLockoutTime } from '../lib/utils';
 import { useAuth } from '../App';
@@ -61,29 +61,17 @@ const LoginPage: React.FC = () => {
   return (
     <div className="auth-screen auth-screen-split">
       <section className="auth-showcase">
-        <div className="auth-showcase-video-layer" aria-hidden="true">
-          <video
-            className="auth-showcase-video"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-          >
-            <source src="/auth-showcase.mp4" type="video/mp4" />
-          </video>
-        </div>
         <div className="auth-showcase-orb auth-showcase-orb-a" />
         <div className="auth-showcase-orb auth-showcase-orb-b" />
         <div className="auth-showcase-inner">
           <div className="auth-showcase-brand-mark">PG</div>
           <h2 className="auth-showcase-brand">PinGuru</h2>
-          <p className="auth-showcase-copy">Turn every comment &amp; DM into a conversion. Automate your Instagram on autopilot.</p>
+          <p className="auth-showcase-copy">Premium Instagram automation for teams that convert every comment and DM into revenue.</p>
 
           <div className="auth-feature-stack">
-            <div className="auth-feature-item"><span>⚡</span><p>Auto-reply to DMs &amp; comments instantly</p></div>
-            <div className="auth-feature-item"><span>📊</span><p>Analytics dashboard to track performance</p></div>
-            <div className="auth-feature-item"><span>🎯</span><p>Smart keyword matching with Hinglish support</p></div>
+            <div className="auth-feature-item"><span><MessageCircle size={18} /></span><p>Instant replies for high-intent DMs and comments</p></div>
+            <div className="auth-feature-item"><span><BarChart3 size={18} /></span><p>Conversion analytics for every automation flow</p></div>
+            <div className="auth-feature-item"><span><Target size={18} /></span><p>Smart keyword matching with Hinglish support</p></div>
           </div>
         </div>
       </section>
@@ -95,16 +83,8 @@ const LoginPage: React.FC = () => {
             <span>PinGuru</span>
           </Link>
 
-          <h1 className="auth-panel-title">Welcome back 👋</h1>
-          <p className="auth-panel-subtitle">Sign in to your account to continue</p>
-
-          <button type="button" className="auth-google-btn">Continue with Google</button>
-
-          <div className="auth-divider-row">
-            <div className="line" />
-            <span>or sign in with email</span>
-            <div className="line" />
-          </div>
+          <h1 className="auth-panel-title">Welcome back</h1>
+          <p className="auth-panel-subtitle">Sign in to manage automations, replies, and campaign performance.</p>
 
           {lockoutMsg && (
             <div className="auth-alert error" style={{ marginBottom: 12 }}>
