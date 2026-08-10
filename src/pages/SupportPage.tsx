@@ -133,7 +133,7 @@ const SupportPage: React.FC = () => {
             action: (
               <div style={{ display:'flex',flexDirection:'column',gap:6,marginTop:12 }}>
                 <Link to="/privacy" style={{ display:'inline-flex',alignItems:'center',gap:5,fontSize:'0.8125rem',fontWeight:600,color:'var(--color-primary)',textDecoration:'none' }}>Privacy Policy <ArrowRight size={12}/></Link>
-                <Link to="/refund" style={{ display:'inline-flex',alignItems:'center',gap:5,fontSize:'0.8125rem',fontWeight:600,color:'var(--color-primary)',textDecoration:'none' }}>Refund Policy <ArrowRight size={12}/></Link>
+                <Link to="/refund-policy" style={{ display:'inline-flex',alignItems:'center',gap:5,fontSize:'0.8125rem',fontWeight:600,color:'var(--color-primary)',textDecoration:'none' }}>Refund Policy <ArrowRight size={12}/></Link>
               </div>
             ),
           },

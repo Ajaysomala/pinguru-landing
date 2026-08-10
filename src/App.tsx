@@ -152,6 +152,8 @@ const SettingsProfileEditPage = lazyWithRetry(() => import('./pages/SettingsProf
 const RefundPage     = lazyWithRetry(() => import('./pages/RefundPage'));
 const PrivacyPage    = lazyWithRetry(() => import('./pages/PrivacyPage'));
 const TermsPage      = lazyWithRetry(() => import('./pages/TermsPage'));
+const CookiePolicyPage = lazyWithRetry(() => import('./pages/CookiePolicyPage'));
+const RefundPolicyPage = lazyWithRetry(() => import('./pages/RefundPolicyPage'));
 const SupportPage    = lazyWithRetry(() => import('./pages/SupportPage'));
 
 const Page: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -179,6 +181,8 @@ const App: React.FC = () => (
         <Route path="/forgot-password" element={<Page><ForgotPasswordPage /></Page>} />
         <Route path="/privacy"  element={<Page><PrivacyPage /></Page>} />
         <Route path="/terms"    element={<Page><TermsPage /></Page>} />
+        <Route path="/cookies"  element={<Page><CookiePolicyPage /></Page>} />
+        <Route path="/refund-policy" element={<Page><RefundPolicyPage /></Page>} />
         <Route path="/support"  element={<Page><SupportPage /></Page>} />
         <Route path="/blog"     element={<Page><BlogPage /></Page>} />
         <Route path="/blog/:slug" element={<Page><BlogPage /></Page>} />

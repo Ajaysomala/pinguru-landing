@@ -702,7 +702,8 @@ const LandingPage: React.FC = () => {
               <div className="footer-col-links">
                 <Link to="/privacy" className="footer-col-link">Privacy Policy</Link>
                 <Link to="/terms"   className="footer-col-link">Terms of Service</Link>
-                <Link to="/refund"  className="footer-col-link">Refund Policy</Link>
+                <Link to="/cookies" className="footer-col-link">Cookie Policy</Link>
+                <Link to="/refund-policy" className="footer-col-link">Refund Policy</Link>
               </div>
 
               {/* Newsletter */}
