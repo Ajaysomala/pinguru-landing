@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { MobileDrawer } from './MobileDrawer';
 import { TopBar } from './TopBar';
@@ -11,6 +11,28 @@ interface AppShellProps {
 
 export const AppShell: React.FC<AppShellProps> = ({ children, user }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const lastFocusedRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!drawerOpen) return;
+
+    lastFocusedRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setDrawerOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+      lastFocusedRef.current?.focus();
+    };
+  }, [drawerOpen]);
 
   return (
     <div className="pg-app-shell">

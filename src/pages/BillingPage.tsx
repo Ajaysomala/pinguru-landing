@@ -28,8 +28,8 @@ type BillingCycle = 'monthly' | 'quarterly' | 'yearly';
 
 const BILLING_CYCLE_META: Record<BillingCycle, { label: string; multiplier: number; discount: number; periodLabel: string; billedEvery: string }> = {
   monthly: { label: 'Monthly', multiplier: 1, discount: 0, periodLabel: '/mo', billedEvery: 'billed monthly' },
-  quarterly: { label: 'Quarterly', multiplier: 3, discount: 0, periodLabel: '/qtr', billedEvery: 'billed every 3 months' },
-  yearly: { label: 'Yearly', multiplier: 12, discount: 0, periodLabel: '/yr', billedEvery: 'billed annually' },
+  quarterly: { label: 'Quarterly', multiplier: 3, discount: 0.08, periodLabel: '/qtr', billedEvery: 'billed every 3 months' },
+  yearly: { label: 'Yearly', multiplier: 12, discount: 0.15, periodLabel: '/yr', billedEvery: 'billed annually' },
 };
 
 const PLANS: PlanDef[] = [
@@ -201,8 +201,6 @@ const BillingPage: React.FC = () => {
   const shouldPoll = !isPollingSuppressed && (hasProcessingParam || Boolean(planStatus?.is_checkout_pending));
 
   useEffect(() => {
-    if (!planStatus) return;
-
     if (!shouldPoll) return;
 
     let active = true;
@@ -284,37 +282,46 @@ const BillingPage: React.FC = () => {
     try {
       const session = await createPlanCheckout(plan.id, billingCycle);
 
-      if (session.subscription_id && session.key_id && (window as any).Razorpay) {
-        const rzp = new (window as any).Razorpay({
-          key: session.key_id,
-          subscription_id: session.subscription_id,
-          name: 'PinGuru',
-          description: `${plan.name} Plan (${billingCycle})`,
-          prefill: { email: session.prefill_email },
-          theme: { color: '#7C3AED' },
-          handler: () => {
-            setBanner({ kind: 'processing', message: 'Payment received. Activating your plan...' });
-            navigate('/billing?payment=processing&provider=razorpay', { replace: true });
-          },
-          modal: {
-            ondismiss: () => {
-              setError('Payment was cancelled. You can try again anytime.');
-              void syncStatusAfterReturn();
+      if (session.subscription_id && session.key_id && typeof window !== 'undefined') {
+        const razorpayCtor = (window as Window & { Razorpay?: new (options: Record<string, unknown>) => { open: () => void; on: (event: string, callback: (response: Record<string, unknown>) => void) => void } }).Razorpay;
+        if (razorpayCtor) {
+          const rzp = new razorpayCtor({
+            key: session.key_id,
+            subscription_id: session.subscription_id,
+            name: 'PinGuru',
+            description: `${plan.name} Plan (${billingCycle})`,
+            prefill: { email: session.prefill_email },
+            theme: { color: '#7C3AED' },
+            handler: () => {
+              setBanner({ kind: 'processing', message: 'Payment received. Activating your plan...' });
+              navigate('/billing?payment=processing&provider=razorpay', { replace: true });
             },
-          },
-        });
+            modal: {
+              ondismiss: () => {
+                setError('Payment was cancelled. You can try again anytime.');
+                void syncStatusAfterReturn();
+              },
+            },
+          });
 
-        rzp.on('payment.failed', (response: any) => {
-          setError(`Payment failed: ${response?.error?.description || 'Please try again.'}`);
-        });
+          rzp.on('payment.failed', (response: Record<string, unknown>) => {
+            const description = typeof response?.error === 'object' && response.error && 'description' in response.error ? String((response.error as { description?: string }).description) : '';
+            setError(`Payment failed: ${description || 'Please try again.'}`);
+          });
 
-        rzp.open();
+          rzp.open();
+          return;
+        }
+      }
+
+      if (!session.checkout_url) {
+        setError('Payment session is missing a checkout URL. Please try again.');
         return;
       }
 
       window.location.href = session.checkout_url;
-    } catch (err: any) {
-      setError(getCheckoutErrorMessage(err?.status, sanitizeApiError(err)));
+    } catch (err: unknown) {
+      setError(getCheckoutErrorMessage((err as { status?: number })?.status, sanitizeApiError(err)));
     } finally {
       setUpgrading(null);
     }

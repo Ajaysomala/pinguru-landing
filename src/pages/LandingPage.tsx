@@ -311,6 +311,9 @@ const PLANS = [
 // ── LandingPage ─────────────────────────────────────────────────────────────
 const LandingPage: React.FC = () => {
   const revealRefs = useRef<(HTMLElement | null)[]>([]);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterState, setNewsletterState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [newsletterMessage, setNewsletterMessage] = useState('');
 
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -327,6 +330,30 @@ const LandingPage: React.FC = () => {
   }, []);
 
   const reveal = (i: number) => (el: HTMLElement | null) => { revealRefs.current[i] = el; };
+
+  const handleNewsletterSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const email = newsletterEmail.trim();
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setNewsletterState('error');
+      setNewsletterMessage('Please enter a valid email address.');
+      return;
+    }
+
+    setNewsletterState('loading');
+    setNewsletterMessage('');
+
+    try {
+      await new Promise((resolve) => window.setTimeout(resolve, 900));
+      setNewsletterState('success');
+      setNewsletterMessage('Thanks! You are on the list for product updates.');
+      setNewsletterEmail('');
+    } catch {
+      setNewsletterState('error');
+      setNewsletterMessage('Something went wrong. Please try again.');
+    }
+  };
 
   return (
     <div className="landing-page">
@@ -706,18 +733,30 @@ const LandingPage: React.FC = () => {
               </div>
 
               {/* Newsletter */}
-              <div className="footer-newsletter" style={{ marginTop: 28 }}>
+              <form className="footer-newsletter" style={{ marginTop: 28 }} onSubmit={handleNewsletterSubmit} noValidate>
                 <div className="footer-newsletter-title">Stay in the loop</div>
                 <div className="footer-newsletter-desc">Tips, product updates, and more.</div>
                 <div className="footer-newsletter-form">
                   <input
                     type="email"
                     className="footer-newsletter-input"
+                    value={newsletterEmail}
+                    onChange={(event) => setNewsletterEmail(event.target.value)}
                     placeholder="you@email.com"
+                    aria-label="Email address for product updates"
+                    autoComplete="email"
+                    disabled={newsletterState === 'loading'}
                   />
-                  <button className="footer-newsletter-btn">→</button>
+                  <button type="submit" className="footer-newsletter-btn" disabled={newsletterState === 'loading'} aria-label="Subscribe to updates">
+                    {newsletterState === 'loading' ? '…' : '→'}
+                  </button>
                 </div>
-              </div>
+                {newsletterMessage && (
+                  <p className={`footer-newsletter-status ${newsletterState}`} role="status" aria-live="polite">
+                    {newsletterMessage}
+                  </p>
+                )}
+              </form>
             </div>
           </div>
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Zap, Camera, BarChart2, CreditCard, Settings, LogOut, X, LifeBuoy, Users } from 'lucide-react';
 import { logout } from '../../lib/api';
@@ -25,31 +25,38 @@ const navItems = [
 
 export const MobileDrawer: React.FC<MobileDrawerProps> = ({ open, onClose, user }) => {
   const displayName = getDisplayName(user);
-  const initial     = getInitial(displayName);
-  const plan        = toTitleCase(user?.plan || 'free');
+  const initial = getInitial(displayName);
+  const plan = toTitleCase(user?.plan || 'free');
+  const firstLinkRef = useRef<HTMLAnchorElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const timeout = window.setTimeout(() => firstLinkRef.current?.focus(), 60);
+    return () => window.clearTimeout(timeout);
+  }, [open]);
 
   return (
     <>
-      {/* Overlay */}
-      {open && (
-        <div
-          className="drawer-overlay open"
-          onClick={onClose}
-        />
-      )}
-      {/* Drawer */}
-      <aside className={`sidebar-mobile ${open ? 'open' : ''}`}>
+      {open && <div className="drawer-overlay open" onClick={onClose} aria-hidden="true" />}
+      <aside
+        className={`sidebar-mobile ${open ? 'open' : ''}`}
+        aria-label="Mobile navigation"
+        aria-hidden={!open}
+        role="dialog"
+        aria-modal="true"
+      >
         <div className="sidebar-mobile-head">
           <BrandLogo to="/dashboard" size="md" onDark onClick={onClose} />
-          <button onClick={onClose} className="sidebar-mobile-close" aria-label="Close navigation">
+          <button type="button" onClick={onClose} className="sidebar-mobile-close" aria-label="Close navigation">
             <X size={18} />
           </button>
         </div>
 
-        <nav className="sidebar-nav">
-          {navItems.map(({ label, href, icon: Icon }) => (
+        <nav className="sidebar-nav" aria-label="Main navigation">
+          {navItems.map(({ label, href, icon: Icon }, index) => (
             <NavLink
               key={href}
+              ref={index === 0 ? firstLinkRef : undefined}
               to={href}
               onClick={onClose}
               className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}
@@ -68,10 +75,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ open, onClose, user 
               <p className="sidebar-user-plan">{plan}</p>
             </div>
           </div>
-          <button
-            onClick={logout}
-            className="sidebar-nav-item"
-          >
+          <button type="button" onClick={logout} className="sidebar-nav-item" aria-label="Sign out">
             <LogOut size={16} />
             Sign out
           </button>

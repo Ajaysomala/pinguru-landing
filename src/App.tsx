@@ -77,7 +77,7 @@ class AppErrorBoundary extends React.Component<{ children: React.ReactNode }, { 
   }
 }
 
-function lazyWithRetry<T extends React.ComponentType<any>>(
+function lazyWithRetry<T extends React.ComponentType<Record<string, unknown>>>(
   importer: () => Promise<{ default: T }>,
 ) {
   return React.lazy(async () => {

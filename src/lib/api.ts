@@ -399,6 +399,15 @@ export async function getPlanStatus(): Promise<PlanStatus> {
   return data as PlanStatus;
 }
 
+type CheckoutSession = {
+  subscription_id?: string;
+  checkout_url?: string;
+  key_id?: string;
+  prefill_email?: string;
+  plan?: string;
+  billing_cycle?: string;
+};
+
 export async function createPlanCheckout(
   plan: 'starter' | 'pro',
   billingCycle: 'monthly' | 'quarterly' | 'yearly' = 'monthly',
@@ -415,10 +424,10 @@ export async function createPlanCheckout(
     body: JSON.stringify({ plan, billing_cycle: billingCycle }),
   });
 
-  let data: any = null;
+  let data: CheckoutSession | null = null;
   const contentType = res.headers.get('content-type') || '';
   if (contentType.includes('application/json')) {
-    data = await res.json();
+    data = await res.json() as CheckoutSession;
   } else {
     const text = await res.text();
     if (!res.ok) {
@@ -434,13 +443,13 @@ export async function createPlanCheckout(
     throw new Error('Payment session returned invalid data. Please try again.');
   }
 
-  return data as {
-    subscription_id: string;
-    checkout_url: string;
-    key_id: string;
-    prefill_email: string;
-    plan: string;
-    billing_cycle: string;
+  return {
+    subscription_id: data?.subscription_id ?? '',
+    checkout_url: data?.checkout_url ?? '',
+    key_id: data?.key_id ?? '',
+    prefill_email: data?.prefill_email ?? '',
+    plan: data?.plan ?? plan,
+    billing_cycle: data?.billing_cycle ?? billingCycle,
   };
 }
 
