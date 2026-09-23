@@ -142,6 +142,8 @@ export async function loginUser(email: string, password: string) {
   return data;
 }
 
+export const login = loginUser;
+
 export async function registerUser(
   email: string,
   password: string,
@@ -156,6 +158,8 @@ export async function registerUser(
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'Registration failed');
 }
+
+export const register = registerUser;
 
 export async function verifyEmailOtp(email: string, otp: string) {
   const res = await authFetch('/auth/verify-email', { method: 'POST', body: JSON.stringify({ email, otp }) });
@@ -267,6 +271,8 @@ export async function getDashboardStats(): Promise<DashboardStats | null> {
     busiest_weekday: typeof data.busiest_weekday === 'string' ? data.busiest_weekday : null,
   };
 }
+
+export const getStats = getDashboardStats;
 
 export async function getRules(): Promise<{ rules: Rule[] }> {
   const res = await authFetch('/automation/rules');
@@ -512,6 +518,8 @@ export async function getInstagramAuthUrl(): Promise<string> {
   }
   return data.auth_url as string;
 }
+
+export const getInstagramConnectUrl = getInstagramAuthUrl;
 
 export async function refreshInstagramToken(): Promise<{ refreshed: boolean; expires_at: string; message: string }> {
   const res = await authFetch('/auth/instagram/refresh-token', { method: 'POST' });

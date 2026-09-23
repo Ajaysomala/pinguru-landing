@@ -21,12 +21,123 @@
 @tailwind utilities;
 
 @layer utilities {
-  .font-display { font-family: 'Sora', system-ui, sans-serif; }
+  .font-display { font-family: 'Plus Jakarta Sans', 'Sora', system-ui, sans-serif; }
   .font-mono    { font-family: 'JetBrains Mono', monospace; }
-  .bg-canvas    { background-color: #F8F7FF; }
-  .bg-sidebar   { background-color: #0D0B1E; }
-  .bg-primary   { background-color: #7C3AED; }
-  .text-primary { color: #7C3AED; }
+  .bg-canvas    { background-color: #020617; }
+  .bg-sidebar   { background-color: #020617; }
+  .bg-primary   { background-color: #6366F1; }
+  .text-primary { color: #818CF8; }
   .bg-success   { background-color: #10B981; }
   .bg-danger    { background-color: #F43F5E; }
 }
+
+/* 3D Transform Utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.perspective-2000 {
+  perspective: 2000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.translate-z-10 {
+  transform: translateZ(10px);
+}
+
+.translate-z-20 {
+  transform: translateZ(20px);
+}
+
+.translate-z-30 {
+  transform: translateZ(30px);
+}
+
+/* Ambient 3D floating animation */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+@keyframes floatGentle {
+  0%, 100% {
+    transform: translateY(0px) translateZ(20px);
+  }
+  50% {
+    transform: translateY(-5px) translateZ(30px);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes shimmerMesh {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-float-slow {
+  animation: floatSlow 6s ease-in-out infinite;
+}
+
+.animate-float-gentle {
+  animation: floatGentle 4s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 5s ease-in-out infinite;
+}
+
+.animate-shimmer-mesh {
+  background-size: 200% 200%;
+  animation: shimmerMesh 8s ease infinite;
+}
+
+/* Glassmorphism gradient surface */
+.glass-card {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card-interactive {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-interactive:hover {
+  border-color: rgba(168, 85, 247, 0.35);
+  box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.25);
+  transform: translateY(-2px);
+}
+

@@ -1,474 +1,353 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import {
-  Plus, Search, Zap, MessageSquare, Camera, Inbox, Sparkles,
-  ToggleLeft, ToggleRight, PencilLine, Trash2, Copy, Play,
-  PauseCircle, Activity, Gauge, ArrowRight, X,
+import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { 
+  Zap, 
+  Plus, 
+  Search, 
+  MessageSquare, 
+  AtSign, 
+  Instagram, 
+  Sparkles, 
+  Edit3, 
+  Trash2, 
+  CheckCircle2, 
+  AlertCircle,
+  RefreshCw,
+  Clock
 } from 'lucide-react';
-import { deleteRule, getInstagramStatus, getRules, toggleRule } from '../lib/api';
-import type { Rule, InstagramStatus, TriggerType } from '../lib/types';
-import { TRIGGER_LABELS } from '../lib/types';
-import { RuleBuilderModal, type RuleSeed } from '../components/rules/RuleBuilderModal';
-import { useAuth } from '../App';
-import '../styles/dashboard.css';
-import '../styles/rules.css';
+import { getRules, deleteRule, toggleRule } from '../lib/api';
+import type { Rule } from '../lib/types';
+import { Card3D } from '../components/ui/Card3D';
+import { RuleBuilderModal } from '../components/rules/RuleBuilderModal';
+import { useToast } from '../context/ToastContext';
 
-const TEMPLATES: Array<{
-  id: string;
-  title: string;
-  blurb: string;
-  icon: React.ReactNode;
-  seed: RuleSeed;
-}> = [
-  {
-    id: 'price',
-    title: 'Price inquiry',
-    blurb: 'Auto-reply when someone asks about pricing',
-    icon: <Zap size={16} />,
-    seed: {
-      name: 'Price inquiry',
-      trigger_type: 'keyword',
-      keywords: ['price', 'pricing', 'cost', 'kitna'],
-      response_template: 'Hi {{name}}! Thanks for asking about pricing. Our plans start at ₹199/mo — want me to share the full breakdown?',
-    },
-  },
-  {
-    id: 'link',
-    title: 'Send link',
-    blurb: 'DM your link when they comment LINK',
-    icon: <MessageSquare size={16} />,
-    seed: {
-      name: 'Comment → send link',
-      trigger_type: 'comment',
-      keywords: ['link', 'url'],
-      any_comment_keyword: false,
-      comment_target_type: 'any',
-      response_template: 'Hey {{username}}! Here is the link you asked for 🔗 https://pinguru.me',
-    },
-  },
-  {
-    id: 'story',
-    title: 'Story thank-you',
-    blurb: 'Warm follow-up after a story reply',
-    icon: <Camera size={16} />,
-    seed: {
-      name: 'Story reply thank-you',
-      trigger_type: 'story_mention',
-      keywords: [],
-      response_template: 'Thanks for the story love, {{name}}! Want early access to our next drop?',
-    },
-  },
-  {
-    id: 'welcome',
-    title: 'Welcome DM',
-    blurb: 'Instant first response on every new DM',
-    icon: <Inbox size={16} />,
-    seed: {
-      name: 'Welcome new DMs',
-      trigger_type: 'new_dm',
-      keywords: [],
-      response_template: 'Hey {{name}}! Thanks for messaging us. Tell us what you need — pricing, support, or a demo — and we will help right away.',
-    },
-  },
-];
+export const RulesPage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { showToast } = useToast();
 
-const RulesPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
   const [rules, setRules] = useState<Rule[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [togglingId, setTogglingId] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
-  const [igStatus, setIgStatus] = useState<InstagramStatus | null>(null);
-  const [connectHint, setConnectHint] = useState('');
-  const [editingRule, setEditingRule] = useState<Rule | null>(null);
-  const [seed, setSeed] = useState<RuleSeed | null>(null);
-  const [search, setSearch] = useState('');
-  const [triggerFilter, setTriggerFilter] = useState<'all' | TriggerType>('all');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'paused'>('all');
-  const [sortBy, setSortBy] = useState<'newest' | 'dms' | 'name'>('newest');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    getRules().then((r) => setRules(r?.rules ?? [])).finally(() => setLoading(false));
-    getInstagramStatus().then((s) => setIgStatus(s));
+  const [searchQuery, setSearchQuery] = useState('');
+  const [triggerFilter, setTriggerFilter] = useState<'all' | string>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'paused'>('all');
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingRule, setEditingRule] = useState<Rule | null>(null);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+
+  const fetchRules = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await getRules();
+      setRules(Array.isArray(res?.rules) ? res.rules : []);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load automation rules');
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const plan = (user?.plan ?? 'free').toLowerCase();
-  const planLimit = plan === 'free' ? 5 : plan === 'starter' ? 15 : null;
-  const activeCount = rules.filter((r) => r.is_active).length;
-  const pausedCount = rules.length - activeCount;
-  const totalDms = rules.reduce((sum, r) => sum + (r.dm_count ?? 0), 0);
-  const usagePct = planLimit ? Math.min(100, Math.round((rules.length / planLimit) * 100)) : 0;
+  useEffect(() => {
+    fetchRules();
+  }, [fetchRules]);
 
-  const filteredRules = useMemo(() => {
-    const list = rules.filter((rule) => {
-      const q = search.trim().toLowerCase();
-      const matchesSearch = !q
-        || rule.name.toLowerCase().includes(q)
-        || rule.keywords.some((k) => k.toLowerCase().includes(q))
-        || rule.response_template.toLowerCase().includes(q);
-      const matchesTrigger = triggerFilter === 'all' || rule.trigger_type === triggerFilter;
-      const matchesStatus = statusFilter === 'all'
-        || (statusFilter === 'active' ? rule.is_active : !rule.is_active);
-      return matchesSearch && matchesTrigger && matchesStatus;
-    });
-
-    return [...list].sort((a, b) => {
-      if (sortBy === 'dms') return (b.dm_count ?? 0) - (a.dm_count ?? 0);
-      if (sortBy === 'name') return a.name.localeCompare(b.name);
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    });
-  }, [rules, search, triggerFilter, statusFilter, sortBy]);
-
-  const ensureConnected = () => {
-    if (!igStatus?.connected) {
-      setConnectHint('Connect Instagram first to create automation rules.');
-      navigate('/connect');
-      return false;
+  useEffect(() => {
+    if (searchParams.get('create') === '1') {
+      setEditingRule(null);
+      setIsModalOpen(true);
+      setSearchParams({}, { replace: true });
     }
-    setConnectHint('');
-    return true;
+  }, [searchParams, setSearchParams]);
+
+  const handleToggle = async (ruleId: string) => {
+    setActionLoadingId(ruleId);
+    try {
+      const res = await toggleRule(ruleId);
+      setRules((prev) =>
+        prev.map((r) => (r.id === ruleId ? { ...r, is_active: res.is_active } : r))
+      );
+      showToast(`Rule is now ${res.is_active ? 'Active' : 'Paused'}.`);
+    } catch {
+      showToast('Failed to toggle rule state.');
+    } finally {
+      setActionLoadingId(null);
+    }
   };
 
-  const openBuilder = () => {
-    if (!ensureConnected()) return;
-    setEditingRule(null);
-    setSeed(null);
-    setShowModal(true);
-  };
-
-  const openTemplate = (templateSeed: RuleSeed) => {
-    if (!ensureConnected()) return;
-    if (planLimit && rules.length >= planLimit) {
-      setConnectHint(`Plan limit reached (${planLimit} rules). Upgrade to add more.`);
+  const handleDelete = async (ruleId: string, ruleName: string) => {
+    if (!window.confirm(`Are you sure you want to delete the automation "${ruleName}"?`)) {
       return;
     }
-    setEditingRule(null);
-    setSeed(templateSeed);
-    setShowModal(true);
-  };
-
-  const openEditor = (rule: Rule) => {
-    setSeed(null);
-    setEditingRule(rule);
-    setShowModal(true);
-  };
-
-  const handleToggle = async (rule: Rule) => {
-    setTogglingId(rule.id);
-    try {
-      const updated = await toggleRule(rule.id);
-      setRules((prev) => prev.map((r) => (r.id === rule.id ? { ...r, is_active: updated.is_active } : r)));
-    } catch {
-      /* silent */
-    } finally {
-      setTogglingId(null);
-    }
-  };
-
-  const handleDelete = async (ruleId: string) => {
-    setDeletingId(ruleId);
+    setActionLoadingId(ruleId);
     try {
       await deleteRule(ruleId);
       setRules((prev) => prev.filter((r) => r.id !== ruleId));
-      setConfirmDeleteId(null);
+      showToast(`Rule "${ruleName}" deleted successfully.`);
     } catch {
-      /* silent */
+      showToast('Failed to delete rule.');
     } finally {
-      setDeletingId(null);
+      setActionLoadingId(null);
     }
   };
 
-  const handleDuplicate = (rule: Rule) => {
-    if (!ensureConnected()) return;
-    if (planLimit && rules.length >= planLimit) {
-      setConnectHint(`Plan limit reached (${planLimit} rules). Upgrade to duplicate.`);
-      return;
-    }
-    setEditingRule(null);
-    setSeed({
-      name: `${rule.name} (copy)`,
-      trigger_type: rule.trigger_type,
-      keywords: [...rule.keywords],
-      response_template: rule.response_template,
-      comment_target_type: rule.comment_target_type,
-      comment_media_filter: rule.comment_media_filter,
-      comment_media_id: rule.comment_media_id,
-      any_comment_keyword: rule.any_comment_keyword,
-      public_comment_reply_enabled: rule.public_comment_reply_enabled,
-      public_comment_reply_template: rule.public_comment_reply_template,
-      ask_follow_before_dm: rule.ask_follow_before_dm,
-      dm_attachment_url: rule.dm_attachment_url,
-    });
-    setShowModal(true);
+  const handleEditClick = (rule: Rule) => {
+    setEditingRule(rule);
+    setIsModalOpen(true);
   };
 
-  const triggerIcon = (trigger: Rule['trigger_type']) => {
-    if (trigger === 'comment') return <MessageSquare size={18} />;
-    if (trigger === 'story_mention') return <Camera size={18} />;
-    if (trigger === 'new_dm') return <Inbox size={18} />;
-    return <Zap size={18} />;
+  const filteredRules = rules.filter((rule) => {
+    const query = searchQuery.toLowerCase();
+    const matchesSearch =
+      rule.name.toLowerCase().includes(query) ||
+      (rule.keywords || []).some((k) => k.toLowerCase().includes(query)) ||
+      (rule.response_template || '').toLowerCase().includes(query);
+
+    const matchesTrigger = triggerFilter === 'all' || rule.trigger_type === triggerFilter;
+    const matchesStatus =
+      statusFilter === 'all' ||
+      (statusFilter === 'active' && rule.is_active) ||
+      (statusFilter === 'paused' && !rule.is_active);
+
+    return matchesSearch && matchesTrigger && matchesStatus;
+  });
+
+  const getTriggerIcon = (type: string) => {
+    switch (type) {
+      case 'comment':
+      case 'post_comment':
+        return <AtSign className="w-4 h-4 text-purple-400" />;
+      case 'story_mention':
+        return <Instagram className="w-4 h-4 text-pink-400" />;
+      case 'new_dm':
+        return <Sparkles className="w-4 h-4 text-amber-400" />;
+      default:
+        return <MessageSquare className="w-4 h-4 text-indigo-400" />;
+    }
   };
 
   return (
-    <div className="page-wrapper rules-studio-page">
-      <section className="pg-surface-hero rules-studio-hero">
-        <div className="rules-studio-hero-copy">
-          <p className="pg-surface-kicker"><Sparkles size={12} /> Automation Studio</p>
-          <h1 className="pg-surface-title">Design flows that convert every DM</h1>
-          <p className="pg-surface-subtitle">
-            Build trigger → condition → reply automations with live templates, health stats, and mobile-first controls.
-          </p>
-          <div className="rules-studio-hero-actions">
-            <button type="button" onClick={openBuilder} className="rules-studio-primary-btn">
-              <Plus size={15} /> New rule
-            </button>
-            <Link to="/connect" className="rules-studio-ghost-btn">
-              {igStatus?.connected ? 'Instagram connected' : 'Connect Instagram'}
-            </Link>
-          </div>
-        </div>
-
-        <div className="rules-studio-capacity">
-          <div className="rules-studio-capacity-ring" style={{ ['--pct' as string]: `${planLimit ? usagePct : 100}` }}>
-            <div className="rules-studio-capacity-inner">
-              <strong>{rules.length}</strong>
-              <span>{planLimit ? `/ ${planLimit}` : 'unlimited'}</span>
+    <div className="space-y-5 sm:space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2.5">
+            <div className="p-2 rounded-2xl bg-gradient-to-tr from-indigo-500/20 via-purple-500/20 to-pink-500/20 text-purple-300 border border-purple-500/30">
+              <Zap className="w-5 h-5 text-purple-400" />
             </div>
+            <span>Automations Studio</span>
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            Trigger custom auto-responses, lead magnets, and story mention rewards on Instagram.
+          </p>
+        </div>
+
+        <button
+          onClick={() => {
+            setEditingRule(null);
+            setIsModalOpen(true);
+          }}
+          className="min-h-[44px] px-5 py-2.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-purple-600/25 transition-all active:scale-95 flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+        >
+          <Plus className="w-4 h-4 stroke-[2.5]" />
+          <span>Create New Automation</span>
+        </button>
+      </div>
+
+      {/* Filter & Search Bar */}
+      <div className="bg-slate-900/90 border border-white/[0.08] rounded-3xl p-3 sm:p-4 space-y-3 shadow-lg">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+          {/* Search Input */}
+          <div className="relative w-full sm:w-80">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by name, keyword, or response..."
+              className="w-full bg-slate-950 border border-white/[0.08] rounded-2xl pl-10 pr-4 py-2 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-purple-500 min-h-[40px]"
+            />
           </div>
-          <div>
-            <p className="rules-studio-capacity-label">Plan capacity</p>
-            <p className="rules-studio-capacity-plan">{plan} plan</p>
-            <p className="rules-studio-capacity-meta">{activeCount} live · {pausedCount} paused</p>
+
+          {/* Trigger Filter Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto no-scrollbar py-0.5">
+            {[
+              { id: 'all', label: 'All Triggers' },
+              { id: 'keyword', label: 'Keyword DM' },
+              { id: 'comment', label: 'Comments' },
+              { id: 'story_mention', label: 'Story Mention' },
+            ].map((f) => (
+              <button
+                key={f.id}
+                onClick={() => setTriggerFilter(f.id)}
+                className={`min-h-[36px] px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                  triggerFilter === f.id
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+                    : 'bg-slate-950 text-slate-400 hover:text-slate-200 border border-white/[0.05]'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
           </div>
         </div>
-      </section>
+      </div>
 
-      <section className="rules-studio-stats">
-        <article>
-          <span><Play size={14} /> Active</span>
-          <strong>{activeCount}</strong>
-        </article>
-        <article>
-          <span><PauseCircle size={14} /> Paused</span>
-          <strong>{pausedCount}</strong>
-        </article>
-        <article>
-          <span><Activity size={14} /> DMs sent</span>
-          <strong>{totalDms}</strong>
-        </article>
-        <article>
-          <span><Gauge size={14} /> Usage</span>
-          <strong>{planLimit ? `${usagePct}%` : '∞'}</strong>
-        </article>
-      </section>
-
-      {connectHint && (
-        <div className="rules-studio-alert">
-          <Camera size={15} />
-          <span>{connectHint}</span>
-          <button type="button" onClick={() => setConnectHint('')} aria-label="Dismiss">
-            <X size={14} />
+      {/* Content Area */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="h-56 rounded-3xl bg-slate-900/60 animate-pulse border border-white/[0.05]" />
+          ))}
+        </div>
+      ) : error ? (
+        <div className="p-8 bg-slate-900/80 border border-rose-500/20 rounded-3xl text-center space-y-4 max-w-lg mx-auto my-8">
+          <AlertCircle className="w-10 h-10 text-rose-400 mx-auto" />
+          <h2 className="text-base font-bold text-white">Error Loading Rules</h2>
+          <p className="text-xs text-slate-400">{error}</p>
+          <button
+            onClick={fetchRules}
+            className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-semibold rounded-2xl hover:from-indigo-500 hover:to-purple-500 transition-all cursor-pointer"
+          >
+            Retry Loading
           </button>
         </div>
-      )}
-
-      <section className="rules-studio-templates">
-        <div className="rules-studio-section-head">
-          <h2>Quick start templates</h2>
-          <p>One tap to prefill a proven flow — edit and launch.</p>
-        </div>
-        <div className="rules-studio-template-grid">
-          {TEMPLATES.map((tpl) => (
-            <button key={tpl.id} type="button" className="rules-studio-template" onClick={() => openTemplate(tpl.seed)}>
-              <span className="rules-studio-template-icon">{tpl.icon}</span>
-              <span className="rules-studio-template-copy">
-                <strong>{tpl.title}</strong>
-                <small>{tpl.blurb}</small>
-              </span>
-              <ArrowRight size={14} />
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="rules-studio-toolbar">
-        <div className="rules-studio-search">
-          <Search size={16} />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search name, keyword, or reply..."
-            aria-label="Search rules"
-          />
-        </div>
-
-        <div className="rules-studio-chips" role="tablist" aria-label="Trigger filter">
-          {([
-            ['all', 'All'],
-            ['keyword', 'Keyword'],
-            ['comment', 'Comment'],
-            ['story_mention', 'Story'],
-            ['new_dm', 'New DM'],
-          ] as const).map(([value, label]) => (
-            <button
-              key={value}
-              type="button"
-              className={triggerFilter === value ? 'active' : ''}
-              onClick={() => setTriggerFilter(value)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div className="rules-studio-toolbar-end">
-          <div className="rules-studio-segment">
-            <button type="button" className={statusFilter === 'all' ? 'active' : ''} onClick={() => setStatusFilter('all')}>All</button>
-            <button type="button" className={statusFilter === 'active' ? 'active' : ''} onClick={() => setStatusFilter('active')}>Live</button>
-            <button type="button" className={statusFilter === 'paused' ? 'active' : ''} onClick={() => setStatusFilter('paused')}>Paused</button>
+      ) : filteredRules.length === 0 ? (
+        <div className="py-16 text-center space-y-4 bg-slate-900/40 border border-white/[0.06] rounded-3xl p-8">
+          <div className="w-14 h-14 rounded-3xl bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center mx-auto">
+            <Zap className="w-7 h-7" />
           </div>
-          <select
-            className="rules-studio-sort"
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-            aria-label="Sort rules"
-          >
-            <option value="newest">Newest</option>
-            <option value="dms">Most DMs</option>
-            <option value="name">Name A–Z</option>
-          </select>
-        </div>
-      </section>
-
-      <section className="rules-studio-list">
-        {loading ? (
-          <div className="rules-studio-empty">Loading your automation studio...</div>
-        ) : filteredRules.length === 0 ? (
-          <div className="rules-studio-empty-card">
-            <div className="rules-studio-empty-mark"><Zap size={22} /></div>
-            <h3>{rules.length === 0 ? 'No rules yet' : 'No matches'}</h3>
-            <p>
-              {rules.length === 0
-                ? 'Start with a template or build a custom trigger → reply flow in under a minute.'
-                : 'Try another search or clear filters to see more rules.'}
+          <div className="space-y-1">
+            <h3 className="text-base font-bold text-white">No Automation Rules Found</h3>
+            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+              {searchQuery || triggerFilter !== 'all'
+                ? 'No rules match your active filters. Try clearing your search.'
+                : 'Get started by creating your first Instagram automation rule.'}
             </p>
-            <button type="button" onClick={openBuilder} className="rules-studio-primary-btn">
-              <Plus size={15} /> Create first rule
-            </button>
           </div>
-        ) : (
-          filteredRules.map((rule) => (
-            <article key={rule.id} className={`rules-studio-card ${rule.is_active ? 'is-live' : 'is-paused'}`}>
-              <div className="rules-studio-card-top">
-                <div className="rules-studio-card-icon">{triggerIcon(rule.trigger_type)}</div>
-                <div className="rules-studio-card-title">
-                  <h3>{rule.name}</h3>
-                  <p>{TRIGGER_LABELS[rule.trigger_type]} · {rule.dm_count ?? 0} DMs sent</p>
-                </div>
-                <span className={`rules-studio-status ${rule.is_active ? 'live' : 'paused'}`}>
-                  {rule.is_active ? 'Live' : 'Paused'}
-                </span>
-              </div>
+          <button
+            onClick={() => {
+              setEditingRule(null);
+              setIsModalOpen(true);
+            }}
+            className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white text-xs font-bold rounded-2xl shadow-lg shadow-purple-600/25 transition-all cursor-pointer"
+          >
+            Create Rule
+          </button>
+        </div>
+      ) : (
+        /* Rules 3D Grid */
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          {filteredRules.map((rule) => (
+            <Card3D key={rule.id} intensity={6} glowColor="rgba(168, 85, 247, 0.2)">
+              <div className="h-full bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-white/[0.08] hover:border-purple-500/30 rounded-3xl p-5 shadow-xl flex flex-col justify-between space-y-4 transition-all">
+                <div className="space-y-3">
+                  {/* Card Header */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2 rounded-xl bg-slate-950 border border-white/[0.08]">
+                        {getTriggerIcon(rule.trigger_type)}
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-white truncate max-w-[160px] sm:max-w-[180px]">
+                          {rule.name}
+                        </h3>
+                        <span className="text-[10px] font-mono text-purple-300 capitalize">
+                          {rule.trigger_type.replace('_', ' ')}
+                        </span>
+                      </div>
+                    </div>
 
-              <div className="rules-studio-flow" aria-label="Rule flow">
-                <div className="rules-studio-flow-step">
-                  <small>Trigger</small>
-                  <strong>{TRIGGER_LABELS[rule.trigger_type]}</strong>
-                </div>
-                <span className="rules-studio-flow-arrow"><ArrowRight size={14} /></span>
-                <div className="rules-studio-flow-step">
-                  <small>Condition</small>
-                  <strong>
-                    {rule.keywords.length
-                      ? rule.keywords.slice(0, 2).map((k) => `"${k}"`).join(', ') + (rule.keywords.length > 2 ? ` +${rule.keywords.length - 2}` : '')
-                      : 'Any message'}
-                  </strong>
-                </div>
-                <span className="rules-studio-flow-arrow"><ArrowRight size={14} /></span>
-                <div className="rules-studio-flow-step wide">
-                  <small>Reply</small>
-                  <strong>{rule.response_template || 'No template yet'}</strong>
-                </div>
-              </div>
-
-              <div className="rules-studio-card-tags">
-                {rule.ask_follow_before_dm && <span>Ask-to-follow</span>}
-                {rule.public_comment_reply_enabled && <span>Public reply</span>}
-                {rule.dm_attachment_url && <span>Attachment</span>}
-                {rule.comment_target_type === 'specific' && <span>Specific media</span>}
-              </div>
-
-              <div className="rules-studio-card-actions">
-                <button type="button" onClick={() => openEditor(rule)}>
-                  <PencilLine size={14} /> Edit
-                </button>
-                <button type="button" onClick={() => handleDuplicate(rule)}>
-                  <Copy size={14} /> Duplicate
-                </button>
-                <button
-                  type="button"
-                  className={rule.is_active ? 'danger-soft' : 'success-soft'}
-                  disabled={togglingId === rule.id}
-                  onClick={() => handleToggle(rule)}
-                >
-                  {rule.is_active ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
-                  {rule.is_active ? 'Pause' : 'Activate'}
-                </button>
-                {confirmDeleteId === rule.id ? (
-                  <div className="rules-studio-delete-confirm">
+                    {/* Toggle Switch */}
                     <button
-                      type="button"
-                      className="danger"
-                      disabled={deletingId === rule.id}
-                      onClick={() => handleDelete(rule.id)}
+                      onClick={() => handleToggle(rule.id)}
+                      disabled={actionLoadingId === rule.id}
+                      className="min-h-[36px] min-w-[48px] flex items-center justify-center cursor-pointer"
                     >
-                      {deletingId === rule.id ? 'Deleting...' : 'Confirm'}
+                      <div
+                        className={`w-10 h-5 flex items-center rounded-full p-0.5 transition-all ${
+                          rule.is_active
+                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 justify-end'
+                            : 'bg-slate-800 justify-start'
+                        }`}
+                      >
+                        <span className="w-4 h-4 rounded-full bg-white shadow-sm" />
+                      </div>
                     </button>
-                    <button type="button" onClick={() => setConfirmDeleteId(null)}>Cancel</button>
                   </div>
-                ) : (
-                  <button type="button" className="danger-ghost" onClick={() => setConfirmDeleteId(rule.id)}>
-                    <Trash2 size={14} />
-                  </button>
-                )}
-              </div>
-            </article>
-          ))
-        )}
-      </section>
 
-      {plan !== 'pro' && (
-        <section className="rules-studio-upgrade">
-          <div>
-            <h3>
-              {planLimit
-                ? `You've used ${rules.length} of ${planLimit} rules`
-                : 'Need more automation power?'}
-            </h3>
-            <p>Upgrade for more flows, premium analytics, and ask-to-follow gates.</p>
-          </div>
-          <Link to="/billing" className="rules-studio-upgrade-btn">Upgrade plan</Link>
-        </section>
+                  {/* Keywords List */}
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      Trigger Keywords:
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {(rule.keywords || []).map((kw) => (
+                        <span
+                          key={kw}
+                          className="px-2 py-0.5 rounded-lg bg-slate-950 border border-white/[0.06] text-purple-300 font-mono text-[10px] font-semibold"
+                        >
+                          #{kw}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Response Template Preview */}
+                  <div className="p-3 bg-slate-950/70 border border-white/[0.06] rounded-2xl text-[11px] text-slate-300 line-clamp-3 leading-relaxed">
+                    {rule.response_template || 'No response template specified.'}
+                  </div>
+                </div>
+
+                {/* Footer Metrics & Actions */}
+                <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-mono">
+                    <MessageSquare className="w-3.5 h-3.5 text-purple-400" />
+                    <span>{rule.dm_count || 0} DMs</span>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => handleEditClick(rule)}
+                      className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.05] transition-colors cursor-pointer"
+                      title="Edit Rule"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(rule.id, rule.name)}
+                      disabled={actionLoadingId === rule.id}
+                      className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                      title="Delete Rule"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Card3D>
+          ))}
+        </div>
       )}
 
-      <button type="button" className="rules-studio-fab" onClick={openBuilder} aria-label="Create new rule">
-        <Plus size={22} />
-      </button>
-
+      {/* Create & Edit Modal */}
       <RuleBuilderModal
-        open={showModal}
+        open={isModalOpen}
         onClose={() => {
-          setShowModal(false);
+          setIsModalOpen(false);
           setEditingRule(null);
-          setSeed(null);
         }}
-        onCreated={(rule) => setRules((prev) => [rule, ...prev])}
-        onUpdated={(updatedRule) => setRules((prev) => prev.map((r) => (r.id === updatedRule.id ? updatedRule : r)))}
+        onCreated={(newRule) => {
+          setRules((prev) => [newRule, ...prev]);
+          showToast(`Rule "${newRule.name}" created successfully!`);
+        }}
+        onUpdated={(updatedRule) => {
+          setRules((prev) => prev.map((r) => (r.id === updatedRule.id ? updatedRule : r)));
+          showToast(`Rule "${updatedRule.name}" updated successfully.`);
+        }}
         initialRule={editingRule}
-        seed={seed}
       />
     </div>
   );

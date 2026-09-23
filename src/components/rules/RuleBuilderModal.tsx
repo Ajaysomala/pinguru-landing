@@ -138,7 +138,9 @@ const PhonePreview: React.FC<{
   triggerType: TriggerType | null;
   template: string;
   keywords: string[];
-}> = ({ triggerType, template, keywords }) => {
+  attachmentUrl?: string;
+  attachmentType?: 'image' | 'video';
+}> = ({ triggerType, template, keywords, attachmentUrl, attachmentType = 'image' }) => {
   const preview = renderTemplate(template);
   const inboundMsg = triggerType === 'keyword'
     ? (keywords[0] ? `Hey! ${keywords[0]}` : 'Hey! price')
@@ -174,6 +176,12 @@ const PhonePreview: React.FC<{
             {template ? (
               <div style={{ background:'linear-gradient(135deg,#7C3AED,#DB2777)',borderRadius:'12px 12px 3px 12px',padding:'8px 10px',fontSize:'0.68rem',color:'white',maxWidth:'88%',marginLeft:'auto',lineHeight:1.4,whiteSpace:'pre-wrap',wordBreak:'break-word' }}>
                 {preview}
+                {attachmentUrl && (
+                  <div style={{ marginTop: 6, padding: '4px 6px', background: 'rgba(255,255,255,0.18)', borderRadius: 6, fontSize: '0.6rem', display: 'flex', alignItems: 'center', gap: 4, border: '1px solid rgba(255,255,255,0.25)' }}>
+                    <span>{attachmentType === 'video' ? '🎬' : '📷'}</span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 130 }}>{attachmentType === 'video' ? 'Video Attachment' : 'Image Attachment'}</span>
+                  </div>
+                )}
                 <div style={{ fontSize:'0.55rem',color:'rgba(255,255,255,0.6)',marginTop:2,textAlign:'right' }}>{new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})} ✓✓</div>
               </div>
             ) : (
@@ -221,6 +229,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
   const [publicCommentReplyTemplate, setPublicCommentReplyTemplate] = useState('Thanks for your comment! Check your DM for details.');
   const [askFollowBeforeDm, setAskFollowBeforeDm] = useState(false);
   const [dmAttachmentUrl, setDmAttachmentUrl] = useState('');
+  const [dmAttachmentType, setDmAttachmentType] = useState<'image' | 'video'>('image');
   const [showAttachmentInput, setShowAttachmentInput] = useState(false);
   const [keywords, setKeywords] = useState<string[]>([]);
   const [kwInput, setKwInput] = useState('');
@@ -255,6 +264,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
         setPublicCommentReplyTemplate(seed.public_comment_reply_template || 'Thanks for your comment! Check your DM for details.');
         setAskFollowBeforeDm(Boolean(seed.ask_follow_before_dm));
         setDmAttachmentUrl(seed.dm_attachment_url || '');
+        setDmAttachmentType((seed.dm_attachment_type as 'image' | 'video') || 'image');
         setShowAttachmentInput(Boolean(seed.dm_attachment_url));
         setKeywords(Array.isArray(seed.keywords) ? seed.keywords : []);
         setKwInput('');
@@ -275,6 +285,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
       setPublicCommentReplyTemplate('Thanks for your comment! Check your DM for details.');
       setAskFollowBeforeDm(false);
       setDmAttachmentUrl('');
+      setDmAttachmentType('image');
       setShowAttachmentInput(false);
       setKeywords([]);
       setKwInput('');
@@ -293,6 +304,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
     setPublicCommentReplyTemplate(initialRule.public_comment_reply_template || 'Thanks for your comment! Check your DM for details.');
     setAskFollowBeforeDm(Boolean(initialRule.ask_follow_before_dm));
     setDmAttachmentUrl(initialRule.dm_attachment_url || '');
+    setDmAttachmentType((initialRule.dm_attachment_type as 'image' | 'video') || 'image');
     setShowAttachmentInput(Boolean(initialRule.dm_attachment_url));
     setKeywords(Array.isArray(initialRule.keywords) ? initialRule.keywords : []);
     setKwInput('');
@@ -312,7 +324,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
     setAnyCommentKeyword(true);setPublicCommentReplyEnabled(false);
     setPublicCommentReplyTemplate('Thanks for your comment! Check your DM for details.');
     setAskFollowBeforeDm(false);
-    setDmAttachmentUrl('');setShowAttachmentInput(false);
+    setDmAttachmentUrl('');setDmAttachmentType('image');setShowAttachmentInput(false);
     setKeywords([]);setKwInput('');setTemplate('');setError('');setShowPreview(false);
   };
 
@@ -384,7 +396,8 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
         public_comment_reply_template:publicCommentReplyEnabled?normalizeTemplateVariables(publicCommentReplyTemplate):undefined,
       }),
       ask_follow_before_dm:askFollowBeforeDm,
-      dm_attachment_url:dmAttachmentUrl.trim()||undefined,
+      dm_attachment_url:(isPro&&showAttachmentInput&&dmAttachmentUrl.trim())?dmAttachmentUrl.trim():undefined,
+      dm_attachment_type:(isPro&&showAttachmentInput&&dmAttachmentUrl.trim())?dmAttachmentType:undefined,
     };
     try {
       if (editing && initialRule) {
@@ -439,7 +452,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
           {/* Mobile preview panel */}
           {showPreview&&(
             <div className="rb-preview-mobile">
-              <PhonePreview triggerType={triggerType} template={template} keywords={keywords}/>
+              <PhonePreview triggerType={triggerType} template={template} keywords={keywords} attachmentUrl={isPro&&showAttachmentInput?dmAttachmentUrl:''} attachmentType={dmAttachmentType}/>
             </div>
           )}
 
@@ -538,7 +551,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                 <p style={{ fontSize:'0.75rem', color:'var(--color-muted)', marginBottom: 8 }}>
                   Tap a button to insert the full placeholder automatically.
                 </p>
-                <textarea ref={textareaRef} className="template-textarea" placeholder="Hi {{name}}! Thanks for reaching out. Here's what you need to know..." value={template} onChange={e=>setTemplate(e.target.value)} rows={4}/>
+                <textarea ref={textareaRef} className="template-textarea" placeholder="Hi {{name}}! Thanks for reaching out. Here's what you need to know..." value={template} onChange={e=>setTemplate(e.target.value.slice(0, 1000))} rows={4} maxLength={1000}/>
                 <p style={{ fontSize:'0.75rem',color:'var(--color-muted)',textAlign:'right',marginTop:4 }}>{template.length} / 1000</p>
               </div>
 
@@ -554,10 +567,65 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
               )}
 
               {/* Toggles */}
-              <div className="rb-field-shell" style={{ display:'flex',flexDirection:'column',gap:2,marginBottom:20 }}>
+              <div className="rb-field-shell" style={{ display:'flex',flexDirection:'column',gap:12,marginBottom:20 }}>
                 <div className="wizard-toggle-row compact">
                   <span className="wizard-toggle-label">Ask to follow before DM {lockBadge(isStarterOrPro,'starter')}</span>
-                  <button type="button" onClick={()=>isStarterOrPro&&setAskFollowBeforeDm(p=>!p)} className={`wizard-switch ${askFollowBeforeDm?'on':''}`} disabled={!isStarterOrPro}><span/></button>
+                  <button type="button" onClick={()=>isStarterOrPro&&setAskFollowBeforeDm(p=>!p)} className={`wizard-switch ${askFollowBeforeDm?'on':''}`} disabled={!isStarterOrPro} aria-label="Toggle ask to follow"><span/></button>
+                </div>
+
+                <div style={{ borderTop: '1px solid rgba(226,232,240,0.8)', paddingTop: 10 }}>
+                  <div className="wizard-toggle-row compact">
+                    <span className="wizard-toggle-label">Media Attachment {lockBadge(isPro,'pro')}</span>
+                    <button
+                      type="button"
+                      onClick={() => isPro && setShowAttachmentInput(p => !p)}
+                      className={`wizard-switch ${showAttachmentInput && isPro ? 'on' : ''}`}
+                      disabled={!isPro}
+                      aria-label="Toggle media attachment"
+                    >
+                      <span />
+                    </button>
+                  </div>
+
+                  {showAttachmentInput && isPro && (
+                    <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <div>
+                        <label className="form-label" style={{ marginBottom: 6, fontSize: '0.78rem' }}>Attachment Type</label>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button
+                            type="button"
+                            onClick={() => setDmAttachmentType('image')}
+                            className={`wizard-filter-pill ${dmAttachmentType === 'image' ? 'active' : ''}`}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}
+                          >
+                            <span>📷</span> Image
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDmAttachmentType('video')}
+                            className={`wizard-filter-pill ${dmAttachmentType === 'video' ? 'active' : ''}`}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}
+                          >
+                            <span>🎬</span> Video
+                          </button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="form-label" style={{ marginBottom: 6, fontSize: '0.78rem' }}>Media URL</label>
+                        <input
+                          type="url"
+                          className="form-input"
+                          placeholder="https://example.com/assets/media.jpg"
+                          value={dmAttachmentUrl}
+                          onChange={(e) => setDmAttachmentUrl(e.target.value)}
+                        />
+                        <p style={{ fontSize: '0.72rem', color: 'var(--color-muted)', marginTop: 4 }}>
+                          Direct HTTPS media link attached to the automated DM.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -600,7 +668,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
 
             {/* Desktop preview */}
             <div className="rb-preview-col">
-              <PhonePreview triggerType={triggerType} template={template} keywords={keywords}/>
+              <PhonePreview triggerType={triggerType} template={template} keywords={keywords} attachmentUrl={isPro&&showAttachmentInput?dmAttachmentUrl:''} attachmentType={dmAttachmentType}/>
             </div>
           </div>
         </div>

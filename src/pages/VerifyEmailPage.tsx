@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, AlertCircle, CheckCircle, RefreshCw, ArrowRight } from 'lucide-react';
-import { verifyEmailOtp, resendEmailOtp } from '../lib/api';
+import { verifyEmailOtp, resendEmailOtp, loginUser, getMe } from '../lib/api';
+import { useAuth } from '../App';
 import '../styles/auth.css';
 
 const VerifyEmailPage: React.FC = () => {
   const navigate      = useNavigate();
+  const { refresh }   = useAuth();
   const [params]      = useSearchParams();
   const email         = params.get('email') || localStorage.getItem('pg_verify_email') || '';
 
@@ -70,9 +72,34 @@ const VerifyEmailPage: React.FC = () => {
     setLoading(true); setError('');
     try {
       await verifyEmailOtp(email, code);
-      setSuccess('Email verified! Redirecting...');
+      setSuccess('Email verified! Setting up your workspace...');
       localStorage.removeItem('pg_verify_email');
-      setTimeout(() => navigate('/onboarding'), 1200);
+
+      const savedPwd = sessionStorage.getItem('pg_temp_pass');
+      if (savedPwd) {
+        sessionStorage.removeItem('pg_temp_pass');
+        try {
+          await loginUser(email, savedPwd);
+        } catch {
+          // If login fails, continue to check session
+        }
+      }
+
+      await refresh();
+
+      try {
+        const profile = await getMe();
+        if (profile) {
+          setTimeout(() => navigate('/onboarding'), 800);
+          return;
+        }
+      } catch {
+        // Fallback
+      }
+
+      localStorage.setItem('pg_verified_email', email);
+      setSuccess('Email verified! Redirecting to sign in...');
+      setTimeout(() => navigate('/login'), 1200);
     } catch (err: any) {
       setError(err.message || 'Invalid or expired OTP');
       setOtp(['', '', '', '', '', '']);

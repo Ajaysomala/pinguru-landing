@@ -3,12 +3,14 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { getProfile } from './lib/api';
 import { AppShell } from './components/layout/AppShell';
 import { CookieBanner } from './components/ui/CookieBanner';
+import { ToastProvider } from './context/ToastContext';
 import type { User } from './lib/types';
 
 const TITLE_MAP: Record<string, string> = {
   '/': 'PinGuru – Instagram DM Automation',
   '/login': 'Sign in · PinGuru',
   '/register': 'Create account · PinGuru',
+  '/auth': 'Authentication · PinGuru',
   '/verify': 'Verify email · PinGuru',
   '/forgot-password': 'Reset password · PinGuru',
   '/onboarding': 'Welcome · PinGuru',
@@ -60,14 +62,14 @@ class AppErrorBoundary extends React.Component<{ children: React.ReactNode }, { 
     if (!this.state.hasError) return this.props.children;
 
     return (
-      <div className="min-h-screen flex items-center justify-center bg-canvas px-4">
-        <div className="max-w-md w-full bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-center">
-          <h1 className="text-lg font-semibold text-slate-800">Something went wrong</h1>
-          <p className="text-sm text-slate-500 mt-2">{this.state.message || 'The app failed to render. Please reload once.'}</p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
+        <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl text-center text-slate-100">
+          <h1 className="text-lg font-semibold text-white">Something went wrong</h1>
+          <p className="text-sm text-slate-400 mt-2">{this.state.message || 'The app failed to render. Please reload once.'}</p>
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary-hover transition-colors"
+            className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold hover:from-indigo-500 hover:to-purple-500 transition-all shadow-lg shadow-purple-600/20"
           >
             Reload app
           </button>
@@ -146,10 +148,10 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 // ── Route guards ──────────────────────────────────────────────────────────────
 
 const Spinner = () => (
-  <div className="min-h-screen flex items-center justify-center bg-canvas">
+  <div className="min-h-screen flex items-center justify-center bg-slate-950">
     <div className="flex flex-col items-center gap-3">
-      <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-      <p className="text-sm text-slate-500">Loading...</p>
+      <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      <p className="text-sm text-slate-400">Loading PinGuru...</p>
     </div>
   </div>
 );
@@ -175,6 +177,7 @@ const LandingPage    = lazyWithRetry(() => import('./pages/LandingPage'));
 const BlogPage       = lazyWithRetry(() => import('./pages/BlogPage'));
 const LoginPage      = lazyWithRetry(() => import('./pages/LoginPage'));
 const RegisterPage   = lazyWithRetry(() => import('./pages/RegisterPage'));
+const AuthPage       = lazyWithRetry(() => import('./pages/AuthPage'));
 const VerifyPage     = lazyWithRetry(() => import('./pages/VerifyEmailPage'));
 const OnboardingPage = lazyWithRetry(() => import('./pages/OnboardingPage'));
 const ForgotPasswordPage = lazyWithRetry(() => import('./pages/ForgotPasswordPage'));
@@ -196,7 +199,7 @@ const SupportPage    = lazyWithRetry(() => import('./pages/SupportPage'));
 const Page: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <React.Suspense fallback={
     <div className="min-h-[60vh] flex items-center justify-center">
-      <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
     </div>
   }>
     {children}
@@ -222,45 +225,49 @@ const App: React.FC = () => (
   <BrowserRouter>
     <AppErrorBoundary>
       <AuthProvider>
-        <DocumentTitle />
-        <CookieBanner />
-        <Routes>
-        {/* Public */}
-        <Route path="/"         element={<PublicOnly><Page><LandingPage /></Page></PublicOnly>} />
-        <Route path="/login"    element={<PublicOnly><Page><LoginPage /></Page></PublicOnly>} />
-        <Route path="/register" element={<PublicOnly><Page><RegisterPage /></Page></PublicOnly>} />
-        <Route path="/verify"   element={<PublicOnly><Page><VerifyPage /></Page></PublicOnly>} />
-        <Route path="/forgot-password" element={<Page><ForgotPasswordPage /></Page>} />
-        <Route path="/privacy"  element={<Page><PrivacyPage /></Page>} />
-        <Route path="/terms"    element={<Page><TermsPage /></Page>} />
-        <Route path="/cookies"  element={<Page><CookiePolicyPage /></Page>} />
-        <Route path="/refund-policy" element={<Page><RefundPolicyPage /></Page>} />
-        <Route path="/support"  element={<SupportRoute />} />
-        <Route path="/blog"     element={<Page><BlogPage /></Page>} />
-        <Route path="/blog/:slug" element={<Page><BlogPage /></Page>} />
+        <ToastProvider>
+          <DocumentTitle />
+          <CookieBanner />
+          <Routes>
+            {/* Public */}
+            <Route path="/"         element={<PublicOnly><Page><LandingPage /></Page></PublicOnly>} />
+            <Route path="/login"    element={<PublicOnly><Page><LoginPage /></Page></PublicOnly>} />
+            <Route path="/register" element={<PublicOnly><Page><RegisterPage /></Page></PublicOnly>} />
+            <Route path="/auth"     element={<PublicOnly><Page><AuthPage /></Page></PublicOnly>} />
+            <Route path="/verify"   element={<PublicOnly><Page><VerifyPage /></Page></PublicOnly>} />
+            <Route path="/forgot-password" element={<Page><ForgotPasswordPage /></Page>} />
+            <Route path="/privacy"  element={<Page><PrivacyPage /></Page>} />
+            <Route path="/terms"    element={<Page><TermsPage /></Page>} />
+            <Route path="/cookies"  element={<Page><CookiePolicyPage /></Page>} />
+            <Route path="/refund-policy" element={<Page><RefundPolicyPage /></Page>} />
+            <Route path="/support"  element={<SupportRoute />} />
+            <Route path="/blog"     element={<Page><BlogPage /></Page>} />
+            <Route path="/blog/:slug" element={<Page><BlogPage /></Page>} />
 
-        {/* Onboarding — authenticated, no app shell */}
-        <Route path="/onboarding" element={
-          <RequireAuth shell={false}>
-            <Page><OnboardingPage /></Page>
-          </RequireAuth>
-        } />
+            {/* Onboarding — authenticated, no app shell */}
+            <Route path="/onboarding" element={
+              <RequireAuth shell={false}>
+                <Page><OnboardingPage /></Page>
+              </RequireAuth>
+            } />
 
-        {/* Protected — user prop flows from context through AppShell */}
-        <Route path="/dashboard"    element={<RequireAuth><Page><DashboardPage /></Page></RequireAuth>} />
-        <Route path="/connect"      element={<RequireAuth><Page><ConnectPage /></Page></RequireAuth>} />
-        <Route path="/connect.html" element={<RequireAuth><Page><ConnectPage /></Page></RequireAuth>} />
-        <Route path="/rules"        element={<RequireAuth><Page><RulesPage /></Page></RequireAuth>} />
-        <Route path="/contacts"     element={<RequireAuth><Page><ContactsPage /></Page></RequireAuth>} />
-        <Route path="/analytics"    element={<RequireAuth><Page><AnalyticsPage /></Page></RequireAuth>} />
-        <Route path="/billing"      element={<RequireAuth><Page><BillingPage /></Page></RequireAuth>} />
-        <Route path="/settings"     element={<RequireAuth><Page><SettingsPage /></Page></RequireAuth>} />
-        <Route path="/settings/profile" element={<RequireAuth><Page><SettingsProfileEditPage /></Page></RequireAuth>} />
-        <Route path="/refund"       element={<RequireAuth><Page><RefundPage /></Page></RequireAuth>} />
+            {/* Protected — user prop flows from context through AppShell */}
+            <Route path="/dashboard"    element={<RequireAuth><Page><DashboardPage /></Page></RequireAuth>} />
+            <Route path="/connect"      element={<RequireAuth><Page><ConnectPage /></Page></RequireAuth>} />
+            <Route path="/connect.html" element={<RequireAuth><Page><ConnectPage /></Page></RequireAuth>} />
+            <Route path="/rules"        element={<RequireAuth><Page><RulesPage /></Page></RequireAuth>} />
+            <Route path="/automations"  element={<Navigate to="/rules" replace />} />
+            <Route path="/contacts"     element={<RequireAuth><Page><ContactsPage /></Page></RequireAuth>} />
+            <Route path="/analytics"    element={<RequireAuth><Page><AnalyticsPage /></Page></RequireAuth>} />
+            <Route path="/billing"      element={<RequireAuth><Page><BillingPage /></Page></RequireAuth>} />
+            <Route path="/settings"     element={<RequireAuth><Page><SettingsPage /></Page></RequireAuth>} />
+            <Route path="/settings/profile" element={<RequireAuth><Page><SettingsProfileEditPage /></Page></RequireAuth>} />
+            <Route path="/refund"       element={<RequireAuth><Page><RefundPage /></Page></RequireAuth>} />
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </ToastProvider>
       </AuthProvider>
     </AppErrorBoundary>
   </BrowserRouter>

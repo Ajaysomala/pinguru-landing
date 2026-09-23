@@ -1,336 +1,329 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import {
-  User,
-  Shield,
-  Bell,
-  Trash2,
-  AlertTriangle,
-  CheckCircle,
-  RefreshCw,
-  Mail,
-  AtSign,
-  BriefcaseBusiness,
-  BadgeCheck,
-  PencilLine,
-  Sparkles,
-  Clock3,
-  ShieldCheck,
+import { useNavigate } from 'react-router-dom';
+import { 
+  Settings, 
+  User, 
+  ShieldCheck, 
+  CreditCard, 
+  Check, 
+  Clock, 
   ExternalLink,
+  Zap,
+  Sparkles
 } from 'lucide-react';
-import { getProfile, requestDataDeletion } from '../lib/api';
-import type { User as UserType } from '../lib/types';
-import { toTitleCase } from '../lib/utils';
 import { useAuth } from '../App';
-import '../styles/dashboard.css';
-import '../styles/settings.css';
+import { updateProfile, getPlanStatus } from '../lib/api';
+import type { PlanStatus } from '../lib/types';
+import { useToast } from '../context/ToastContext';
 
-const PREFS_KEY = 'pg_prefs';
-
-const SettingsPage: React.FC = () => {
+export const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user: authUser } = useAuth();
-  const [user, setUser] = useState<UserType | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const [deleteInput, setDeleteInput] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const { user, refresh } = useAuth();
+  const { showToast } = useToast();
 
-  const [pauseHours, setPauseHours] = useState(false);
-  const [usageAlert, setUsageAlert] = useState(true);
+  const [activeTab, setActiveTab] = useState<'profile' | 'compliance' | 'billing'>('profile');
+
+  // Profile Form State - sourced from real user
+  const [displayName, setDisplayName] = useState(user?.display_name || '');
+  const [firstName, setFirstName] = useState(user?.first_name || '');
+  const [lastName, setLastName] = useState(user?.last_name || '');
+  const [email] = useState(user?.email || '');
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Compliance state
+  const [enableSafetyBuffer, setEnableSafetyBuffer] = useState(true);
+  const [blockedKws, setBlockedKws] = useState<string[]>(['crypto', 'loan', 'gambling']);
+  const [newBlockedKw, setNewBlockedKw] = useState('');
+
+  // Plan status
+  const [planStatus, setPlanStatus] = useState<PlanStatus | null>(null);
 
   useEffect(() => {
-    let mounted = true;
-
-    const loadProfile = async () => {
-      try {
-        const profile = await getProfile();
-        if (!mounted) return;
-        if (profile) {
-          setUser(profile);
-        } else if (authUser) {
-          setUser(authUser);
-        }
-      } catch {
-        if (!mounted) return;
-        if (authUser) setUser(authUser);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    const rawPrefs = localStorage.getItem(PREFS_KEY);
-    if (rawPrefs) {
-      try {
-        const parsed = JSON.parse(rawPrefs) as { pauseHours?: boolean; usageAlert?: boolean };
-        setPauseHours(Boolean(parsed.pauseHours));
-        setUsageAlert(parsed.usageAlert ?? true);
-      } catch {
-        setPauseHours(false);
-        setUsageAlert(true);
-      }
+    if (user) {
+      setDisplayName(user.display_name || '');
+      setFirstName(user.first_name || '');
+      setLastName(user.last_name || '');
     }
+  }, [user]);
 
-    loadProfile();
-    return () => {
-      mounted = false;
-    };
-  }, [authUser]);
+  useEffect(() => {
+    getPlanStatus().then(setPlanStatus).catch(() => null);
+  }, []);
 
-  const handleDataDeletion = async () => {
-    setDeleting(true);
-    setError('');
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
     try {
-      await requestDataDeletion();
-      setSuccess('Data deletion request submitted. You will receive a confirmation email.');
-      setConfirmDelete(false);
-      setDeleteInput('');
-      setTimeout(() => {
-        setSuccess('');
-        navigate('/login');
-      }, 4000);
-    } catch (err: any) {
-      setError(err.message || 'Failed to submit deletion request.');
+      await updateProfile({
+        display_name: displayName,
+        first_name: firstName,
+        last_name: lastName,
+      });
+      await refresh();
+      showToast('Profile information updated successfully.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to update profile';
+      showToast(msg);
     } finally {
-      setDeleting(false);
+      setIsSaving(false);
     }
   };
 
-  const savePrefs = () => {
-    localStorage.setItem(PREFS_KEY, JSON.stringify({ pauseHours, usageAlert }));
-    setSuccess('Preferences saved.');
-    setTimeout(() => setSuccess(''), 2000);
+  const handleAddBlockedKeyword = () => {
+    const trimmed = newBlockedKw.trim().toLowerCase();
+    if (trimmed && !blockedKws.includes(trimmed)) {
+      setBlockedKws([...blockedKws, trimmed]);
+      setNewBlockedKw('');
+      showToast(`Added "${trimmed}" to blocklist.`);
+    }
   };
 
-  if (loading) {
-    return (
-      <div className="page-wrapper flex justify-center items-center min-h-[60vh]">
-        <svg className="animate-spin h-6 w-6 text-primary" viewBox="0 0 24 24" fill="none">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-        </svg>
-      </div>
-    );
-  }
-
-  const fullName = user?.display_name || [user?.first_name, user?.last_name].filter(Boolean).join(' ') || 'Your profile';
-  const instagramStatus = user?.instagram_connected
-    ? (user.instagram_username ? `Connected as @${user.instagram_username}` : 'Connected')
-    : 'Not connected';
+  const handleRemoveBlockedKeyword = (kw: string) => {
+    setBlockedKws(blockedKws.filter((k) => k !== kw));
+    showToast(`Removed "${kw}" from blocklist.`);
+  };
 
   return (
-    <div className="page-wrapper settings-v2-page">
-      <section className="settings-v2-hero pg-surface-hero">
-        <div className="settings-v2-hero-copy">
-          <p className="settings-v2-kicker pg-surface-kicker"><Sparkles size={12} /> Account Control Center</p>
-          <h1 className="settings-v2-title pg-surface-title">Settings</h1>
-          <p className="settings-v2-subtitle pg-surface-subtitle">A cleaner workspace for profile details, automation preferences, and privacy controls.</p>
-          <div className="settings-v2-chip-row">
-            <span className="settings-v2-chip"><BadgeCheck size={12} /> Plan: {toTitleCase(user?.plan ?? 'free')}</span>
-            <span className="settings-v2-chip"><AtSign size={12} /> {instagramStatus}</span>
+    <div className="space-y-5 sm:space-y-6">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2.5">
+          <div className="p-2 rounded-2xl bg-gradient-to-tr from-indigo-500/20 via-purple-500/20 to-pink-500/20 text-purple-300 border border-purple-500/30">
+            <Settings className="w-5 h-5 text-purple-400" />
           </div>
-        </div>
-        <div className="settings-v2-identity-card">
-          <div className="settings-v2-avatar">{user?.first_name?.[0] || user?.display_name?.[0] || 'P'}</div>
+          <span>Settings & Workspace</span>
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          Manage your account profile, compliance anti-spam protections, and subscription plan.
+        </p>
+      </div>
+
+      {/* Settings Navigation Tabs */}
+      <div className="bg-gradient-to-r from-slate-900/90 to-slate-950/90 border border-white/[0.08] rounded-3xl p-1.5 flex items-center gap-1 overflow-x-auto text-xs no-scrollbar shadow-lg">
+        {[
+          { id: 'profile', label: 'Workspace & Profile', icon: User },
+          { id: 'compliance', label: 'Compliance & Safety', icon: ShieldCheck },
+          { id: 'billing', label: 'Plan & Billing', icon: CreditCard },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as typeof activeTab)}
+              className={`min-h-[40px] px-4 py-2 rounded-2xl font-semibold transition-all flex items-center gap-2 whitespace-nowrap active:scale-95 shrink-0 cursor-pointer ${
+                activeTab === tab.id
+                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Tab 1: Profile & Workspace */}
+      {activeTab === 'profile' && (
+        <form onSubmit={handleSaveProfile} className="bg-gradient-to-br from-slate-900/90 to-slate-950/90 border border-white/[0.08] rounded-3xl p-5 sm:p-7 space-y-5 shadow-xl max-w-2xl">
           <div>
-            <p className="settings-v2-name">{fullName}</p>
-            <p className="settings-v2-meta">{user?.email}</p>
+            <h2 className="text-sm sm:text-base font-bold text-white">Account Information</h2>
+            <p className="text-xs text-slate-400">Update your public profile and workspace identity.</p>
           </div>
-          <Link to="/settings/profile" className="settings-v2-edit-link">
-            <PencilLine size={13} /> Edit Profile
-          </Link>
-        </div>
-      </section>
 
-      {error && (
-        <div className="settings-v2-alert error">
-          <AlertTriangle size={15} className="flex-shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-      {success && (
-        <div className="settings-v2-alert success">
-          <CheckCircle size={15} className="flex-shrink-0" />
-          <span>{success}</span>
-        </div>
-      )}
-
-      <div className="settings-v2-layout">
-        <div className="settings-v2-main-col">
-          <section className="settings-v2-card">
-            <header className="settings-v2-card-head">
-              <div>
-                <p className="settings-v2-card-eyebrow"><User size={14} /> Profile Snapshot</p>
-                <h3>Account Profile</h3>
-              </div>
-              <Link to="/settings/profile" className="settings-v2-inline-action">
-                <PencilLine size={13} /> Edit
-              </Link>
-            </header>
-            <div className="settings-v2-profile-grid">
-              <div className="settings-v2-profile-tile">
-                <Mail size={15} />
-                <div>
-                  <p className="label">Email</p>
-                  <p className="value">{user?.email}</p>
-                </div>
-              </div>
-              <div className="settings-v2-profile-tile">
-                <AtSign size={15} />
-                <div>
-                  <p className="label">Instagram</p>
-                  <p className="value">{user?.instagram_connected ? (user.instagram_username ? `@${user.instagram_username}` : 'Connected') : 'Not connected'}</p>
-                </div>
-              </div>
-              <div className="settings-v2-profile-tile">
-                <BadgeCheck size={15} />
-                <div>
-                  <p className="label">Plan</p>
-                  <p className="value">{toTitleCase(user?.plan ?? 'free')}</p>
-                </div>
-              </div>
-              <div className="settings-v2-profile-tile">
-                <BriefcaseBusiness size={15} />
-                <div>
-                  <p className="label">Business Category</p>
-                  <p className="value">{user?.business_category || 'Not set'}</p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="settings-v2-card">
-            <header className="settings-v2-card-head">
-              <div>
-                <p className="settings-v2-card-eyebrow"><Bell size={14} /> Automation Preferences</p>
-                <h3>Flow Controls</h3>
-              </div>
-            </header>
-            <div className="settings-v2-toggle-list">
-              <label className="settings-v2-toggle-item">
-                <div>
-                  <p className="toggle-title">Pause outside working hours</p>
-                  <p className="toggle-desc">Stop automations between 10 PM and 8 AM IST.</p>
-                </div>
-                <input type="checkbox" checked={pauseHours} onChange={(e) => setPauseHours(e.target.checked)} />
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                Display Name
               </label>
-              <label className="settings-v2-toggle-item">
-                <div>
-                  <p className="toggle-title">Email me at 80% usage</p>
-                  <p className="toggle-desc">Get a heads-up before you hit your monthly DM threshold.</p>
-                </div>
-                <input type="checkbox" checked={usageAlert} onChange={(e) => setUsageAlert(e.target.checked)} />
-              </label>
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="e.g. Alex Rivera"
+                className="w-full bg-slate-950 border border-white/[0.08] rounded-2xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-purple-500 min-h-[44px]"
+              />
             </div>
-            <p className="settings-v2-note">Preferences are saved locally in this browser.</p>
-            <button onClick={savePrefs} className="settings-v2-primary-btn">Save Preferences</button>
-          </section>
 
-          <section className="settings-v2-card">
-            <header className="settings-v2-card-head">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <p className="settings-v2-card-eyebrow"><Shield size={14} /> Security & Access</p>
-                <h3>Session & Support</h3>
-              </div>
-            </header>
-            <div className="settings-v2-action-stack">
-              <button onClick={() => navigate('/login')} className="settings-v2-neutral-btn">
-                <RefreshCw size={14} /> Re-authenticate
-              </button>
-              <a href="/support" className="settings-v2-neutral-btn">
-                <ShieldCheck size={14} /> Open Support Center
-              </a>
-              <a href="mailto:support@pinguru.me" className="settings-v2-neutral-btn">
-                <ExternalLink size={14} /> Email Support
-              </a>
-            </div>
-          </section>
-        </div>
-
-        <aside className="settings-v2-side-col">
-          <section className="settings-v2-card settings-v2-health-card">
-            <header className="settings-v2-card-head">
-              <div>
-                <p className="settings-v2-card-eyebrow"><Clock3 size={14} /> Account Health</p>
-                <h3>Status Overview</h3>
-              </div>
-            </header>
-            <div className="settings-v2-health-list">
-              <div className="settings-v2-health-item">
-                <span>Instagram</span>
-                <strong>{user?.instagram_connected ? 'Connected' : 'Disconnected'}</strong>
-              </div>
-              <div className="settings-v2-health-item">
-                <span>Plan</span>
-                <strong>{toTitleCase(user?.plan ?? 'free')}</strong>
-              </div>
-              <div className="settings-v2-health-item">
-                <span>Business Category</span>
-                <strong>{user?.business_category || 'Not set'}</strong>
-              </div>
-            </div>
-          </section>
-
-          <section className="settings-v2-card settings-v2-danger-card">
-            <header className="settings-v2-card-head">
-              <div>
-                <p className="settings-v2-card-eyebrow"><Trash2 size={14} /> Data & Privacy</p>
-                <h3>Danger Zone</h3>
-              </div>
-            </header>
-            <p className="settings-v2-danger-text">Request permanent deletion of your account, automation rules, and DM logs. This action is irreversible.</p>
-            {!confirmDelete ? (
-              <button onClick={() => setConfirmDelete(true)} className="settings-v2-danger-btn">
-                <Trash2 size={14} /> Delete My Data
-              </button>
-            ) : (
-              <div className="settings-v2-danger-confirm">
-                <div className="settings-v2-danger-warning">
-                  <AlertTriangle size={15} className="text-danger flex-shrink-0" />
-                  <p>Type DELETE to confirm permanent deletion.</p>
-                </div>
+                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                  First Name
+                </label>
                 <input
                   type="text"
-                  className="settings-field-input"
-                  value={deleteInput}
-                  onChange={(e) => setDeleteInput(e.target.value)}
-                  placeholder="Type DELETE"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full bg-slate-950 border border-white/[0.08] rounded-2xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-purple-500 min-h-[44px]"
                 />
-                <div className="settings-v2-danger-actions">
-                  <button
-                    onClick={handleDataDeletion}
-                    disabled={deleting || deleteInput !== 'DELETE'}
-                    className="settings-v2-danger-confirm-btn"
-                  >
-                    {deleting ? (
-                      <>
-                        <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        Deleting...
-                      </>
-                    ) : (
-                      'Confirm Delete'
-                    )}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setConfirmDelete(false);
-                      setDeleteInput('');
-                    }}
-                    className="settings-v2-cancel-btn"
-                  >
-                    Cancel
-                  </button>
-                </div>
               </div>
-            )}
-          </section>
-        </aside>
-      </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full bg-slate-950 border border-white/[0.08] rounded-2xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-purple-500 min-h-[44px]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                Email Address
+              </label>
+              <input
+                type="email"
+                disabled
+                value={email}
+                className="w-full bg-slate-950/60 border border-white/[0.05] rounded-2xl px-3.5 py-2.5 text-xs text-slate-400 focus:outline-none min-h-[44px] cursor-not-allowed"
+              />
+              <span className="text-[10px] text-slate-500 mt-1 block">
+                Contact support to modify your account primary email.
+              </span>
+            </div>
+          </div>
+
+          <div className="pt-3 border-t border-white/[0.06] flex justify-end">
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="w-full sm:w-auto min-h-[44px] px-6 py-2.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-bold text-xs rounded-2xl shadow-lg shadow-purple-600/25 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            >
+              <Check className="w-4 h-4 stroke-[2.5]" />
+              <span>{isSaving ? 'Saving...' : 'Save Profile Details'}</span>
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* Tab 2: Compliance & Safety */}
+      {activeTab === 'compliance' && (
+        <div className="bg-gradient-to-br from-slate-900/90 to-slate-950/90 border border-white/[0.08] rounded-3xl p-5 sm:p-7 space-y-6 shadow-xl max-w-2xl">
+          <div>
+            <h2 className="text-sm sm:text-base font-bold text-white">Instagram Community & Anti-Spam Compliance</h2>
+            <p className="text-xs text-slate-400">
+              Guarantees your account complies with Meta’s anti-spam rules and message frequency guidelines.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {/* Safety Buffer Switch */}
+            <div className="p-4 bg-slate-950/80 rounded-2xl border border-white/[0.06] flex items-center justify-between gap-4">
+              <div>
+                <span className="text-xs font-bold text-slate-200 block">
+                  Meta Rate-Limit Safety Buffer
+                </span>
+                <span className="text-[11px] text-slate-400 leading-normal">
+                  Automatically throttles auto-replies if incoming volume approaches Instagram hourly limits.
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEnableSafetyBuffer(!enableSafetyBuffer)}
+                className="min-h-[44px] min-w-[52px] flex items-center justify-center shrink-0 cursor-pointer"
+              >
+                <div
+                  className={`w-12 h-6 flex items-center rounded-full p-1 transition-all ${
+                    enableSafetyBuffer 
+                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 justify-end shadow-md shadow-purple-600/30' 
+                      : 'bg-slate-800 justify-start'
+                  }`}
+                >
+                  <span className="w-4 h-4 rounded-full bg-white shadow-sm" />
+                </div>
+              </button>
+            </div>
+
+            {/* Blocked Keywords List */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-slate-300">
+                Spam Keyword Blocklist (Never auto-reply if message contains):
+              </label>
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {blockedKws.map((kw) => (
+                  <span
+                    key={kw}
+                    className="inline-flex items-center gap-1.5 bg-slate-950 text-rose-300 border border-rose-500/25 px-3 py-1 rounded-xl text-xs font-mono"
+                  >
+                    {kw}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveBlockedKeyword(kw)}
+                      className="text-slate-400 hover:text-rose-400 ml-1 text-sm font-bold min-w-[20px] min-h-[20px] flex items-center justify-center cursor-pointer"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={newBlockedKw}
+                  onChange={(e) => setNewBlockedKw(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddBlockedKeyword())}
+                  placeholder="Add blocked keyword or phrase..."
+                  className="flex-1 bg-slate-950 border border-white/[0.08] rounded-2xl px-3.5 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-purple-500 min-h-[40px]"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddBlockedKeyword}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-2xl transition-colors min-h-[40px] cursor-pointer"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tab 3: Plan & Billing */}
+      {activeTab === 'billing' && (
+        <div className="bg-gradient-to-br from-slate-900/90 to-slate-950/90 border border-white/[0.08] rounded-3xl p-5 sm:p-7 space-y-6 shadow-xl max-w-2xl">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-sm sm:text-base font-bold text-white">Subscription & Plan Tier</h2>
+              <p className="text-xs text-slate-400">View your active quotas and billing invoice status.</p>
+            </div>
+            <button
+              onClick={() => navigate('/billing')}
+              className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-bold rounded-2xl shadow-md cursor-pointer"
+            >
+              Manage in Billing
+            </button>
+          </div>
+
+          <div className="p-4 bg-slate-950/80 rounded-2xl border border-white/[0.06] space-y-3">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-400">Active Tier:</span>
+              <span className="font-bold text-purple-300 uppercase font-mono">
+                {planStatus?.current_plan || user?.plan || 'Free'} Plan
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-400">DM Quota Limit:</span>
+              <span className="font-mono text-white font-bold">
+                {(planStatus?.current_plan || user?.plan) === 'pro'
+                  ? 'Unlimited'
+                  : (planStatus?.current_plan || user?.plan) === 'starter'
+                    ? '15,000 / mo'
+                    : '500 / mo'}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-400">Billing Cycle:</span>
+              <span className="font-mono text-slate-300 capitalize">
+                {planStatus?.current_billing_cycle || 'Monthly'}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
