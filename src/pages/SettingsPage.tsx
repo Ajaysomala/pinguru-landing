@@ -308,9 +308,9 @@ export const SettingsPage: React.FC = () => {
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-400">DM Quota Limit:</span>
               <span className="font-mono text-white font-bold">
-                {(planStatus?.current_plan || user?.plan) === 'pro'
+                {String(planStatus?.current_plan || user?.plan || '').toLowerCase() === 'pro'
                   ? 'Unlimited'
-                  : (planStatus?.current_plan || user?.plan) === 'starter'
+                  : String(planStatus?.current_plan || user?.plan || '').toLowerCase() === 'starter'
                     ? '15,000 / mo'
                     : '500 / mo'}
               </span>

@@ -238,9 +238,10 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
   const [error, setError] = useState('');
   const [showPreview, setShowPreview] = useState(false);
 
-  const plan = user?.plan ?? 'free';
-  const isStarterOrPro = plan==='starter'||plan==='pro';
-  const isPro = plan==='pro';
+  const rawPlan = String(user?.plan ?? 'free').toLowerCase();
+  const plan = rawPlan.includes('pro') ? 'pro' : rawPlan.includes('starter') ? 'starter' : 'free';
+  const isStarterOrPro = plan === 'starter' || plan === 'pro';
+  const isPro = plan === 'pro';
   const kwInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const editing = Boolean(initialRule);

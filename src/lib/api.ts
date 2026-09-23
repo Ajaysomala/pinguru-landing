@@ -214,7 +214,14 @@ export async function getProfile(): Promise<User | null> {
   if (res.status === 401) return null;
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'Failed to get profile');
-  return data;
+  const rawPlan = String(data.plan || 'free').toLowerCase();
+  const normalizedPlan: 'free' | 'starter' | 'pro' =
+    rawPlan.includes('pro') ? 'pro' :
+    rawPlan.includes('starter') ? 'starter' : 'free';
+  return {
+    ...data,
+    plan: normalizedPlan,
+  };
 }
 
 export async function updateOnboarding(payload: { first_name: string; last_name: string; business_category: string }) {
