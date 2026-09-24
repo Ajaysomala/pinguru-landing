@@ -23,13 +23,15 @@
 @layer utilities {
   .font-display { font-family: 'Plus Jakarta Sans', 'Sora', system-ui, sans-serif; }
   .font-mono    { font-family: 'JetBrains Mono', monospace; }
-  .bg-canvas    { background-color: #020617; }
-  .bg-sidebar   { background-color: #020617; }
-  .bg-primary   { background-color: #6366F1; }
-  .text-primary { color: #818CF8; }
+  .bg-canvas    { background-color: #F8FAFC; }
+  .bg-sidebar   { background-color: #FFFFFF; }
+  .bg-surface   { background-color: #FFFFFF; }
+  .bg-primary   { background-color: #7C3AED; }
+  .text-primary { color: #7C3AED; }
   .bg-success   { background-color: #10B981; }
   .bg-danger    { background-color: #F43F5E; }
 }
+
 
 /* 3D Transform Utilities */
 .perspective-1000 {
@@ -119,25 +121,63 @@
   animation: shimmerMesh 8s ease infinite;
 }
 
-/* Glassmorphism gradient surface */
+:root {
+  /* Surfaces */
+  --bg-canvas: #F8FAFC;          /* Clean porcelain canvas */
+  --bg-surface: #FFFFFF;         /* Crisp floating cards */
+  --bg-surface-subtle: #F1F5F9;  /* Inset wells & table headers */
+  --bg-surface-elevated: #FFFFFF;
+  
+  /* Text */
+  --text-primary: #0F172A;       /* Slate 900 for crisp readability */
+  --text-secondary: #475569;     /* Slate 600 for body copy */
+  --text-muted: #94A3B8;         /* Slate 400 for secondary hints */
+  
+  /* Borders */
+  --border-subtle: rgba(226, 232, 240, 0.8);
+  --border-card: rgba(0, 0, 0, 0.06);
+  --border-card-hover: rgba(124, 58, 237, 0.25);
+
+  /* Primary Brand Gradients */
+  --grad-primary: linear-gradient(135deg, #7C3AED 0%, #6366F1 50%, #EC4899 100%);
+  --grad-primary-hover: linear-gradient(135deg, #6D28D9 0%, #4F46E5 50%, #DB2777 100%);
+  --grad-hero: linear-gradient(135deg, #FAF5FF 0%, #EEF2FF 50%, #FDF2F8 100%);
+  
+  /* Soft Colored Glows & Shadows */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.02), 0 8px 24px -4px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 12px 36px -4px rgba(124, 58, 237, 0.08), 0 4px 12px rgba(0, 0, 0, 0.03);
+  --shadow-btn-primary: 0 8px 20px -4px rgba(124, 58, 237, 0.35);
+  --shadow-btn-hover: 0 12px 24px -4px rgba(124, 58, 237, 0.45);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.6); }
+
+/* Glassmorphism gradient surface — Light porcelain */
 .glass-card {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-card);
 }
 
 .glass-card-interactive {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-card);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card-interactive:hover {
-  border-color: rgba(168, 85, 247, 0.35);
-  box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.25);
+  border-color: rgba(124, 58, 237, 0.25);
+  box-shadow: var(--shadow-card-hover);
   transform: translateY(-2px);
 }
+
 

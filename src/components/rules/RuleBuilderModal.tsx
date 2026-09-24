@@ -2,9 +2,10 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   AlertCircle, ArrowLeft, Check, X, RefreshCw, Lock,
   Smartphone, Zap, MessageSquare, ArrowRight, Eye, EyeOff,
+  Plus, Trash2, Clock, ExternalLink
 } from 'lucide-react';
 import { createRule, getInstagramMedia, updateRule } from '../../lib/api';
-import type { InstagramMediaItem, Rule, RuleCreatePayload, TriggerType } from '../../lib/types';
+import type { InstagramMediaItem, Rule, RuleCreatePayload, TriggerType, RuleButton } from '../../lib/types';
 import { Modal } from '../ui/Modal';
 import { useAuth } from '../../App';
 
@@ -140,7 +141,27 @@ const PhonePreview: React.FC<{
   keywords: string[];
   attachmentUrl?: string;
   attachmentType?: 'image' | 'video';
-}> = ({ triggerType, template, keywords, attachmentUrl, attachmentType = 'image' }) => {
+  dmButtons?: RuleButton[];
+  captureEmailEnabled?: boolean;
+  emailCapturePrompt?: string;
+  emailCaptureSuccessMessage?: string;
+  replyDelaySeconds?: number;
+  publicCommentReplyEnabled?: boolean;
+  publicCommentReplyTemplates?: string[];
+}> = ({
+  triggerType,
+  template,
+  keywords,
+  attachmentUrl,
+  attachmentType = 'image',
+  dmButtons = [],
+  captureEmailEnabled = false,
+  emailCapturePrompt = '',
+  emailCaptureSuccessMessage = '',
+  replyDelaySeconds = 0,
+  publicCommentReplyEnabled = false,
+  publicCommentReplyTemplates = [],
+}) => {
   const preview = renderTemplate(template);
   const inboundMsg = triggerType === 'keyword'
     ? (keywords[0] ? `Hey! ${keywords[0]}` : 'Hey! price')
@@ -148,41 +169,118 @@ const PhonePreview: React.FC<{
     : triggerType === 'story_mention' ? 'Mentioned you in their story'
     : 'Sent you a message';
 
+  const visibleButtons = dmButtons.filter((b) => b.title && b.title.trim().length > 0);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
       <div style={{ display:'flex',alignItems:'center',gap:6,padding:'5px 12px',background:'linear-gradient(135deg,rgba(124,58,237,0.1),rgba(219,39,119,0.05))',border:'1px solid rgba(124,58,237,0.2)',borderRadius:999,fontSize:'0.7rem',fontWeight:700,color:'var(--color-primary)',letterSpacing:'0.05em' }}>
-        <Smartphone size={11}/> LIVE PREVIEW
+        <Smartphone size={11}/> LIVE SIMULATOR
       </div>
-      <div style={{ width:240,background:'#1A1A2E',borderRadius:32,padding:'14px 10px',boxShadow:'0 0 0 1px rgba(255,255,255,0.08), 0 24px 48px rgba(0,0,0,0.45), 0 0 40px rgba(124,58,237,0.15)' }}>
-        <div style={{ width:56,height:5,background:'rgba(255,255,255,0.12)',borderRadius:3,margin:'0 auto 10px' }}/>
-        <div style={{ background:'#F0F2F5',borderRadius:20,overflow:'hidden' }}>
+      <div style={{ width:250,background:'#0F172A',borderRadius:36,padding:'12px 10px',border:'4px solid #1E293B',boxShadow:'0 20px 50px -10px rgba(15,23,42,0.25), 0 0 0 1px rgba(15,23,42,0.1)' }}>
+        <div style={{ width:56,height:5,background:'rgba(255,255,255,0.2)',borderRadius:3,margin:'0 auto 10px' }}/>
+        <div style={{ background:'#F8FAFC',borderRadius:20,overflow:'hidden' }}>
+          {/* Header */}
           <div style={{ background:'white',padding:'9px 12px',display:'flex',alignItems:'center',gap:8,borderBottom:'1px solid #e4e6ea' }}>
             <div style={{ width:26,height:26,borderRadius:'50%',background:'linear-gradient(135deg,#7C3AED,#DB2777)',flexShrink:0 }}/>
-            <div>
-              <div style={{ fontSize:'0.68rem',fontWeight:700,color:'#1c1e21' }}>@yourbrand</div>
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ fontSize:'0.68rem',fontWeight:700,color:'#1c1e21',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' }}>@yourbrand</div>
               <div style={{ fontSize:'0.58rem',color:'#10B981',fontWeight:600 }}>● PinGuru Automated</div>
             </div>
+            {replyDelaySeconds > 0 && (
+              <span style={{ fontSize:'0.55rem',background:'rgba(124,58,237,0.1)',color:'#7C3AED',padding:'2px 5px',borderRadius:4,fontWeight:700 }}>
+                {replyDelaySeconds}s delay
+              </span>
+            )}
           </div>
-          <div style={{ padding:'12px 10px',display:'flex',flexDirection:'column',gap:8,minHeight:220 }}>
+
+          <div style={{ padding:'12px 10px',display:'flex',flexDirection:'column',gap:8,minHeight:240 }}>
+            {/* Public Comment Reply Pill (if comment trigger) */}
+            {triggerType === 'comment' && publicCommentReplyEnabled && (
+              <div style={{ background:'#FFFFFF',border:'1px solid #E2E8F0',borderRadius:10,padding:'7px 9px',fontSize:'0.62rem',color:'#334155',boxShadow:'0 1px 2px rgba(0,0,0,0.04)' }}>
+                <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',color:'#7C3AED',fontWeight:700,fontSize:'0.58rem',marginBottom:2 }}>
+                  <span>💬 PUBLIC COMMENT REPLY</span>
+                  {publicCommentReplyTemplates.length > 1 && (
+                    <span style={{ color:'#059669',background:'#ECFDF5',padding:'1px 5px',borderRadius:4 }}>
+                      {publicCommentReplyTemplates.length} variations
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontStyle:'italic',color:'#1E293B',lineHeight:1.3 }}>
+                  "{publicCommentReplyTemplates[0] || 'Thanks for your comment! Check your DM for details.'}"
+                </div>
+              </div>
+            )}
+
+            {/* Inbound user message */}
             <div style={{ background:'white',borderRadius:'12px 12px 12px 3px',padding:'8px 10px',fontSize:'0.68rem',color:'#1c1e21',boxShadow:'0 1px 3px rgba(0,0,0,0.08)',maxWidth:'80%',lineHeight:1.4 }}>
               {inboundMsg}
               <div style={{ fontSize:'0.55rem',color:'#65676B',marginTop:2 }}>{new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>
             </div>
+
             {triggerType && (
               <div style={{ display:'flex',alignItems:'center',gap:4,background:'rgba(124,58,237,0.08)',border:'1px solid rgba(124,58,237,0.15)',borderRadius:7,padding:'3px 8px',fontSize:'0.6rem',fontWeight:600,color:'#7C3AED',alignSelf:'center' }}>
                 <Zap size={8}/> Rule triggered: {TRIGGER_OPTIONS.find(t=>t.value===triggerType)?.label}
               </div>
             )}
+
+            {/* Lead / Email Capture Flow in DM */}
+            {captureEmailEnabled && (
+              <>
+                <div style={{ background:'linear-gradient(135deg,#7C3AED,#DB2777)',borderRadius:'12px 12px 3px 12px',padding:'7px 9px',fontSize:'0.65rem',color:'white',maxWidth:'88%',marginLeft:'auto',lineHeight:1.35 }}>
+                  {emailCapturePrompt || "What's the best email address to send your link to? 📩"}
+                </div>
+                <div style={{ background:'white',borderRadius:'12px 12px 12px 3px',padding:'6px 9px',fontSize:'0.65rem',color:'#1c1e21',boxShadow:'0 1px 3px rgba(0,0,0,0.08)',maxWidth:'75%',lineHeight:1.35 }}>
+                  alex@example.com
+                </div>
+                <div style={{ background:'linear-gradient(135deg,#7C3AED,#DB2777)',borderRadius:'12px 12px 3px 12px',padding:'7px 9px',fontSize:'0.65rem',color:'white',maxWidth:'88%',marginLeft:'auto',lineHeight:1.35 }}>
+                  {emailCaptureSuccessMessage || "Thanks! We've sent it to your email. 🎉"}
+                </div>
+              </>
+            )}
+
+            {/* Main Response DM */}
             {template ? (
-              <div style={{ background:'linear-gradient(135deg,#7C3AED,#DB2777)',borderRadius:'12px 12px 3px 12px',padding:'8px 10px',fontSize:'0.68rem',color:'white',maxWidth:'88%',marginLeft:'auto',lineHeight:1.4,whiteSpace:'pre-wrap',wordBreak:'break-word' }}>
-                {preview}
-                {attachmentUrl && (
-                  <div style={{ marginTop: 6, padding: '4px 6px', background: 'rgba(255,255,255,0.18)', borderRadius: 6, fontSize: '0.6rem', display: 'flex', alignItems: 'center', gap: 4, border: '1px solid rgba(255,255,255,0.25)' }}>
-                    <span>{attachmentType === 'video' ? '🎬' : '📷'}</span>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 130 }}>{attachmentType === 'video' ? 'Video Attachment' : 'Image Attachment'}</span>
+              <div style={{ display:'flex',flexDirection:'column',maxWidth:'88%',marginLeft:'auto' }}>
+                <div style={{ background:'linear-gradient(135deg,#7C3AED,#DB2777)',borderRadius:visibleButtons.length>0?'12px 12px 3px 3px':'12px 12px 3px 12px',padding:'8px 10px',fontSize:'0.68rem',color:'white',lineHeight:1.4,whiteSpace:'pre-wrap',wordBreak:'break-word' }}>
+                  {preview}
+                  {attachmentUrl && (
+                    <div style={{ marginTop: 6, padding: '4px 6px', background: 'rgba(255,255,255,0.18)', borderRadius: 6, fontSize: '0.6rem', display: 'flex', alignItems: 'center', gap: 4, border: '1px solid rgba(255,255,255,0.25)' }}>
+                      <span>📷</span>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 130 }}>Image Attachment</span>
+                    </div>
+                  )}
+                  <div style={{ fontSize:'0.55rem',color:'rgba(255,255,255,0.6)',marginTop:2,textAlign:'right' }}>{new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})} ✓✓</div>
+                </div>
+
+                {/* Interactive DM Buttons Stack */}
+                {visibleButtons.length > 0 && (
+                  <div style={{ display:'flex',flexDirection:'column',gap:2,marginTop:2 }}>
+                    {visibleButtons.map((btn, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          background:'white',
+                          color:'#2563EB',
+                          fontWeight:700,
+                          fontSize:'0.63rem',
+                          padding:'6px 8px',
+                          textAlign:'center',
+                          borderRadius: idx === visibleButtons.length - 1 ? '3px 3px 12px 12px' : 3,
+                          border:'1px solid #E2E8F0',
+                          boxShadow:'0 1px 2px rgba(0,0,0,0.05)',
+                          display:'flex',
+                          alignItems:'center',
+                          justifyContent:'center',
+                          gap:4,
+                          cursor:'pointer'
+                        }}
+                      >
+                        <span style={{ overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',maxWidth:150 }}>{btn.title}</span>
+                        <ExternalLink size={9} style={{ opacity:0.8,flexShrink:0 }}/>
+                      </div>
+                    ))}
                   </div>
                 )}
-                <div style={{ fontSize:'0.55rem',color:'rgba(255,255,255,0.6)',marginTop:2,textAlign:'right' }}>{new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})} ✓✓</div>
               </div>
             ) : (
               <div style={{ background:'rgba(0,0,0,0.04)',borderRadius:'12px 12px 3px 12px',padding:'8px 10px',fontSize:'0.67rem',color:'#94A3B8',maxWidth:'88%',marginLeft:'auto',lineHeight:1.4,fontStyle:'italic',border:'1.5px dashed #CBD5E1' }}>
@@ -192,7 +290,7 @@ const PhonePreview: React.FC<{
           </div>
         </div>
       </div>
-      <div style={{ width:240,background:'white',border:'1px solid var(--color-border)',borderRadius:12,padding:'12px 14px' }}>
+      <div style={{ width:250,background:'white',border:'1px solid var(--color-border)',borderRadius:12,padding:'12px 14px' }}>
         <div style={{ fontSize:'0.65rem',fontWeight:700,color:'var(--color-muted)',marginBottom:8,textTransform:'uppercase',letterSpacing:'0.06em' }}>Variables preview as</div>
         {Object.entries(PREVIEW_VALUES).map(([key,val])=>(
           <div key={key} style={{ display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:5,fontSize:'0.72rem' }}>
@@ -227,6 +325,14 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
   const [anyCommentKeyword, setAnyCommentKeyword] = useState(true);
   const [publicCommentReplyEnabled, setPublicCommentReplyEnabled] = useState(false);
   const [publicCommentReplyTemplate, setPublicCommentReplyTemplate] = useState('Thanks for your comment! Check your DM for details.');
+  const [publicCommentReplyTemplates, setPublicCommentReplyTemplates] = useState<string[]>([
+    'Thanks for your comment! Check your DM for details.'
+  ]);
+  const [dmButtons, setDmButtons] = useState<RuleButton[]>([]);
+  const [captureEmailEnabled, setCaptureEmailEnabled] = useState(false);
+  const [emailCapturePrompt, setEmailCapturePrompt] = useState("What's the best email address to send your link to? 📩");
+  const [emailCaptureSuccessMessage, setEmailCaptureSuccessMessage] = useState("Thanks! We've sent it to your email. 🎉");
+  const [replyDelaySeconds, setReplyDelaySeconds] = useState(0);
   const [askFollowBeforeDm, setAskFollowBeforeDm] = useState(false);
   const [dmAttachmentUrl, setDmAttachmentUrl] = useState('');
   const [dmAttachmentType, setDmAttachmentType] = useState<'image' | 'video'>('image');
@@ -262,7 +368,16 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
         setSelectedMediaId(seed.comment_media_id ?? '');
         setAnyCommentKeyword(seed.any_comment_keyword ?? true);
         setPublicCommentReplyEnabled(Boolean(seed.public_comment_reply_enabled));
-        setPublicCommentReplyTemplate(seed.public_comment_reply_template || 'Thanks for your comment! Check your DM for details.');
+        const seedCommentTemplates = Array.isArray(seed.public_comment_reply_templates) && seed.public_comment_reply_templates.length > 0
+          ? seed.public_comment_reply_templates
+          : [seed.public_comment_reply_template || 'Thanks for your comment! Check your DM for details.'];
+        setPublicCommentReplyTemplates(seedCommentTemplates);
+        setPublicCommentReplyTemplate(seedCommentTemplates[0] || 'Thanks for your comment! Check your DM for details.');
+        setDmButtons(Array.isArray(seed.dm_buttons) ? seed.dm_buttons : []);
+        setCaptureEmailEnabled(Boolean(seed.capture_email_enabled));
+        setEmailCapturePrompt(seed.email_capture_prompt || "What's the best email address to send your link to? 📩");
+        setEmailCaptureSuccessMessage(seed.email_capture_success_message || "Thanks! We've sent it to your email. 🎉");
+        setReplyDelaySeconds(typeof seed.reply_delay_seconds === 'number' ? seed.reply_delay_seconds : 0);
         setAskFollowBeforeDm(Boolean(seed.ask_follow_before_dm));
         setDmAttachmentUrl(seed.dm_attachment_url || '');
         setDmAttachmentType((seed.dm_attachment_type as 'image' | 'video') || 'image');
@@ -284,6 +399,12 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
       setAnyCommentKeyword(true);
       setPublicCommentReplyEnabled(false);
       setPublicCommentReplyTemplate('Thanks for your comment! Check your DM for details.');
+      setPublicCommentReplyTemplates(['Thanks for your comment! Check your DM for details.']);
+      setDmButtons([]);
+      setCaptureEmailEnabled(false);
+      setEmailCapturePrompt("What's the best email address to send your link to? 📩");
+      setEmailCaptureSuccessMessage("Thanks! We've sent it to your email. 🎉");
+      setReplyDelaySeconds(0);
       setAskFollowBeforeDm(false);
       setDmAttachmentUrl('');
       setDmAttachmentType('image');
@@ -302,7 +423,16 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
     setSelectedMediaId(initialRule.comment_media_id ?? '');
     setAnyCommentKeyword(initialRule.any_comment_keyword ?? true);
     setPublicCommentReplyEnabled(Boolean(initialRule.public_comment_reply_enabled));
-    setPublicCommentReplyTemplate(initialRule.public_comment_reply_template || 'Thanks for your comment! Check your DM for details.');
+    const initCommentTemplates = Array.isArray(initialRule.public_comment_reply_templates) && initialRule.public_comment_reply_templates.length > 0
+      ? initialRule.public_comment_reply_templates
+      : [initialRule.public_comment_reply_template || 'Thanks for your comment! Check your DM for details.'];
+    setPublicCommentReplyTemplates(initCommentTemplates);
+    setPublicCommentReplyTemplate(initCommentTemplates[0] || 'Thanks for your comment! Check your DM for details.');
+    setDmButtons(Array.isArray(initialRule.dm_buttons) ? initialRule.dm_buttons : []);
+    setCaptureEmailEnabled(Boolean(initialRule.capture_email_enabled));
+    setEmailCapturePrompt(initialRule.email_capture_prompt || "What's the best email address to send your link to? 📩");
+    setEmailCaptureSuccessMessage(initialRule.email_capture_success_message || "Thanks! We've sent it to your email. 🎉");
+    setReplyDelaySeconds(typeof initialRule.reply_delay_seconds === 'number' ? initialRule.reply_delay_seconds : 0);
     setAskFollowBeforeDm(Boolean(initialRule.ask_follow_before_dm));
     setDmAttachmentUrl(initialRule.dm_attachment_url || '');
     setDmAttachmentType((initialRule.dm_attachment_type as 'image' | 'video') || 'image');
@@ -314,16 +444,23 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
 
   useEffect(()=>{
     if(!isStarterOrPro&&askFollowBeforeDm) setAskFollowBeforeDm(false);
+    if(!isStarterOrPro&&captureEmailEnabled) setCaptureEmailEnabled(false);
     if(!isPro&&publicCommentReplyEnabled) setPublicCommentReplyEnabled(false);
     if(!isPro&&dmAttachmentUrl) setDmAttachmentUrl('');
     if(!isPro&&showAttachmentInput) setShowAttachmentInput(false);
-  },[askFollowBeforeDm,dmAttachmentUrl,isPro,isStarterOrPro,publicCommentReplyEnabled,showAttachmentInput]);
+  },[askFollowBeforeDm,captureEmailEnabled,dmAttachmentUrl,isPro,isStarterOrPro,publicCommentReplyEnabled,showAttachmentInput]);
 
   const reset=()=>{
     setStep('choose');setName('');setTriggerType(null);setCommentTarget('specific');
     setCommentFilter('all');setSelectedMediaId('');setMediaItems([]);setMediaLimit(24);
     setAnyCommentKeyword(true);setPublicCommentReplyEnabled(false);
     setPublicCommentReplyTemplate('Thanks for your comment! Check your DM for details.');
+    setPublicCommentReplyTemplates(['Thanks for your comment! Check your DM for details.']);
+    setDmButtons([]);
+    setCaptureEmailEnabled(false);
+    setEmailCapturePrompt("What's the best email address to send your link to? 📩");
+    setEmailCaptureSuccessMessage("Thanks! We've sent it to your email. 🎉");
+    setReplyDelaySeconds(0);
     setAskFollowBeforeDm(false);
     setDmAttachmentUrl('');setDmAttachmentType('image');setShowAttachmentInput(false);
     setKeywords([]);setKwInput('');setTemplate('');setError('');setShowPreview(false);
@@ -384,6 +521,15 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
   const handleSubmit=async()=>{
     if(!triggerType||!canSubmit()) return;
     setLoading(true); setError('');
+    const cleanTemplates = publicCommentReplyTemplates.map(t => t.trim()).filter(Boolean);
+    const validButtons = dmButtons
+      .map(b => ({
+        type: 'web_url' as const,
+        title: b.title.trim().slice(0, 20),
+        url: b.url?.trim() || undefined,
+      }))
+      .filter(b => b.title.length > 0);
+
     const payload:RuleCreatePayload={
       name:name.trim()||`${TRIGGER_OPTIONS.find(t=>t.value===triggerType)?.label} Rule`,
       trigger_type:triggerType,
@@ -394,8 +540,14 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
         comment_media_id:commentTarget==='specific'?selectedMediaId:undefined,
         any_comment_keyword:anyCommentKeyword,
         public_comment_reply_enabled:publicCommentReplyEnabled,
-        public_comment_reply_template:publicCommentReplyEnabled?normalizeTemplateVariables(publicCommentReplyTemplate):undefined,
+        public_comment_reply_template:publicCommentReplyEnabled ? (cleanTemplates[0] || normalizeTemplateVariables(publicCommentReplyTemplate)) : undefined,
+        public_comment_reply_templates:publicCommentReplyEnabled ? cleanTemplates.map(normalizeTemplateVariables) : undefined,
       }),
+      dm_buttons: validButtons.length > 0 ? validButtons : undefined,
+      capture_email_enabled: isStarterOrPro && captureEmailEnabled,
+      email_capture_prompt: isStarterOrPro && captureEmailEnabled ? (emailCapturePrompt.trim() || undefined) : undefined,
+      email_capture_success_message: isStarterOrPro && captureEmailEnabled ? (emailCaptureSuccessMessage.trim() || undefined) : undefined,
+      reply_delay_seconds: replyDelaySeconds,
       ask_follow_before_dm:askFollowBeforeDm,
       dm_attachment_url:(isPro&&showAttachmentInput&&dmAttachmentUrl.trim())?dmAttachmentUrl.trim():undefined,
       dm_attachment_type:(isPro&&showAttachmentInput&&dmAttachmentUrl.trim())?dmAttachmentType:undefined,
@@ -453,7 +605,20 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
           {/* Mobile preview panel */}
           {showPreview&&(
             <div className="rb-preview-mobile">
-              <PhonePreview triggerType={triggerType} template={template} keywords={keywords} attachmentUrl={isPro&&showAttachmentInput?dmAttachmentUrl:''} attachmentType={dmAttachmentType}/>
+              <PhonePreview
+                triggerType={triggerType}
+                template={template}
+                keywords={keywords}
+                attachmentUrl={isPro&&showAttachmentInput?dmAttachmentUrl:''}
+                attachmentType={dmAttachmentType}
+                dmButtons={dmButtons}
+                captureEmailEnabled={captureEmailEnabled&&isStarterOrPro}
+                emailCapturePrompt={emailCapturePrompt}
+                emailCaptureSuccessMessage={emailCaptureSuccessMessage}
+                replyDelaySeconds={replyDelaySeconds}
+                publicCommentReplyEnabled={publicCommentReplyEnabled&&isPro}
+                publicCommentReplyTemplates={publicCommentReplyTemplates}
+              />
             </div>
           )}
 
@@ -532,7 +697,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                 </div>
               )}
 
-              {/* Response Template */}
+              {/* Response Template & Interactive DM Buttons */}
               <div className="rb-field-shell rb-template-shell" style={{ marginBottom:16 }}>
                 <label className="form-label">Response Template</label>
                 <div className="rb-var-chips">
@@ -554,26 +719,293 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                 </p>
                 <textarea ref={textareaRef} className="template-textarea" placeholder="Hi {{name}}! Thanks for reaching out. Here's what you need to know..." value={template} onChange={e=>setTemplate(e.target.value.slice(0, 1000))} rows={4} maxLength={1000}/>
                 <p style={{ fontSize:'0.75rem',color:'var(--color-muted)',textAlign:'right',marginTop:4 }}>{template.length} / 1000</p>
+
+                {/* Interactive DM Buttons Builder */}
+                <div style={{ marginTop: 14, borderTop: '1px dashed rgba(226, 232, 240, 0.9)', paddingTop: 12 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text)' }}>
+                        Interactive DM Buttons
+                      </span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--color-muted)' }}>
+                        (Max 3 links)
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--color-muted)', fontWeight: 600 }}>
+                      {dmButtons.length}/3 buttons
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '0.73rem', color: 'var(--color-muted)', marginBottom: 10 }}>
+                    Attach native clickable CTA buttons underneath your DM speech bubble in Instagram.
+                  </p>
+
+                  {dmButtons.map((btn, bIdx) => (
+                    <div key={bIdx} style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '10px 12px', marginBottom: 8 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                        <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--color-primary)' }}>Button #{bIdx + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => setDmButtons(dmButtons.filter((_, i) => i !== bIdx))}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', padding: '2px' }}
+                          title="Delete Button"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                            <label style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>Button Title</label>
+                            <span style={{ fontSize: '0.65rem', color: btn.title.length >= 20 ? '#EF4444' : 'var(--color-muted)' }}>
+                              {btn.title.length}/20
+                            </span>
+                          </div>
+                          <input
+                            type="text"
+                            className="form-input"
+                            placeholder="e.g. Claim Discount"
+                            maxLength={20}
+                            value={btn.title}
+                            onChange={(e) => {
+                              const updated = [...dmButtons];
+                              updated[bIdx] = { ...updated[bIdx], title: e.target.value.slice(0, 20) };
+                              setDmButtons(updated);
+                            }}
+                            style={{ padding: '6px 10px', fontSize: '0.78rem' }}
+                          />
+                        </div>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                            <label style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>Website URL (HTTPS)</label>
+                          </div>
+                          <input
+                            type="url"
+                            className="form-input"
+                            placeholder="https://yourbrand.com/offer"
+                            value={btn.url || ''}
+                            onChange={(e) => {
+                              const updated = [...dmButtons];
+                              updated[bIdx] = { ...updated[bIdx], url: e.target.value };
+                              setDmButtons(updated);
+                            }}
+                            style={{ padding: '6px 10px', fontSize: '0.78rem' }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {dmButtons.length < 3 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDmButtons([...dmButtons, { type: 'web_url', title: '', url: 'https://' }]);
+                      }}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        color: 'var(--color-primary)',
+                        background: 'rgba(124, 58, 237, 0.06)',
+                        border: '1px dashed rgba(124, 58, 237, 0.3)',
+                        borderRadius: 8,
+                        padding: '7px 14px',
+                        cursor: 'pointer',
+                        marginTop: 2
+                      }}
+                    >
+                      <Plus size={14} /> Add Button ({3 - dmButtons.length} remaining)
+                    </button>
+                  )}
+                </div>
               </div>
 
-              {/* Comment advanced */}
+              {/* Multi-Comment Rotation Pool (Anti-Spam) */}
               {triggerType==='comment'&&(
-                <div style={{ marginBottom:14 }}>
+                <div className="rb-field-shell" style={{ marginBottom:14 }}>
                   <div className="wizard-toggle-row compact">
                     <span className="wizard-toggle-label">Publicly reply to comments {lockBadge(isPro,'pro')}</span>
                     <button type="button" onClick={()=>isPro&&setPublicCommentReplyEnabled(p=>!p)} className={`wizard-switch ${publicCommentReplyEnabled?'on':''}`} disabled={!isPro}><span/></button>
                   </div>
-                  {publicCommentReplyEnabled&&(<textarea className="template-textarea" style={{ marginTop:8 }} rows={2} value={publicCommentReplyTemplate} onChange={e=>setPublicCommentReplyTemplate(e.target.value)}/>)}
+                  {publicCommentReplyEnabled&&(
+                    <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
+                          Reply Variations (Anti-Spam Rotation Pool)
+                        </span>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--color-muted)' }}>
+                          {publicCommentReplyTemplates.length}/5 variations
+                        </span>
+                      </div>
+                      <p style={{ fontSize: '0.73rem', color: 'var(--color-muted)', margin: 0 }}>
+                        PinGuru randomly rotates through these variations so every commenter gets a unique reply, avoiding Instagram automated spam blocks.
+                      </p>
+
+                      {publicCommentReplyTemplates.map((reply, idx) => (
+                        <div key={idx} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-primary)', width: 22, textAlign: 'center' }}>
+                            #{idx + 1}
+                          </span>
+                          <input
+                            type="text"
+                            className="form-input"
+                            placeholder="e.g. Sent you a DM! Check your requests 📩"
+                            value={reply}
+                            onChange={(e) => {
+                              const updated = [...publicCommentReplyTemplates];
+                              updated[idx] = e.target.value;
+                              setPublicCommentReplyTemplates(updated);
+                            }}
+                            style={{ flex: 1, padding: '7px 10px', fontSize: '0.82rem' }}
+                          />
+                          {publicCommentReplyTemplates.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setPublicCommentReplyTemplates(publicCommentReplyTemplates.filter((_, i) => i !== idx));
+                              }}
+                              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', padding: '6px' }}
+                              title="Remove variation"
+                            >
+                              <X size={14} />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+
+                      {publicCommentReplyTemplates.length < 5 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPublicCommentReplyTemplates([...publicCommentReplyTemplates, '']);
+                          }}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 6,
+                            fontSize: '0.78rem',
+                            fontWeight: 600,
+                            color: 'var(--color-primary)',
+                            background: 'rgba(124, 58, 237, 0.06)',
+                            border: '1px dashed rgba(124, 58, 237, 0.3)',
+                            borderRadius: 8,
+                            padding: '6px 12px',
+                            cursor: 'pointer',
+                            alignSelf: 'flex-start',
+                            marginTop: 2,
+                          }}
+                        >
+                          <Plus size={13} /> Add Reply Variation
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* Toggles */}
               <div className="rb-field-shell" style={{ display:'flex',flexDirection:'column',gap:12,marginBottom:20 }}>
+                {/* Ask to follow */}
                 <div className="wizard-toggle-row compact">
                   <span className="wizard-toggle-label">Ask to follow before DM {lockBadge(isStarterOrPro,'starter')}</span>
                   <button type="button" onClick={()=>isStarterOrPro&&setAskFollowBeforeDm(p=>!p)} className={`wizard-switch ${askFollowBeforeDm?'on':''}`} disabled={!isStarterOrPro} aria-label="Toggle ask to follow"><span/></button>
                 </div>
 
+                {/* In-DM Lead / Email Capture Toggle */}
+                <div style={{ borderTop: '1px solid rgba(226,232,240,0.8)', paddingTop: 10 }}>
+                  <div className="wizard-toggle-row compact">
+                    <span className="wizard-toggle-label">Capture Email Address before sending link {lockBadge(isStarterOrPro,'starter')}</span>
+                    <button
+                      type="button"
+                      onClick={() => isStarterOrPro && setCaptureEmailEnabled(p => !p)}
+                      className={`wizard-switch ${captureEmailEnabled && isStarterOrPro ? 'on' : ''}`}
+                      disabled={!isStarterOrPro}
+                      aria-label="Toggle email capture"
+                    >
+                      <span />
+                    </button>
+                  </div>
+                  <p style={{ fontSize: '0.72rem', color: 'var(--color-muted)', marginTop: 3 }}>
+                    Automatically asks for the follower's email address in Instagram DM before delivering your download link or offer.
+                  </p>
+
+                  {captureEmailEnabled && isStarterOrPro && (
+                    <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 10, background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '12px' }}>
+                      <div>
+                        <label className="form-label" style={{ marginBottom: 4, fontSize: '0.76rem' }}>
+                          Email Capture Prompt
+                        </label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          placeholder="What's the best email address to send your link to? 📩"
+                          value={emailCapturePrompt}
+                          onChange={(e) => setEmailCapturePrompt(e.target.value)}
+                          style={{ fontSize: '0.8rem', padding: '7px 10px' }}
+                        />
+                      </div>
+                      <div>
+                        <label className="form-label" style={{ marginBottom: 4, fontSize: '0.76rem' }}>
+                          Thank You / Confirmation Message
+                        </label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          placeholder="Thanks! We've sent it to your email. 🎉"
+                          value={emailCaptureSuccessMessage}
+                          onChange={(e) => setEmailCaptureSuccessMessage(e.target.value)}
+                          style={{ fontSize: '0.8rem', padding: '7px 10px' }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Reply Delay Selector */}
+                <div style={{ borderTop: '1px solid rgba(226,232,240,0.8)', paddingTop: 10 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span className="wizard-toggle-label">Reply Delay (Anti-Spam Latency)</span>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-primary)' }}>
+                      {replyDelaySeconds === 0 ? '0s (Instant)' : `${replyDelaySeconds}s delay`}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
+                    {[
+                      { sec: 0, label: '0s (Instant)' },
+                      { sec: 3, label: '3s (Safe)' },
+                      { sec: 5, label: '5s (Natural)' },
+                      { sec: 10, label: '10s (High Safety)' },
+                      { sec: 15, label: '15s (Max)' },
+                    ].map((opt) => (
+                      <button
+                        key={opt.sec}
+                        type="button"
+                        onClick={() => setReplyDelaySeconds(opt.sec)}
+                        style={{
+                          flex: 1,
+                          padding: '6px 4px',
+                          borderRadius: 8,
+                          fontSize: '0.7rem',
+                          fontWeight: replyDelaySeconds === opt.sec ? 700 : 500,
+                          border: replyDelaySeconds === opt.sec ? '1.5px solid var(--color-primary)' : '1px solid #E2E8F0',
+                          background: replyDelaySeconds === opt.sec ? 'rgba(124, 58, 237, 0.08)' : '#FFFFFF',
+                          color: replyDelaySeconds === opt.sec ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+                          cursor: 'pointer',
+                          transition: 'all 120ms'
+                        }}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p style={{ fontSize: '0.72rem', color: 'var(--color-muted)', marginTop: 6 }}>
+                    Prevents Instagram automated spam blocks by simulating natural human response latency.
+                  </p>
+                </div>
+
+                {/* Media Attachment */}
                 <div style={{ borderTop: '1px solid rgba(226,232,240,0.8)', paddingTop: 10 }}>
                   <div className="wizard-toggle-row compact">
                     <span className="wizard-toggle-label">Media Attachment {lockBadge(isPro,'pro')}</span>
@@ -591,38 +1023,16 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                   {showAttachmentInput && isPro && (
                     <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
                       <div>
-                        <label className="form-label" style={{ marginBottom: 6, fontSize: '0.78rem' }}>Attachment Type</label>
-                        <div style={{ display: 'flex', gap: 8 }}>
-                          <button
-                            type="button"
-                            onClick={() => setDmAttachmentType('image')}
-                            className={`wizard-filter-pill ${dmAttachmentType === 'image' ? 'active' : ''}`}
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}
-                          >
-                            <span>📷</span> Image
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setDmAttachmentType('video')}
-                            className={`wizard-filter-pill ${dmAttachmentType === 'video' ? 'active' : ''}`}
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}
-                          >
-                            <span>🎬</span> Video
-                          </button>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="form-label" style={{ marginBottom: 6, fontSize: '0.78rem' }}>Media URL</label>
+                        <label className="form-label" style={{ marginBottom: 6, fontSize: '0.78rem' }}>Image URL</label>
                         <input
                           type="url"
                           className="form-input"
-                          placeholder="https://example.com/assets/media.jpg"
+                          placeholder="https://example.com/assets/image.jpg"
                           value={dmAttachmentUrl}
                           onChange={(e) => setDmAttachmentUrl(e.target.value)}
                         />
                         <p style={{ fontSize: '0.72rem', color: 'var(--color-muted)', marginTop: 4 }}>
-                          Direct HTTPS media link attached to the automated DM.
+                          Direct HTTPS image link attached to the automated DM. Meta's Instagram API only supports image attachments for comment replies.
                         </p>
                       </div>
                     </div>
@@ -658,7 +1068,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
               )}
 
               <button type="button" onClick={handleSubmit} disabled={loading||!canSubmit()}
-                style={{ width:'100%',padding:'13px',background:canSubmit()?'linear-gradient(135deg,#7C3AED,#DB2777)':'#E2E8F0',color:canSubmit()?'white':'#94A3B8',border:'none',borderRadius:12,fontFamily:'var(--font-display)',fontWeight:700,fontSize:'0.9375rem',cursor:canSubmit()?'pointer':'not-allowed',transition:'all 200ms',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:canSubmit()?'0 8px 24px rgba(124,58,237,0.3)':'none' }}>
+                style={{ width:'100%',padding:'13px',background:canSubmit()?'linear-gradient(135deg,#7C3AED 0%,#6366F1 50%,#EC4899 100%)':'#F1F5F9',color:canSubmit()?'white':'#94A3B8',border:canSubmit()?'none':'1px solid #E2E8F0',borderRadius:14,fontFamily:'var(--font-display)',fontWeight:700,fontSize:'0.9375rem',cursor:canSubmit()?'pointer':'not-allowed',transition:'all 200ms',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:canSubmit()?'0 8px 20px -4px rgba(124,58,237,0.35)':'none' }}>
                 {loading ? (
                   <><RefreshCw size={16} className="animate-spin"/> {editing ? 'Saving...' : 'Creating rule...'}</>
                 ) : (
@@ -669,7 +1079,20 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
 
             {/* Desktop preview */}
             <div className="rb-preview-col">
-              <PhonePreview triggerType={triggerType} template={template} keywords={keywords} attachmentUrl={isPro&&showAttachmentInput?dmAttachmentUrl:''} attachmentType={dmAttachmentType}/>
+              <PhonePreview
+                triggerType={triggerType}
+                template={template}
+                keywords={keywords}
+                attachmentUrl={isPro&&showAttachmentInput?dmAttachmentUrl:''}
+                attachmentType={dmAttachmentType}
+                dmButtons={dmButtons}
+                captureEmailEnabled={captureEmailEnabled&&isStarterOrPro}
+                emailCapturePrompt={emailCapturePrompt}
+                emailCaptureSuccessMessage={emailCaptureSuccessMessage}
+                replyDelaySeconds={replyDelaySeconds}
+                publicCommentReplyEnabled={publicCommentReplyEnabled&&isPro}
+                publicCommentReplyTemplates={publicCommentReplyTemplates}
+              />
             </div>
           </div>
         </div>
@@ -677,3 +1100,4 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
     </Modal>
   );
 };
+

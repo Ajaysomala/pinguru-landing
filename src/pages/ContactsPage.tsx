@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
-import { getContacts, getContactStats, getDashboardStats } from '../lib/api';
+import { Search, ChevronLeft, ChevronRight, Sparkles, Download, RefreshCw, Mail } from 'lucide-react';
+import { getContacts, getContactStats, getDashboardStats, exportContactsCsv } from '../lib/api';
 import { Badge } from '../components/ui/Badge';
 import { useAuth } from '../App';
 import '../styles/dashboard.css';
@@ -16,6 +16,8 @@ interface Contact {
   dm_count: number;
   first_seen_at: string;
   last_seen_at: string;
+  captured_email?: string | null;
+  email?: string | null;
 }
 
 interface ContactStats {
@@ -33,6 +35,7 @@ const ContactsPage: React.FC = () => {
   const [loading, setLoading]     = useState(true);
   const [search, setSearch] = useState('');
   const [triggerFilter, setTriggerFilter] = useState('all');
+  const [isExporting, setIsExporting] = useState(false);
 
   const LIMIT = 20;
 
@@ -49,6 +52,25 @@ const ContactsPage: React.FC = () => {
   useEffect(() => {
     load(1);
   }, [load]);
+
+  const handleExportCsv = async () => {
+    setIsExporting(true);
+    try {
+      const blob = await exportContactsCsv();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'pinguru_contacts.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Failed to export contacts CSV');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const totalPages = Math.ceil(total / LIMIT);
 
@@ -72,7 +94,7 @@ const ContactsPage: React.FC = () => {
   const totalDmsToContacts = contacts.reduce((sum, c) => sum + (c.dm_count ?? 0), 0);
 
   const filteredContacts = contacts.filter((contact) => {
-    const searchText = `${contact.ig_username ?? ''} ${contact.ig_user_id ?? ''} ${contact.display_name ?? ''}`.toLowerCase();
+    const searchText = `${contact.ig_username ?? ''} ${contact.ig_user_id ?? ''} ${contact.display_name ?? ''} ${contact.captured_email ?? ''} ${contact.email ?? ''}`.toLowerCase();
     const matchesSearch = !search || searchText.includes(search.toLowerCase());
     const matchesTrigger = triggerFilter === 'all' || (contact.trigger_type ?? '') === triggerFilter;
     return matchesSearch && matchesTrigger;
@@ -102,7 +124,7 @@ const ContactsPage: React.FC = () => {
         <article className="contacts-v6-stat-card">
           <p className="value">{newThisWeek}</p>
           <p className="label">New this week</p>
-          <p className="trend up">▲ +14%</p>
+          <p className="trend up">Last 7 days</p>
         </article>
         <article className="contacts-v6-stat-card">
           <p className="value">{Math.max(totalDmsToContacts, dmsSentThisMonth)}</p>
@@ -113,7 +135,7 @@ const ContactsPage: React.FC = () => {
       <section className="contacts-v6-filters">
         <div className="contacts-v6-search">
           <Search size={16} />
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by username..." />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by username, ID, or email..." />
         </div>
         <select value={triggerFilter} onChange={(e) => setTriggerFilter(e.target.value)}>
           <option value="all">All triggers</option>
@@ -122,6 +144,16 @@ const ContactsPage: React.FC = () => {
           <option value="story_mention">Story reply</option>
           <option value="new_dm">New DM</option>
         </select>
+        <button
+          type="button"
+          onClick={handleExportCsv}
+          disabled={isExporting}
+          className="contacts-v6-export-btn"
+          title="Export Contacts to CSV"
+        >
+          {isExporting ? <RefreshCw size={15} className="animate-spin" /> : <Download size={15} />}
+          <span>{isExporting ? 'Exporting...' : 'Export to CSV'}</span>
+        </button>
       </section>
 
       <section className="contacts-v6-table-wrap">
@@ -129,6 +161,7 @@ const ContactsPage: React.FC = () => {
           <thead>
             <tr>
               <th>Contact</th>
+              <th>Captured Email</th>
               <th>Trigger Type</th>
               <th>DMs Received</th>
               <th>Last Seen</th>
@@ -137,11 +170,11 @@ const ContactsPage: React.FC = () => {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={4} className="contacts-v6-empty">Loading contacts...</td>
+                <td colSpan={5} className="contacts-v6-empty">Loading contacts...</td>
               </tr>
             ) : filteredContacts.length === 0 ? (
               <tr>
-                <td colSpan={4} className="contacts-v6-empty">No contacts found.</td>
+                <td colSpan={5} className="contacts-v6-empty">No contacts found.</td>
               </tr>
             ) : (
               filteredContacts.map((contact) => (
@@ -154,6 +187,16 @@ const ContactsPage: React.FC = () => {
                         <p className="id">{contact.ig_user_id}</p>
                       </div>
                     </div>
+                  </td>
+                  <td>
+                    {contact.captured_email || contact.email ? (
+                      <Badge variant="indigo">
+                        <Mail size={11} className="mr-1 inline-block shrink-0" />
+                        {contact.captured_email || contact.email}
+                      </Badge>
+                    ) : (
+                      <span style={{ color: 'var(--color-muted)', fontSize: '0.85rem' }}>—</span>
+                    )}
                   </td>
                   <td><Badge variant="gray">{triggerLabel(contact.trigger_type)}</Badge></td>
                   <td className="num">{contact.dm_count}</td>

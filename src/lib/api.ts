@@ -1,4 +1,4 @@
-import type { User, DashboardStats, Rule, RuleCreatePayload, AnalyticsData, PlanStatus, InstagramMediaItem } from './types';
+import type { User, DashboardStats, Rule, RuleCreatePayload, AnalyticsData, PlanStatus, InstagramMediaItem, RuleButton, AutomationRule } from './types';
 
 const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://api.pinguru.me' : '/api')).replace(/\/$/, '');
 
@@ -24,7 +24,20 @@ type BackendRule = {
   any_comment_keyword?: boolean;
   public_comment_reply_enabled?: boolean;
   public_comment_reply_template?: string;
+  public_comment_reply_templates?: string[];
+  dm_buttons?: RuleButton[];
+  capture_email_enabled?: boolean;
+  email_capture_prompt?: string;
+  email_capture_success_message?: string;
+  reply_delay_seconds?: number;
   ask_follow_before_dm?: boolean;
+  analytics?: {
+    triggers: number;
+    dms_sent: number;
+    follows_unlocked: number;
+    emails_captured: number;
+    conversion_rate: number;
+  };
 };
 
 function mapBackendTriggerToUi(trigger: string): Rule['trigger_type'] {
@@ -41,6 +54,10 @@ function mapUiTriggerToBackend(trigger: RuleCreatePayload['trigger_type']): stri
 }
 
 function mapRule(rule: BackendRule): Rule {
+  const commentTemplates = Array.isArray(rule.public_comment_reply_templates) && rule.public_comment_reply_templates.length > 0
+    ? rule.public_comment_reply_templates
+    : (rule.public_comment_reply_template ? [rule.public_comment_reply_template] : []);
+
   return {
     id: String(rule.id ?? rule._id ?? ''),
     name: rule.name,
@@ -57,11 +74,18 @@ function mapRule(rule: BackendRule): Rule {
     dm_attachment_type: rule.dm_attachment_type,
     any_comment_keyword: rule.any_comment_keyword,
     public_comment_reply_enabled: rule.public_comment_reply_enabled,
-    public_comment_reply_template: rule.public_comment_reply_template,
+    public_comment_reply_template: rule.public_comment_reply_template ?? commentTemplates[0],
+    public_comment_reply_templates: commentTemplates,
+    dm_buttons: Array.isArray(rule.dm_buttons) ? rule.dm_buttons : [],
+    capture_email_enabled: Boolean(rule.capture_email_enabled),
+    email_capture_prompt: rule.email_capture_prompt,
+    email_capture_success_message: rule.email_capture_success_message,
+    reply_delay_seconds: typeof rule.reply_delay_seconds === 'number' ? rule.reply_delay_seconds : 0,
     ask_follow_before_dm: rule.ask_follow_before_dm,
     is_active: Boolean(rule.is_active),
     created_at: rule.created_at ?? new Date().toISOString(),
     dm_count: rule.sent_count,
+    analytics: rule.analytics,
   };
 }
 
@@ -120,9 +144,11 @@ async function authFetch(path: string, options: RequestInit = {}): Promise<Respo
   const method = (options.method || 'GET').toUpperCase();
   const isStateChanging = !['GET', 'HEAD', 'OPTIONS', 'TRACE'].includes(method);
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
     ...((options.headers as Record<string, string>) || {}),
   };
+  if (!(options.body instanceof FormData) && !headers['Content-Type']) {
+    headers['Content-Type'] = 'application/json';
+  }
   if (isStateChanging) {
     const csrfToken = readCookie('pg_csrf') || readCookie('pg_admin_csrf');
     if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
@@ -133,6 +159,16 @@ async function authFetch(path: string, options: RequestInit = {}): Promise<Respo
     ...options,
     headers,
   });
+}
+
+export async function submitRefundRequest(formData: FormData): Promise<{ message: string }> {
+  const res = await authFetch('/billing/refund', {
+    method: 'POST',
+    body: formData,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(asErrorMessage(data, 'Failed to submit refund request'));
+  return data;
 }
 
 export async function loginUser(email: string, password: string) {
@@ -291,6 +327,10 @@ export async function getRules(): Promise<{ rules: Rule[] }> {
 }
 
 export async function createRule(payload: RuleCreatePayload): Promise<Rule> {
+  const commentTemplates = payload.public_comment_reply_templates && payload.public_comment_reply_templates.length > 0
+    ? payload.public_comment_reply_templates
+    : (payload.public_comment_reply_template ? [payload.public_comment_reply_template] : undefined);
+
   const backendPayload = {
     name: payload.name,
     trigger_type: mapUiTriggerToBackend(payload.trigger_type),
@@ -306,7 +346,13 @@ export async function createRule(payload: RuleCreatePayload): Promise<Rule> {
     dm_attachment_type: payload.dm_attachment_type,
     any_comment_keyword: payload.any_comment_keyword,
     public_comment_reply_enabled: payload.public_comment_reply_enabled,
-    public_comment_reply_template: payload.public_comment_reply_template,
+    public_comment_reply_template: payload.public_comment_reply_template ?? (commentTemplates ? commentTemplates[0] : undefined),
+    public_comment_reply_templates: commentTemplates,
+    dm_buttons: payload.dm_buttons,
+    capture_email_enabled: payload.capture_email_enabled,
+    email_capture_prompt: payload.email_capture_prompt,
+    email_capture_success_message: payload.email_capture_success_message,
+    reply_delay_seconds: payload.reply_delay_seconds,
     ask_follow_before_dm: payload.ask_follow_before_dm,
   };
   const res = await authFetch('/automation/rules', { method: 'POST', body: JSON.stringify(backendPayload) });
@@ -332,6 +378,17 @@ export async function updateRule(ruleId: string, payload: Partial<RuleCreatePayl
   if (payload.any_comment_keyword !== undefined) backendPayload.any_comment_keyword = payload.any_comment_keyword;
   if (payload.public_comment_reply_enabled !== undefined) backendPayload.public_comment_reply_enabled = payload.public_comment_reply_enabled;
   if (payload.public_comment_reply_template !== undefined) backendPayload.public_comment_reply_template = payload.public_comment_reply_template;
+  if (payload.public_comment_reply_templates !== undefined) {
+    backendPayload.public_comment_reply_templates = payload.public_comment_reply_templates;
+    if (!backendPayload.public_comment_reply_template && payload.public_comment_reply_templates.length > 0) {
+      backendPayload.public_comment_reply_template = payload.public_comment_reply_templates[0];
+    }
+  }
+  if (payload.dm_buttons !== undefined) backendPayload.dm_buttons = payload.dm_buttons;
+  if (payload.capture_email_enabled !== undefined) backendPayload.capture_email_enabled = payload.capture_email_enabled;
+  if (payload.email_capture_prompt !== undefined) backendPayload.email_capture_prompt = payload.email_capture_prompt;
+  if (payload.email_capture_success_message !== undefined) backendPayload.email_capture_success_message = payload.email_capture_success_message;
+  if (payload.reply_delay_seconds !== undefined) backendPayload.reply_delay_seconds = payload.reply_delay_seconds;
   if (payload.ask_follow_before_dm !== undefined) backendPayload.ask_follow_before_dm = payload.ask_follow_before_dm;
 
   const res = await authFetch(`/automation/rules/${ruleId}`, { method: 'PUT', body: JSON.stringify(backendPayload) });
@@ -574,4 +631,24 @@ export async function getContactStats(): Promise<{ total: number; limit: number 
   } catch {
     return { total: 0, limit: null };
   }
+}
+
+export async function apiRequestBlob(path: string, options: RequestInit = {}): Promise<Blob> {
+  const res = await authFetch(path, options);
+  if (!res.ok) {
+    if (res.status === 404 && path.startsWith('/contacts/')) {
+      const fallbackRes = await authFetch(`/dashboard${path}`, options);
+      if (fallbackRes.ok) {
+        return await fallbackRes.blob();
+      }
+    }
+    const data = await res.json().catch(() => null);
+    throw new Error(asErrorMessage(data, `Failed to download file (${res.status})`));
+  }
+  return await res.blob();
+}
+
+export async function exportContactsCsv(): Promise<Blob> {
+  const res = await apiRequestBlob('/contacts/export-csv');
+  return res;
 }

@@ -11,11 +11,11 @@ interface BadgeProps {
 }
 
 const variantClasses: Record<BadgeVariant, string> = {
-  green:  'bg-emerald-50 text-emerald-800',
-  red:    'bg-rose-50 text-rose-800',
-  amber:  'bg-amber-50 text-amber-800',
-  indigo: 'bg-primary-light text-primary',
-  gray:   'bg-slate-100 text-slate-600',
+  green:  'bg-emerald-50 text-emerald-700 border border-emerald-200/60',
+  red:    'bg-rose-50 text-rose-700 border border-rose-200/60',
+  amber:  'bg-amber-50 text-amber-700 border border-amber-200/60',
+  indigo: 'bg-indigo-50 text-indigo-700 border border-indigo-200/60',
+  gray:   'bg-slate-100 text-slate-600 border border-slate-200/60',
 };
 
 const dotColors: Record<BadgeVariant, string> = {

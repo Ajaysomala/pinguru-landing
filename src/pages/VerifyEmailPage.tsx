@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, AlertCircle, CheckCircle, RefreshCw, ArrowRight } from 'lucide-react';
-import { verifyEmailOtp, resendEmailOtp, loginUser, getMe } from '../lib/api';
+import { verifyEmailOtp, resendEmailOtp, getMe } from '../lib/api';
 import { useAuth } from '../App';
 import '../styles/auth.css';
 
@@ -74,16 +74,6 @@ const VerifyEmailPage: React.FC = () => {
       await verifyEmailOtp(email, code);
       setSuccess('Email verified! Setting up your workspace...');
       localStorage.removeItem('pg_verify_email');
-
-      const savedPwd = sessionStorage.getItem('pg_temp_pass');
-      if (savedPwd) {
-        sessionStorage.removeItem('pg_temp_pass');
-        try {
-          await loginUser(email, savedPwd);
-        } catch {
-          // If login fails, continue to check session
-        }
-      }
 
       await refresh();
 

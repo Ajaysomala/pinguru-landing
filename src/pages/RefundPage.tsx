@@ -1,8 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, AlertTriangle, Upload, X } from 'lucide-react';
-
-const API = (import.meta.env.VITE_API_URL || 'https://api.pinguru.me').replace(/\/$/, '');
+import { submitRefundRequest } from '../lib/api';
 
 const RefundPage: React.FC = () => {
   const [reason, setReason]       = useState('');
@@ -32,13 +31,7 @@ const RefundPage: React.FC = () => {
       if (paymentId.trim()) formData.append('payment_id', paymentId.trim());
       screenshots.forEach((file, idx) => formData.append(`screenshot_${idx}`, file));
 
-      const res = await fetch(`${API}/billing/refund`, {
-        method: 'POST',
-        credentials: 'include',
-        body: formData,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'Failed to submit refund request');
+      const data = await submitRefundRequest(formData);
       setSuccess(data.message);
       setReason(''); setPaymentId(''); setScreenshots([]);
     } catch (err: any) {

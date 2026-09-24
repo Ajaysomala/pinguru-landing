@@ -34,6 +34,13 @@ export interface DashboardStats {
   busiest_weekday?: string | null;
 }
 
+export interface RuleButton {
+  type: 'web_url' | 'postback';
+  title: string;      // Max 20 chars
+  url?: string;       // HTTPS only
+  payload?: string;
+}
+
 export interface Rule {
   id: string;
   name: string;
@@ -51,11 +58,26 @@ export interface Rule {
   any_comment_keyword?: boolean;
   public_comment_reply_enabled?: boolean;
   public_comment_reply_template?: string;
+  public_comment_reply_templates?: string[];
+  dm_buttons?: RuleButton[];
+  capture_email_enabled?: boolean;
+  email_capture_prompt?: string;
+  email_capture_success_message?: string;
+  reply_delay_seconds?: number;
   ask_follow_before_dm?: boolean;
   is_active: boolean;
   created_at: string;
   dm_count?: number;
+  analytics?: {
+    triggers: number;
+    dms_sent: number;
+    follows_unlocked: number;
+    emails_captured: number;
+    conversion_rate: number;
+  };
 }
+
+export type AutomationRule = Rule;
 
 export interface RuleCreatePayload {
   name: string;
@@ -73,7 +95,26 @@ export interface RuleCreatePayload {
   any_comment_keyword?: boolean;
   public_comment_reply_enabled?: boolean;
   public_comment_reply_template?: string;
+  public_comment_reply_templates?: string[];
+  dm_buttons?: RuleButton[];
+  capture_email_enabled?: boolean;
+  email_capture_prompt?: string;
+  email_capture_success_message?: string;
+  reply_delay_seconds?: number;
   ask_follow_before_dm?: boolean;
+}
+
+export interface Contact {
+  id: string;
+  ig_user_id: string;
+  ig_username?: string;
+  display_name?: string;
+  trigger_type?: string;
+  dm_count: number;
+  first_seen_at: string;
+  last_seen_at: string;
+  captured_email?: string | null;
+  email?: string | null;
 }
 
 export interface InstagramMediaItem {

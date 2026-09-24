@@ -94,8 +94,8 @@ export const ConnectPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="h-64 rounded-3xl bg-slate-900/60 animate-pulse border border-white/[0.05]" />
-        <div className="h-48 rounded-3xl bg-slate-900/60 animate-pulse border border-white/[0.05]" />
+        <div className="h-64 rounded-3xl bg-slate-200/60 animate-pulse border border-slate-200/50" />
+        <div className="h-48 rounded-3xl bg-slate-200/60 animate-pulse border border-slate-200/50" />
       </div>
     );
   }
@@ -105,13 +105,13 @@ export const ConnectPage: React.FC = () => {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2.5">
+          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2.5">
             <div className="p-2 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white shadow-md">
               <Instagram className="w-5 h-5 text-white" />
             </div>
             <span>Instagram & Meta Integration</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Connect your Instagram Business or Creator account to enable real-time DM & comment automation.
           </p>
         </div>
@@ -121,9 +121,9 @@ export const ConnectPage: React.FC = () => {
             <button
               onClick={handleRefreshToken}
               disabled={isActionLoading}
-              className="flex-1 sm:flex-initial min-h-[44px] px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-semibold rounded-2xl border border-white/[0.08] transition-colors flex items-center justify-center gap-1.5 active:scale-95 shadow-md disabled:opacity-50 cursor-pointer"
+              className="flex-1 sm:flex-initial min-h-[42px] px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 transition-colors flex items-center justify-center gap-1.5 active:scale-95 shadow-xs hover:border-slate-300 disabled:opacity-50 cursor-pointer"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-purple-400 ${isActionLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 text-violet-600 ${isActionLoading ? 'animate-spin' : ''}`} />
               <span>Refresh Token</span>
             </button>
           )}
@@ -132,7 +132,7 @@ export const ConnectPage: React.FC = () => {
             <button
               onClick={handleDisconnect}
               disabled={isActionLoading}
-              className="flex-1 sm:flex-initial min-h-[44px] px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-semibold rounded-2xl border border-rose-500/30 transition-colors flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="flex-1 sm:flex-initial min-h-[42px] px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold rounded-xl border border-rose-200/60 transition-colors flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <Unlink className="w-3.5 h-3.5" />
               <span>Disconnect</span>
@@ -141,7 +141,7 @@ export const ConnectPage: React.FC = () => {
             <button
               onClick={handleConnect}
               disabled={isActionLoading}
-              className="flex-1 sm:flex-initial min-h-[44px] px-5 py-2.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white text-xs font-bold rounded-2xl transition-colors flex items-center justify-center gap-1.5 shadow-lg active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="flex-1 sm:flex-initial min-h-[42px] px-5 py-2.5 bg-gradient-to-r from-violet-600 via-indigo-600 to-pink-600 text-white text-xs font-semibold rounded-xl shadow-[0_8px_20px_-4px_rgba(124,58,237,0.35)] hover:shadow-[0_12px_24px_-4px_rgba(124,58,237,0.45)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
             >
               <Share2 className="w-3.5 h-3.5" />
               <span>{isActionLoading ? 'Connecting...' : 'Connect Instagram Account'}</span>
@@ -151,38 +151,38 @@ export const ConnectPage: React.FC = () => {
       </div>
 
       {error && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-xs text-rose-300 flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-700 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Main Connection Status 3D Card */}
-      <Card3D intensity={6} glowColor="rgba(236, 72, 153, 0.25)">
-        <div className="bg-gradient-to-br from-slate-900/90 via-slate-900 to-purple-950/60 border border-white/[0.1] rounded-3xl p-5 sm:p-7 shadow-2xl space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/[0.08]">
+      <Card3D intensity={4} glowColor="rgba(124, 58, 237, 0.08)">
+        <div className="bg-white border border-slate-200/80 rounded-3xl p-5 sm:p-7 shadow-sm space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-100">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 p-[2.5px] shadow-lg shadow-purple-600/30 shrink-0">
-                <div className="w-full h-full bg-slate-950 rounded-[22px] flex items-center justify-center text-white text-xl font-black">
+              <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 p-[2.5px] shadow-md shadow-purple-500/20 shrink-0">
+                <div className="w-full h-full bg-white rounded-[22px] flex items-center justify-center text-slate-900 text-xl font-black">
                   {status?.username ? status.username.slice(0, 2).toUpperCase() : 'IG'}
                 </div>
               </div>
               <div className="space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-base sm:text-lg font-black text-white font-mono">
+                  <h2 className="text-base sm:text-lg font-bold text-slate-900 font-mono">
                     {status?.connected ? `@${status.username}` : 'No Account Connected'}
                   </h2>
                   <span
                     className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold border ${
                       status?.connected
-                        ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                        : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200/60'
+                        : 'bg-amber-50 text-amber-700 border-amber-200/60'
                     }`}
                   >
                     {status?.connected ? 'Connected' : 'Disconnected'}
                   </span>
                 </div>
-                <p className="text-xs text-slate-300">
+                <p className="text-xs text-slate-500">
                   {status?.connected
                     ? `Account ID: ${status.user_id || 'Meta Verified'}`
                     : 'Click "Connect Instagram Account" to authorize PinGuru via Meta OAuth.'}
@@ -192,16 +192,16 @@ export const ConnectPage: React.FC = () => {
 
             {/* Read-only Live Indicator Grid */}
             <div className="grid grid-cols-2 gap-3 text-xs font-mono">
-              <div className="bg-slate-950/80 p-3 rounded-2xl border border-white/[0.06]">
+              <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/70">
                 <span className="text-[10px] text-slate-400 uppercase block font-sans font-bold">API State</span>
-                <span className="text-emerald-400 font-semibold flex items-center gap-1 mt-1 text-[11px]">
-                  <Radio className="w-3 h-3 animate-pulse" />
+                <span className="text-emerald-700 font-semibold flex items-center gap-1 mt-1 text-[11px]">
+                  <Radio className="w-3 h-3 animate-pulse text-emerald-600" />
                   {status?.connected ? 'Active & Live' : 'Standby'}
                 </span>
               </div>
-              <div className="bg-slate-950/80 p-3 rounded-2xl border border-white/[0.06]">
+              <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/70">
                 <span className="text-[10px] text-slate-400 uppercase block font-sans font-bold">Token Expiry</span>
-                <span className="text-slate-300 font-medium mt-1 block truncate text-[11px]">
+                <span className="text-slate-700 font-medium mt-1 block truncate text-[11px]">
                   {status?.token_expires_at || (status?.connected ? '60 Days Lifetime' : 'N/A')}
                 </span>
               </div>
@@ -211,10 +211,10 @@ export const ConnectPage: React.FC = () => {
           {/* Permissions & Scopes Matrix */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                 Approved Meta Graph API Permissions
               </h3>
-              <span className="text-[11px] text-emerald-400 font-mono font-bold">
+              <span className="text-[11px] text-emerald-700 font-mono font-bold">
                 {status?.connected ? 'Active' : 'Pending Authorization'}
               </span>
             </div>
@@ -240,15 +240,15 @@ export const ConnectPage: React.FC = () => {
               ].map((p) => (
                 <div 
                   key={p.scope}
-                  className="p-3.5 bg-slate-950/70 border border-white/[0.06] rounded-2xl space-y-1"
+                  className="p-3.5 bg-slate-50 border border-slate-200/70 rounded-2xl space-y-1"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono text-purple-300 font-bold truncate">
+                    <span className="text-xs font-mono text-violet-700 font-bold truncate">
                       {p.scope}
                     </span>
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                   </div>
-                  <p className="text-[11px] text-slate-400 leading-normal">
+                  <p className="text-[11px] text-slate-500 leading-normal">
                     {p.description}
                   </p>
                 </div>
@@ -259,8 +259,8 @@ export const ConnectPage: React.FC = () => {
       </Card3D>
 
       {/* Security & Architecture Marker */}
-      <div className="p-4 bg-slate-900/60 border border-white/[0.06] rounded-2xl text-[11px] text-slate-400 flex items-center gap-2">
-        <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+      <div className="p-4 bg-white border border-slate-200/80 rounded-2xl text-[11px] text-slate-500 flex items-center gap-2 shadow-2xs">
+        <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
         <span>Meta Graph API v20.0 official connection. End-to-end webhook verification managed automatically.</span>
       </div>
     </div>

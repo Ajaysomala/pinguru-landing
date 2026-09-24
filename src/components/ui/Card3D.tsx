@@ -11,7 +11,7 @@ export const Card3D: React.FC<Card3DProps> = ({
   children,
   className = '',
   intensity = 12,
-  glowColor = 'rgba(99, 102, 241, 0.25)',
+  glowColor = 'rgba(124, 58, 237, 0.08)',
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [rotateX, setRotateX] = useState(0);
@@ -67,7 +67,7 @@ export const Card3D: React.FC<Card3DProps> = ({
       <div
         className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 z-10 overflow-hidden"
         style={{
-          opacity: isHovered ? 0.7 : 0,
+          opacity: isHovered ? 0.6 : 0,
           background: `radial-gradient(circle 240px at ${glowPos.x}% ${glowPos.y}%, ${glowColor}, transparent 70%)`,
         }}
       />

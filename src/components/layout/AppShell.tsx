@@ -21,11 +21,16 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-950 text-slate-100 antialiased selection:bg-purple-500/30 selection:text-purple-200 relative font-sans">
-      {/* Background 3D Ambient Gradient Orbs */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-purple-600/15 rounded-full blur-[140px] pointer-events-none animate-pulse-glow" />
-      <div className="absolute top-1/3 -right-40 w-96 h-96 bg-indigo-600/15 rounded-full blur-[150px] pointer-events-none animate-pulse-glow delay-1000" />
-      <div className="absolute -bottom-40 left-1/3 w-96 h-96 bg-pink-600/10 rounded-full blur-[140px] pointer-events-none animate-pulse-glow delay-700" />
+    <div className="flex h-screen w-screen overflow-hidden bg-[#F8FAFC] text-slate-900 antialiased selection:bg-purple-500/20 selection:text-purple-700 relative font-sans">
+      {/* Atmospheric Ambient Orbs (GPU-accelerated background lighting layer) */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden z-0" aria-hidden="true">
+        {/* Orb 1 (Top-Left): Soft Violet */}
+        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-[#C084FC] opacity-25 rounded-full blur-[140px] transform-gpu animate-float-slow" />
+        {/* Orb 2 (Top-Right): Rose / Sunset Pink */}
+        <div className="absolute -top-20 -right-20 w-[450px] h-[450px] bg-[#F472B6] opacity-20 rounded-full blur-[130px] transform-gpu animate-pulse-glow" />
+        {/* Orb 3 (Bottom-Center): Electric Sky Cyan */}
+        <div className="absolute -bottom-32 left-1/3 w-[400px] h-[400px] bg-[#38BDF8] opacity-15 rounded-full blur-[150px] transform-gpu animate-float-gentle" />
+      </div>
 
       {/* Workspace Sidebar (Desktop) */}
       <Sidebar 
@@ -49,8 +54,8 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
       {/* Toast Alert Notification */}
       {toastMessage && (
-        <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950 border border-purple-500/40 text-white text-xs px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 animate-in slide-in-from-bottom-2 duration-200 font-medium">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+        <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 bg-white/95 backdrop-blur-xl border border-slate-200/80 text-slate-900 text-xs px-4 py-3 rounded-2xl shadow-[0_12px_36px_-4px_rgba(124,58,237,0.18)] flex items-center gap-2.5 animate-in slide-in-from-bottom-2 duration-200 font-medium">
+          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
