@@ -628,8 +628,13 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
     finally { setLoading(false); }
   };
 
+  const handleModalClose = useCallback(() => {
+    onClose();
+    reset();
+  }, [onClose]);
+
   return (
-    <Modal id="rule-builder-modal" open={open} onClose={()=>{onClose();reset();}} title={editing ? 'Edit Automation Rule' : (step==='choose'?'Create Automation Rule':'Configure Rule')} maxWidth={step==='details' ? 'max-w-5xl' : 'max-w-2xl'}>
+    <Modal id="rule-builder-modal" open={open} onClose={handleModalClose} title={editing ? 'Edit Automation Rule' : (step==='choose'?'Create Automation Rule':'Configure Rule')} maxWidth={step==='details' ? 'max-w-5xl' : 'max-w-2xl'}>
 
       {/* STEP 1 */}
       {step==='choose'&&(

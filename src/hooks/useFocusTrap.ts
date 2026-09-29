@@ -2,10 +2,12 @@ import { useEffect, useRef } from 'react';
 
 /**
  * Focus trap hook for accessible modal dialogs
- * - Stores previous activeElement on open and restores it on close
- * - Moves focus to first focusable element inside the modal on open
- * - Wraps Tab / Shift+Tab at the boundary
+ * - Captures the triggering element only when the modal transitions from closed to open
+ * - Sets initial focus only on open, without stealing focus if an element inside is already focused
+ * - Traps Tab / Shift+Tab within the modal container boundaries
  * - Listens for Escape key to close the modal
+ * - Restores focus to the triggering element only when the modal actually closes
+ * - Stable against caller re-renders and unmemoized callbacks
  */
 export function useFocusTrap(
   containerRef: React.RefObject<HTMLElement | null>,
@@ -13,47 +15,86 @@ export function useFocusTrap(
   onClose?: () => void
 ) {
   const triggerElementRef = useRef<HTMLElement | null>(null);
+  const wasOpenRef = useRef(false);
+  const onCloseRef = useRef(onClose);
+
+  // Always keep latest onClose callback without re-triggering effects
+  onCloseRef.current = onClose;
 
   useEffect(() => {
-    if (!isOpen) return;
+    // Modal transitioned from closed -> open
+    if (isOpen && !wasOpenRef.current) {
+      wasOpenRef.current = true;
+      triggerElementRef.current = document.activeElement as HTMLElement | null;
 
-    // 1. Store the element that triggered the modal open
-    triggerElementRef.current = document.activeElement as HTMLElement | null;
+      const container = containerRef.current;
+      if (container) {
+        // Only set initial focus if focus is not already inside the modal
+        if (!container.contains(document.activeElement)) {
+          const selector =
+            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+          const focusables = Array.from(container.querySelectorAll<HTMLElement>(selector)).filter(
+            (el) => el.offsetParent !== null || el.offsetWidth > 0 || el.offsetHeight > 0
+          );
+
+          if (focusables.length > 0) {
+            const autoFocusEl = focusables.find((el) => el.hasAttribute('autofocus'));
+            (autoFocusEl || focusables[0]).focus();
+          } else {
+            container.focus();
+          }
+        }
+      }
+    }
+
+    // Modal transitioned from open -> closed
+    if (!isOpen && wasOpenRef.current) {
+      wasOpenRef.current = false;
+      if (triggerElementRef.current && typeof triggerElementRef.current.focus === 'function') {
+        const el = triggerElementRef.current;
+        triggerElementRef.current = null;
+        requestAnimationFrame(() => {
+          el.focus();
+        });
+      }
+    }
+  }, [isOpen, containerRef]);
+
+  // Clean up on unmount if modal was open
+  useEffect(() => {
+    return () => {
+      if (wasOpenRef.current && triggerElementRef.current && typeof triggerElementRef.current.focus === 'function') {
+        const el = triggerElementRef.current;
+        triggerElementRef.current = null;
+        requestAnimationFrame(() => {
+          el.focus();
+        });
+      }
+    };
+  }, []);
+
+  // Keyboard navigation trap (Tab & Escape) active while open
+  useEffect(() => {
+    if (!isOpen) return;
 
     const container = containerRef.current;
     if (!container) return;
 
-    const getFocusableElements = () => {
-      if (!container) return [];
-      const selector =
-        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-      return Array.from(container.querySelectorAll<HTMLElement>(selector)).filter(
-        (el) => el.offsetParent !== null || el.offsetWidth > 0 || el.offsetHeight > 0
-      );
-    };
-
-    // 2. Move focus inside the modal on open
-    const timer = setTimeout(() => {
-      const focusables = getFocusableElements();
-      if (focusables.length > 0) {
-        const autoFocusEl = focusables.find((el) => el.hasAttribute('autofocus'));
-        (autoFocusEl || focusables[0]).focus();
-      } else {
-        container.focus();
-      }
-    }, 50);
-
-    // 3. Handle keyboard boundary trapping & Escape key
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
         e.stopPropagation();
-        onClose?.();
+        onCloseRef.current?.();
         return;
       }
 
       if (e.key === 'Tab') {
-        const focusables = getFocusableElements();
+        const selector =
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+        const focusables = Array.from(container.querySelectorAll<HTMLElement>(selector)).filter(
+          (el) => el.offsetParent !== null || el.offsetWidth > 0 || el.offsetHeight > 0
+        );
+
         if (focusables.length === 0) {
           e.preventDefault();
           return;
@@ -77,18 +118,10 @@ export function useFocusTrap(
     };
 
     document.addEventListener('keydown', handleKeyDown, true);
-
     return () => {
-      clearTimeout(timer);
       document.removeEventListener('keydown', handleKeyDown, true);
-      // 4. Return focus to the trigger element when modal closes
-      if (triggerElementRef.current && typeof triggerElementRef.current.focus === 'function') {
-        requestAnimationFrame(() => {
-          triggerElementRef.current?.focus();
-        });
-      }
     };
-  }, [isOpen, onClose, containerRef]);
+  }, [isOpen, containerRef]);
 
   return triggerElementRef;
 }
