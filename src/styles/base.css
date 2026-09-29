@@ -54,8 +54,8 @@
   --chart-amber:   #F59E0B;
 
   /* Typography */
-  --font-sans:     'DM Sans', system-ui, sans-serif;
-  --font-display:  'Sora', system-ui, sans-serif;
+  --font-sans:     'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-display:  'Plus Jakarta Sans', system-ui, sans-serif;
   --font-mono:     'JetBrains Mono', monospace;
 
   /* Spacing */
@@ -153,6 +153,29 @@ input, textarea, select {
   font-size: 0.9375rem;
 }
 
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-muted);
+  opacity: 1; /* Firefox default is <1, causes inconsistent look */
+}
+
+/* Light placeholder overrides for inputs on dark surfaces */
+.auth-showcase input::placeholder,
+.auth-showcase textarea::placeholder,
+.dashboard-v5-hero input::placeholder,
+.dashboard-v5-hero textarea::placeholder,
+.dashboard-hero input::placeholder,
+.dashboard-hero textarea::placeholder,
+.rules-hero-card input::placeholder,
+.rules-hero-card textarea::placeholder,
+.dark-panel input::placeholder,
+.dark-panel textarea::placeholder,
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+  opacity: 1;
+}
+
 /* --- Scrollbar --- */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -247,14 +270,14 @@ input, textarea, select {
 
 @keyframes orb1 {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  33%  { transform: translate(30px, -20px) scale(1.05); }
-  66%  { transform: translate(-20px, 15px) scale(0.95); }
+  33%  { transform: translate(20px, -14px) scale(1.03); }
+  66%  { transform: translate(-14px, 10px) scale(0.97); }
 }
 
 @keyframes orb2 {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  40%  { transform: translate(-25px, 20px) scale(1.08); }
-  70%  { transform: translate(15px, -10px) scale(0.92); }
+  40%  { transform: translate(-18px, 14px) scale(1.04); }
+  70%  { transform: translate(10px, -7px) scale(0.96); }
 }
 
 @keyframes revealUp {

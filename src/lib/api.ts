@@ -1,4 +1,4 @@
-import type { User, DashboardStats, Rule, RuleCreatePayload, AnalyticsData, PlanStatus, InstagramMediaItem, RuleButton, AutomationRule } from './types';
+import type { User, DashboardStats, Rule, RuleCreatePayload, AnalyticsData, PlanStatus, InstagramMediaResponse, RuleButton } from './types';
 
 const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://api.pinguru.me' : '/api')).replace(/\/$/, '');
 
@@ -565,13 +565,16 @@ export async function getInstagramStatus() {
   };
 }
 
-export async function getInstagramMedia(mediaType: 'all' | 'post' | 'reel' = 'all', limit: number = 24): Promise<InstagramMediaItem[]> {
+export async function getInstagramMedia(mediaType: 'all' | 'post' | 'reel' = 'all', limit: number = 24): Promise<InstagramMediaResponse> {
   const safeLimit = Math.min(Math.max(limit, 1), 50);
   const res = await authFetch(`/auth/instagram/media?media_type=${mediaType}&limit=${safeLimit}`);
-  if (res.status === 401) return [];
+  if (res.status === 401) return { media: [], source: 'unavailable' };
   const data = await res.json();
   if (!res.ok) throw new Error(asErrorMessage(data, 'Failed to load Instagram media'));
-  return Array.isArray(data?.media) ? data.media : [];
+  const rawSource = String(data?.source ?? '').toLowerCase();
+  const source: InstagramMediaResponse['source'] = rawSource === 'instagram' ? 'instagram' : rawSource === 'fallback' ? 'fallback' : 'unavailable';
+  const media = Array.isArray(data?.media) ? data.media : [];
+  return { media, source };
 }
 
 export async function getInstagramAuthUrl(): Promise<string> {

@@ -10,9 +10,7 @@ import {
   Sparkles, 
   Edit3, 
   Trash2, 
-  CheckCircle2, 
   AlertCircle,
-  RefreshCw,
   Clock,
   TrendingUp,
   ArrowRight
@@ -33,7 +31,7 @@ export const RulesPage: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [triggerFilter, setTriggerFilter] = useState<'all' | string>('all');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'paused'>('all');
+  const [statusFilter, _setStatusFilter] = useState<'all' | 'active' | 'paused'>('all');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRule, setEditingRule] = useState<Rule | null>(null);

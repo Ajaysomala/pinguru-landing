@@ -128,6 +128,11 @@ export interface InstagramMediaItem {
   timestamp?: string;
 }
 
+export interface InstagramMediaResponse {
+  media: InstagramMediaItem[];
+  source: 'instagram' | 'fallback' | 'unavailable' | string;
+}
+
 export interface Plan {
   id: string;
   name: 'free' | 'starter' | 'pro';

@@ -11,12 +11,17 @@
     <meta name="googlebot" content="index,follow,noimageindex" />
     <meta name="theme-color" content="#6366F1" />
     <meta name="application-name" content="PinGuru" />
+    <link rel="canonical" href="https://pinguru.me/" />
     <meta property="og:site_name" content="PinGuru" />
     <meta property="og:title" content="PinGuru – Instagram DM Automation & Growth Suite" />
     <meta property="og:description" content="Professional Instagram DM automation, keyword auto-replies, story mentions, analytics, and notification center for creators and brands." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://pinguru.me/" />
+    <meta property="og:image" content="https://pinguru.me/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://pinguru.me/og-image.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
     <link rel="mask-icon" href="/favicon.svg" color="#6366F1" />
@@ -25,7 +30,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
       rel="stylesheet"
     />
 
@@ -38,9 +43,25 @@
         }
       })();
     </script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "PinGuru",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "url": "https://pinguru.me/",
+      "description": "Instagram DM automation and growth suite for creators and brands, with Hinglish keyword matching.",
+      "offers": {
+        "@type": "AggregateOffer",
+        "priceCurrency": "INR",
+        "lowPrice": "0",
+        "highPrice": "499"
+      }
+    }
+    </script>
   </head>
-  <body class="bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500/30 selection:text-indigo-200">
+  <body class="bg-[#F8FAFC] text-slate-900 antialiased selection:bg-violet-500/20 selection:text-violet-700">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

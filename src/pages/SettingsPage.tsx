@@ -5,11 +5,7 @@ import {
   User, 
   ShieldCheck, 
   CreditCard, 
-  Check, 
-  Clock, 
-  ExternalLink,
-  Zap,
-  Sparkles
+  Check
 } from 'lucide-react';
 import { useAuth } from '../App';
 import { updateProfile, getPlanStatus } from '../lib/api';

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Zap, 
   MessageSquare, 
-  MousePointerClick, 
   Clock, 
   Plus, 
   CheckCircle2, 
@@ -11,11 +10,8 @@ import {
   TrendingUp, 
   Instagram, 
   Sparkles, 
-  ExternalLink, 
-  ShieldCheck, 
   Flame,
-  AlertCircle,
-  RefreshCw
+  AlertCircle
 } from 'lucide-react';
 import { useAuth } from '../App';
 import { getDashboardStats, getRules, getInstagramStatus, toggleRule } from '../lib/api';

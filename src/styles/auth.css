@@ -9,7 +9,7 @@
   justify-content: center;
   background:
     radial-gradient(circle at 12% 12%, rgba(124, 58, 237, 0.1) 0%, transparent 36%),
-    radial-gradient(circle at 88% 78%, rgba(219, 39, 119, 0.08) 0%, transparent 34%),
+    radial-gradient(circle at 88% 78%, rgba(124, 58, 237, 0.06) 0%, transparent 34%),
     #f8f7ff;
   padding: 24px 16px;
   position: relative;
@@ -23,7 +23,7 @@
   inset: 0;
   background:
     radial-gradient(circle at 20% 20%, rgba(124,58,237,0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(219,39,119,0.06) 0%, transparent 50%);
+    radial-gradient(circle at 80% 80%, rgba(124,58,237,0.05) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -334,7 +334,7 @@
 .auth-showcase-orb {
   position: absolute;
   border-radius: 999px;
-  filter: blur(70px);
+  filter: blur(48px);
   pointer-events: none;
   z-index: 0;
 }
@@ -344,7 +344,7 @@
   height: 320px;
   left: -70px;
   top: -90px;
-  background: radial-gradient(circle, rgba(124, 58, 237, 0.4), transparent 72%);
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.24), transparent 72%);
   animation: orb1 16s ease-in-out infinite;
 }
 
@@ -353,7 +353,7 @@
   height: 260px;
   right: -40px;
   bottom: -90px;
-  background: radial-gradient(circle, rgba(219, 39, 119, 0.3), transparent 72%);
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.18), transparent 72%);
   animation: orb2 19s ease-in-out infinite;
 }
 
@@ -1113,7 +1113,7 @@
 .pg-auth-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(70px);
+  filter: blur(48px);
   pointer-events: none;
 }
 
@@ -1122,7 +1122,7 @@
   height: 420px;
   top: -120px;
   left: -80px;
-  background: radial-gradient(circle, rgba(124,58,237,0.55), transparent 70%);
+  background: radial-gradient(circle, rgba(124,58,237,0.25), transparent 70%);
   animation: authOrbA 14s ease-in-out infinite;
 }
 
@@ -1131,7 +1131,7 @@
   height: 360px;
   right: -90px;
   bottom: -80px;
-  background: radial-gradient(circle, rgba(219,39,119,0.45), transparent 70%);
+  background: radial-gradient(circle, rgba(124,58,237,0.18), transparent 70%);
   animation: authOrbB 17s ease-in-out infinite;
 }
 
@@ -1140,7 +1140,7 @@
   height: 260px;
   left: 42%;
   top: 38%;
-  background: radial-gradient(circle, rgba(249,115,22,0.22), transparent 72%);
+  background: radial-gradient(circle, rgba(124,58,237,0.14), transparent 72%);
   animation: authOrbC 12s ease-in-out infinite;
 }
 

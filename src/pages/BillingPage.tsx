@@ -104,6 +104,18 @@ function getBillingPollSuppressedUntil(): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function loadRazorpayScript(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (typeof window === 'undefined') return resolve();
+    if (document.querySelector('script[src*="checkout.razorpay.com"]')) return resolve();
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Failed to load Razorpay checkout'));
+    document.body.appendChild(script);
+  });
+}
+
 const BillingPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -283,6 +295,7 @@ const BillingPage: React.FC = () => {
       const session = await createPlanCheckout(plan.id, billingCycle);
 
       if (session.subscription_id && session.key_id && typeof window !== 'undefined') {
+        await loadRazorpayScript();
         const razorpayCtor = (window as Window & { Razorpay?: new (options: Record<string, unknown>) => { open: () => void; on: (event: string, callback: (response: Record<string, unknown>) => void) => void } }).Razorpay;
         if (razorpayCtor) {
           const rzp = new razorpayCtor({

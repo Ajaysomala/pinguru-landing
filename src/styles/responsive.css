@@ -237,14 +237,84 @@ canvas {
 
   .pg-auth-orb-a,
   .pg-auth-orb-b {
-    width: min(280px, 70vw);
-    height: min(280px, 70vw);
-    filter: blur(56px);
+    width: min(240px, 60vw);
+    height: min(240px, 60vw);
+    filter: blur(40px);
+    opacity: 0.6;
   }
 
   .pg-auth-orb-c {
+    width: min(150px, 40vw);
+    height: min(150px, 40vw);
+    filter: blur(32px);
+    opacity: 0.5;
+  }
+
+  .hero-orb-1,
+  .hero-orb-2 {
+    width: min(260px, 65vw);
+    height: min(260px, 65vw);
+    filter: blur(36px);
+    opacity: 0.5;
+  }
+
+  .hero-orb-3 {
+    width: min(180px, 45vw);
+    height: min(180px, 45vw);
+    filter: blur(32px);
+    opacity: 0.35;
+  }
+
+  .connect-v5-orb-a,
+  .connect-v5-orb-b,
+  .dashboard-v5-orb-a,
+  .dashboard-v5-orb-b,
+  .automation-v5-orb-a,
+  .automation-v5-orb-b,
+  .auth-showcase-orb-a,
+  .auth-showcase-orb-b {
+    width: min(160px, 45vw);
+    height: min(160px, 45vw);
+    filter: blur(28px);
+    opacity: 0.3;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Hide decorative secondary orbs entirely on small phones */
+  .hero-orb-3,
+  .pg-auth-orb-c,
+  .connect-v5-orb-b,
+  .dashboard-v5-orb-b,
+  .automation-v5-orb-b,
+  .auth-showcase-orb-b {
+    display: none !important;
+  }
+
+  .hero-orb-1,
+  .hero-orb-2 {
     width: min(180px, 50vw);
     height: min(180px, 50vw);
+    filter: blur(28px);
+    opacity: 0.35;
+  }
+
+  .pg-auth-orb-a,
+  .pg-auth-orb-b {
+    width: min(160px, 45vw);
+    height: min(160px, 45vw);
+    filter: blur(26px);
+    opacity: 0.35;
+  }
+
+  .connect-v5-orb-a,
+  .dashboard-v5-orb-a,
+  .automation-v5-orb-a,
+  .auth-showcase-orb-a {
+    width: min(130px, 36vw);
+    height: min(130px, 36vw);
+    filter: blur(22px);
+    opacity: 0.22;
   }
 }
 
@@ -569,6 +639,7 @@ table {
 .pg-auth-stage,
 .dashboard-v5-hero,
 .connect-v5-hero,
+.automation-v5-hero,
 .settings-v2-hero,
 .pg-surface-hero {
   overflow: hidden;

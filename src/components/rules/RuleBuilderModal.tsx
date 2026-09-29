@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   AlertCircle, ArrowLeft, Check, X, RefreshCw, Lock,
   Smartphone, Zap, MessageSquare, ArrowRight, Eye, EyeOff,
-  Plus, Trash2, Clock, ExternalLink
+  Plus, Trash2, ExternalLink
 } from 'lucide-react';
 import { createRule, getInstagramMedia, updateRule } from '../../lib/api';
 import type { InstagramMediaItem, Rule, RuleCreatePayload, TriggerType, RuleButton } from '../../lib/types';
@@ -38,7 +38,8 @@ const COMMENT_MEDIA_FILTERS = [
   { value: 'reel', label: 'Reels' },
 ] as const;
 
-const COMMENT_MEDIA_PREVIEW: InstagramMediaItem[] = [
+// Storybook / design fixture only — must NEVER be used in active user rule builder flow
+const _COMMENT_MEDIA_PREVIEW: InstagramMediaItem[] = [
   { id: 'preview-1', media_type: 'post', caption: 'Post' },
   { id: 'preview-2', media_type: 'reel', caption: 'Reel' },
   { id: 'preview-3', media_type: 'post', caption: 'Post' },
@@ -153,7 +154,7 @@ const PhonePreview: React.FC<{
   template,
   keywords,
   attachmentUrl,
-  attachmentType = 'image',
+  attachmentType: _attachmentType = 'image',
   dmButtons = [],
   captureEmailEnabled = false,
   emailCapturePrompt = '',
@@ -321,6 +322,8 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
   const [selectedMediaId, setSelectedMediaId] = useState<string>('');
   const [mediaItems, setMediaItems] = useState<InstagramMediaItem[]>([]);
   const [mediaLoading, setMediaLoading] = useState(false);
+  const [mediaError, setMediaError] = useState<string | null>(null);
+  const [mediaSource, setMediaSource] = useState<string | null>(null);
   const [mediaLimit, setMediaLimit] = useState(24);
   const [anyCommentKeyword, setAnyCommentKeyword] = useState(true);
   const [publicCommentReplyEnabled, setPublicCommentReplyEnabled] = useState(false);
@@ -464,55 +467,114 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
     setAskFollowBeforeDm(false);
     setDmAttachmentUrl('');setDmAttachmentType('image');setShowAttachmentInput(false);
     setKeywords([]);setKwInput('');setTemplate('');setError('');setShowPreview(false);
+    setMediaError(null);setMediaSource(null);
   };
 
-  useEffect(()=>{
-    const shouldLoad=open&&step==='details'&&triggerType==='comment'&&commentTarget==='specific';
-    if(!shouldLoad) return;
-    let alive=true;
-    const load=async()=>{
-      setMediaLoading(true);
-      try {
-        const items=await getInstagramMedia(commentFilter,mediaLimit);
-        if(!alive) return;
-        setMediaItems(items);
-        if(!selectedMediaId&&items.length>0) setSelectedMediaId(items[0].id);
-      } catch { if(!alive) return; setMediaItems([]); }
-      finally { if(alive) setMediaLoading(false); }
-    };
-    load();
-    return()=>{ alive=false; };
-  },[open,step,triggerType,commentTarget,commentFilter,mediaLimit,selectedMediaId]);
+  const fetchMedia = useCallback(async () => {
+    setMediaLoading(true);
+    setMediaError(null);
+    try {
+      const res = await getInstagramMedia(commentFilter, mediaLimit);
+      setMediaSource(res.source);
+      if (res.source !== 'instagram' || !res.media || res.media.length === 0) {
+        setMediaItems([]);
+        setSelectedMediaId('');
+        setMediaError("Couldn't load your Instagram posts. Reconnect your Instagram account or try again.");
+      } else {
+        setMediaItems(res.media);
+        setSelectedMediaId(prev => (prev && res.media.some(m => m.id === prev)) ? prev : res.media[0].id);
+        setMediaError(null);
+      }
+    } catch {
+      setMediaItems([]);
+      setSelectedMediaId('');
+      setMediaSource('unavailable');
+      setMediaError("Couldn't load your Instagram posts. Reconnect your Instagram account or try again.");
+    } finally {
+      setMediaLoading(false);
+    }
+  }, [commentFilter, mediaLimit]);
 
-  const addKeyword=useCallback(()=>{
-    const kw=kwInput.trim().toLowerCase();
-    if(kw&&!keywords.includes(kw)) setKeywords(p=>[...p,kw]);
+  useEffect(() => {
+    const shouldLoad = open && step === 'details' && triggerType === 'comment' && commentTarget === 'specific';
+    if (!shouldLoad) return;
+    fetchMedia();
+  }, [open, step, triggerType, commentTarget, fetchMedia]);
+
+  const addKeyword = useCallback(() => {
+    const raw = kwInput.trim().toLowerCase();
+    if (!raw) return;
+    const parts = raw.split(',').map(s => s.trim()).filter(Boolean);
+    const newItems: string[] = [];
+    parts.forEach(part => {
+      if (part && !keywords.includes(part) && !newItems.includes(part)) {
+        newItems.push(part);
+      }
+    });
+    if (newItems.length > 0) {
+      setKeywords(p => [...p, ...newItems]);
+    }
     setKwInput('');
-  },[kwInput,keywords]);
+  }, [kwInput, keywords]);
 
-  const removeKeyword=(kw:string)=>setKeywords(p=>p.filter(k=>k!==kw));
+  const removeKeyword = (kw: string) => setKeywords(p => p.filter(k => k !== kw));
 
-  const handleKwKeyDown=(e:React.KeyboardEvent<HTMLInputElement>)=>{
-    if(e.key==='Enter'||e.key===','){e.preventDefault();addKeyword();}
-    if(e.key==='Backspace'&&!kwInput&&keywords.length>0) setKeywords(p=>p.slice(0,-1));
+  const handleKwChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (val.includes(',')) {
+      const parts = val.split(',');
+      const newItems: string[] = [];
+      parts.forEach(part => {
+        const clean = part.trim().toLowerCase();
+        if (clean && !keywords.includes(clean) && !newItems.includes(clean)) {
+          newItems.push(clean);
+        }
+      });
+      if (newItems.length > 0) {
+        setKeywords(p => [...p, ...newItems]);
+      }
+      setKwInput('');
+    } else {
+      setKwInput(val);
+    }
   };
 
-  const insertVar=(v:string)=>{
-    if(!textareaRef.current) return;
-    const{selectionStart:s,selectionEnd:e}=textareaRef.current;
-    setTemplate(template.substring(0,s)+v+template.substring(e));
-    requestAnimationFrame(()=>{ textareaRef.current?.setSelectionRange(s+v.length,s+v.length); textareaRef.current?.focus(); });
+  const handleKwKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addKeyword();
+    }
+    if (e.key === 'Backspace' && !kwInput && keywords.length > 0) {
+      setKeywords(p => p.slice(0, -1));
+    }
   };
 
-  const lockBadge=(unlocked:boolean,tier:string)=>{
-    if(unlocked) return null;
-    return <span style={{ display:'inline-flex',alignItems:'center',gap:3,padding:'2px 7px',borderRadius:999,background:'#F1F5F9',color:'#64748B',fontSize:'0.65rem',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.04em' }}><Lock size={9}/>{tier}</span>;
+  const insertVar = (v: string) => {
+    if (!textareaRef.current) return;
+    const { selectionStart: s, selectionEnd: e } = textareaRef.current;
+    setTemplate(template.substring(0, s) + v + template.substring(e));
+    requestAnimationFrame(() => {
+      textareaRef.current?.setSelectionRange(s + v.length, s + v.length);
+      textareaRef.current?.focus();
+    });
   };
 
-  const canSubmit=():boolean=>{
-    if(!triggerType||!template.trim()) return false;
-    if(triggerType==='keyword'&&keywords.length===0) return false;
-    if(triggerType==='comment'&&commentTarget==='specific'&&!selectedMediaId) return false;
+  const lockBadge = (unlocked: boolean, tier: string) => {
+    if (unlocked) return null;
+    return <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 7px', borderRadius: 999, background: '#F1F5F9', color: '#64748B', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}><Lock size={9} />{tier}</span>;
+  };
+
+  const canSubmit = (): boolean => {
+    if (!triggerType || !template.trim()) return false;
+    if (triggerType === 'keyword' && keywords.length === 0) return false;
+    if (triggerType === 'comment') {
+      if (!anyCommentKeyword && keywords.length === 0) return false;
+      if (commentTarget === 'specific') {
+        if (mediaLoading || Boolean(mediaError) || mediaSource !== 'instagram' || mediaItems.length === 0 || !selectedMediaId) {
+          return false;
+        }
+      }
+    }
     return true;
   };
 
@@ -567,7 +629,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
   };
 
   return (
-    <Modal open={open} onClose={()=>{onClose();reset();}} title={editing ? 'Edit Automation Rule' : (step==='choose'?'Create Automation Rule':'Configure Rule')} maxWidth={step==='details' ? 'max-w-5xl' : 'max-w-2xl'}>
+    <Modal id="rule-builder-modal" open={open} onClose={()=>{onClose();reset();}} title={editing ? 'Edit Automation Rule' : (step==='choose'?'Create Automation Rule':'Configure Rule')} maxWidth={step==='details' ? 'max-w-5xl' : 'max-w-2xl'}>
 
       {/* STEP 1 */}
       {step==='choose'&&(
@@ -645,12 +707,42 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
               {/* Keywords */}
               {triggerType==='keyword'&&(
                 <div className="rb-field-shell" style={{ marginBottom:18 }}>
-                  <label className="form-label">Keywords <span style={{ fontWeight:400,color:'var(--color-muted)',marginLeft:8,fontSize:'0.75rem' }}>Press Enter or comma to add</span></label>
-                  <div className="keywords-container" onClick={()=>kwInputRef.current?.focus()}>
-                    {keywords.map(kw=>(
-                      <span key={kw} className="keyword-tag">{kw}<button type="button" className="keyword-tag-remove" onClick={()=>removeKeyword(kw)}><X size={10}/></button></span>
-                    ))}
-                    <input ref={kwInputRef} type="text" className="keywords-input" placeholder={keywords.length===0?'price, buy, order...':''} value={kwInput} onChange={e=>setKwInput(e.target.value)} onKeyDown={handleKwKeyDown}/>
+                  <label className="form-label">Keywords <span style={{ fontWeight:400,color:'var(--color-muted)',marginLeft:8,fontSize:'0.75rem' }}>Type and tap Add or press Enter/comma</span></label>
+                  <div className="keywords-input-wrapper">
+                    <div className="keywords-container" onClick={()=>kwInputRef.current?.focus()}>
+                      {keywords.map(kw=>(
+                        <span key={kw} className="keyword-tag">
+                          {kw}
+                          <button
+                            type="button"
+                            className="keyword-tag-remove"
+                            onClick={(e)=>{ e.stopPropagation(); removeKeyword(kw); }}
+                            aria-label={`Remove keyword ${kw}`}
+                          >
+                            <X size={12}/>
+                          </button>
+                        </span>
+                      ))}
+                      <input
+                        ref={kwInputRef}
+                        type="text"
+                        className="keywords-input"
+                        placeholder={keywords.length===0?'price, buy, order...':'Add keyword...'}
+                        value={kwInput}
+                        onChange={handleKwChange}
+                        onKeyDown={handleKwKeyDown}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      className="keyword-add-btn"
+                      onClick={(e)=>{ e.stopPropagation(); addKeyword(); }}
+                      disabled={!kwInput.trim()}
+                      aria-label="Add keyword"
+                    >
+                      <Plus size={15} />
+                      <span>Add</span>
+                    </button>
                   </div>
                 </div>
               )}
@@ -672,14 +764,53 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                       <div className="wizard-filter-row" style={{ marginBottom:10 }}>
                         {COMMENT_MEDIA_FILTERS.map(f=>(<button key={f.value} type="button" className={`wizard-filter-pill ${commentFilter===f.value?'active':''}`} onClick={()=>setCommentFilter(f.value)}>{f.label}</button>))}
                       </div>
-                      {mediaLoading?(<div className="wizard-media-loading"><RefreshCw size={14} className="animate-spin"/> Loading...</div>):(
+                      {mediaLoading ? (
+                        <div className="wizard-media-loading"><RefreshCw size={14} className="animate-spin"/> Loading Instagram posts...</div>
+                      ) : (mediaError || mediaSource !== 'instagram' || mediaItems.length === 0) ? (
+                        <div className="wizard-media-error-card">
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                            <AlertCircle size={18} style={{ color: '#DC2626', flexShrink: 0, marginTop: 2 }} />
+                            <div>
+                              <p style={{ fontWeight: 600, fontSize: '0.85rem', color: '#991B1B', margin: 0, lineHeight: 1.4 }}>
+                                {mediaError || "Couldn't load your Instagram posts. Reconnect your Instagram account or try again."}
+                              </p>
+                              <p style={{ fontSize: '0.78rem', color: '#B91C1C', marginTop: 4, marginBottom: 0 }}>
+                                A verified Instagram connection is required to target a specific post.
+                              </p>
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10 }}>
+                            <button
+                              type="button"
+                              className="wizard-media-retry-btn"
+                              onClick={fetchMedia}
+                            >
+                              <RefreshCw size={13} />
+                              <span>Retry</span>
+                            </button>
+                            <a
+                              href="/connect"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="wizard-media-reconnect-link"
+                            >
+                              Reconnect Instagram <ExternalLink size={12} />
+                            </a>
+                          </div>
+                        </div>
+                      ) : (
                         <div className="wizard-media-grid">
-                          {(mediaItems.length>0?mediaItems:COMMENT_MEDIA_PREVIEW).filter(item=>commentFilter==='all'||item.media_type===commentFilter).map(item=>(
+                          {mediaItems.filter(item=>commentFilter==='all'||item.media_type===commentFilter).map(item=>(
                             <button key={item.id} type="button" onClick={()=>setSelectedMediaId(item.id)} className={`wizard-media-card ${selectedMediaId===item.id?'active':''}`}>
                               <span className={`wizard-media-thumb ${item.media_type}`}>{item.media_type==='post'?'▣':'▶'}</span>
                               <span className="wizard-media-label">{item.media_type}</span>
                             </button>
                           ))}
+                          {mediaItems.filter(item=>commentFilter==='all'||item.media_type===commentFilter).length === 0 && (
+                            <div style={{ gridColumn: '1 / -1', padding: '16px', textAlign: 'center', color: 'var(--color-muted)', fontSize: '0.85rem' }}>
+                              No {commentFilter === 'all' ? 'posts or reels' : commentFilter + 's'} found.
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -689,9 +820,41 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                     <button type="button" onClick={()=>setAnyCommentKeyword(p=>!p)} className={`wizard-switch ${anyCommentKeyword?'on':''}`}><span/></button>
                   </div>
                   {!anyCommentKeyword&&(
-                    <div className="keywords-container" style={{ marginTop:10 }} onClick={()=>kwInputRef.current?.focus()}>
-                      {keywords.map(kw=>(<span key={kw} className="keyword-tag">{kw}<button type="button" className="keyword-tag-remove" onClick={()=>removeKeyword(kw)}><X size={10}/></button></span>))}
-                      <input ref={kwInputRef} type="text" className="keywords-input" placeholder={keywords.length===0?'Type keyword and press Enter':''} value={kwInput} onChange={e=>setKwInput(e.target.value)} onKeyDown={handleKwKeyDown}/>
+                    <div className="keywords-input-wrapper" style={{ marginTop:10 }}>
+                      <div className="keywords-container" onClick={()=>kwInputRef.current?.focus()}>
+                        {keywords.map(kw=>(
+                          <span key={kw} className="keyword-tag">
+                            {kw}
+                            <button
+                              type="button"
+                              className="keyword-tag-remove"
+                              onClick={(e)=>{ e.stopPropagation(); removeKeyword(kw); }}
+                              aria-label={`Remove keyword ${kw}`}
+                            >
+                              <X size={12}/>
+                            </button>
+                          </span>
+                        ))}
+                        <input
+                          ref={kwInputRef}
+                          type="text"
+                          className="keywords-input"
+                          placeholder={keywords.length===0?'Type keyword and tap Add...':'Add keyword...'}
+                          value={kwInput}
+                          onChange={handleKwChange}
+                          onKeyDown={handleKwKeyDown}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        className="keyword-add-btn"
+                        onClick={(e)=>{ e.stopPropagation(); addKeyword(); }}
+                        disabled={!kwInput.trim()}
+                        aria-label="Add keyword"
+                      >
+                        <Plus size={15} />
+                        <span>Add</span>
+                      </button>
                     </div>
                   )}
                 </div>

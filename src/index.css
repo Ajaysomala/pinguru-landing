@@ -21,7 +21,7 @@
 @tailwind utilities;
 
 @layer utilities {
-  .font-display { font-family: 'Plus Jakarta Sans', 'Sora', system-ui, sans-serif; }
+  .font-display { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
   .font-mono    { font-family: 'JetBrains Mono', monospace; }
   .bg-canvas    { background-color: #F8FAFC; }
   .bg-sidebar   { background-color: #FFFFFF; }

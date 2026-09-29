@@ -7,9 +7,7 @@ import {
   User, 
   LogOut, 
   ChevronDown, 
-  ExternalLink,
   Zap,
-  Radio,
   Share2
 } from 'lucide-react';
 import { useAuth } from '../../App';

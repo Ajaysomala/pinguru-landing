@@ -164,14 +164,14 @@
 .hero-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
+  filter: blur(48px);
   pointer-events: none;
 }
 
 .hero-orb-1 {
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(124, 58, 237, 0.4) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.24) 0%, transparent 70%);
   top: -100px;
   left: -100px;
   animation: orb1 12s ease-in-out infinite;
@@ -180,7 +180,7 @@
 .hero-orb-2 {
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(219, 39, 119, 0.35) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.18) 0%, transparent 70%);
   bottom: -80px;
   right: -80px;
   animation: orb2 15s ease-in-out infinite;
@@ -189,7 +189,7 @@
 .hero-orb-3 {
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(249, 115, 22, 0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.12) 0%, transparent 70%);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -767,8 +767,8 @@
   content: '';
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle at 20% 50%, rgba(124,58,237,0.3) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 50%, rgba(219,39,119,0.2) 0%, transparent 50%);
+  background-image: radial-gradient(circle at 20% 50%, rgba(124,58,237,0.22) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 50%, rgba(124,58,237,0.12) 0%, transparent 50%);
 }
 
 .demo-inner {
@@ -1111,8 +1111,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 22% 18%, rgba(124,58,237,0.34), transparent 42%),
-    radial-gradient(circle at 78% 72%, rgba(219,39,119,0.24), transparent 42%);
+    radial-gradient(circle at 22% 18%, rgba(124,58,237,0.24), transparent 42%),
+    radial-gradient(circle at 78% 72%, rgba(124,58,237,0.14), transparent 42%);
   pointer-events: none;
 }
 

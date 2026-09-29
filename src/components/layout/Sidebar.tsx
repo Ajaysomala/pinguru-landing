@@ -9,10 +9,7 @@ import {
   Sparkles,
   ChevronLeft,
   ChevronRight,
-  ExternalLink,
   Instagram,
-  CheckCircle2,
-  AlertCircle,
   CreditCard,
   Users
 } from 'lucide-react';
