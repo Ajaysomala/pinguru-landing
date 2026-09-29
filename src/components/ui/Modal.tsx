@@ -43,7 +43,7 @@ export const Modal: React.FC<ModalProps> = ({
       {/* Excluded from accessibility tree & tab order backdrop */}
       <div
         className="pg-modal-overlay fixed inset-0"
-        style={{ background: 'rgba(15,10,30,0.62)', backdropFilter: 'blur(6px)' }}
+        style={{ background: 'rgba(9, 9, 11, 0.80)', backdropFilter: 'blur(10px)' }}
         onClick={onClose}
         aria-hidden="true"
       />
@@ -55,24 +55,24 @@ export const Modal: React.FC<ModalProps> = ({
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className={`pg-modal-sheet relative z-10 bg-white shadow-2xl w-full ${maxWidth} max-h-[92dvh] sm:max-h-[90vh] flex flex-col animate-[scaleIn_0.2s_ease-out] rounded-t-3xl sm:rounded-2xl outline-none`}
+        className={`pg-modal-sheet relative z-10 bg-white dark:bg-[#121218]/95 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white backdrop-blur-xl shadow-2xl w-full ${maxWidth} max-h-[92dvh] sm:max-h-[90vh] flex flex-col animate-[scaleIn_0.2s_ease-out] rounded-t-3xl sm:rounded-2xl outline-none`}
       >
-        <div className="mx-auto mt-2 mb-1 h-1 w-10 rounded-full bg-slate-200 sm:hidden" aria-hidden="true" />
+        <div className="mx-auto mt-2 mb-1 h-1 w-10 rounded-full bg-slate-300 dark:bg-white/20 sm:hidden" aria-hidden="true" />
         <div className="flex items-center justify-between px-5 sm:px-6 pt-3 sm:pt-5 pb-0 flex-shrink-0">
-          <h2 id={titleId} className="font-display font-bold text-lg text-slate-900">
+          <h2 id={titleId} className="font-display font-bold text-lg text-slate-900 dark:text-white">
             {title}
           </h2>
           <button
             onClick={onClose}
             aria-label="Close dialog"
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all cursor-pointer"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-all cursor-pointer"
           >
             <X size={18} />
           </button>
         </div>
         <div className="px-5 sm:px-6 py-4 sm:py-5 overflow-y-auto flex-1">{children}</div>
         {footer && (
-          <div className="px-5 sm:px-6 py-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 flex-shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <div className="px-5 sm:px-6 py-4 border-t border-white/10 flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 flex-shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
             {footer}
           </div>
         )}

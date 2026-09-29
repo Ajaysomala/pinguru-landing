@@ -53,56 +53,56 @@
 
 .contacts-v6-chip {
   border-radius: 999px;
-  border: 1px solid rgba(124, 58, 237, 0.2);
-  background: #ffffff;
-  color: #7C3AED;
-  font-size: 0.78rem;
+  border: 1px solid var(--color-primary-ring);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 0.8125rem;
   font-weight: 700;
-  padding: 6px 12px;
+  padding: 6px 14px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.03);
 }
 
 .contacts-v6-hero .contacts-v6-chip {
-  border: 1px solid rgba(124, 58, 237, 0.25);
-  background: #ffffff;
-  color: #7C3AED;
+  border: 1px solid var(--color-primary-ring);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
   box-shadow: 0 1px 2px rgba(0,0,0,0.04);
 }
 
 .contacts-v6-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: 14px;
+  margin-bottom: 16px;
 }
 
 .contacts-v6-stat-card {
-  border-radius: 16px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 8px 24px -4px rgba(0, 0, 0, 0.04);
-  padding: 18px 20px;
+  padding: 20px 22px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .contacts-v6-stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 36px -4px rgba(124, 58, 237, 0.08), 0 4px 12px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 12px 36px -4px rgba(124, 58, 237, 0.12), 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .contacts-v6-stat-card .value {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 2rem;
+  font-size: 2.25rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #0F172A;
+  color: var(--color-text);
 }
 
 .contacts-v6-stat-card .label {
   margin: 4px 0 0;
-  color: #64748B;
-  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  font-size: 0.92rem;
   font-weight: 600;
 }
 
@@ -120,18 +120,18 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 140px auto;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .contacts-v6-export-btn {
-  height: 42px;
-  min-height: 42px;
-  padding: 0 16px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0 18px;
   border-radius: 12px;
   border: 1px solid rgba(124, 58, 237, 0.25);
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(219, 39, 119, 0.04));
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(219, 39, 119, 0.06));
   color: var(--color-primary);
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
@@ -156,15 +156,15 @@
 }
 
 .contacts-v6-search {
-  height: 42px;
+  height: 44px;
   border-radius: 12px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  background: #fff;
+  border: 1px solid var(--color-border);
+  background: var(--color-input-bg);
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 12px;
-  color: #94A3B8;
+  padding: 0 14px;
+  color: var(--color-muted);
 }
 
 .contacts-v6-search input {
@@ -172,24 +172,28 @@
   outline: none;
   width: 100%;
   background: transparent;
-  color: #0F172A;
-  font-size: 0.875rem;
+  color: var(--color-text);
+  font-size: 0.9375rem;
+}
+
+.contacts-v6-search input::placeholder {
+  color: var(--color-muted);
 }
 
 .contacts-v6-filters select {
-  height: 42px;
+  height: 44px;
   border-radius: 12px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  background: #fff;
-  color: #334155;
-  font-size: 0.875rem;
-  padding: 0 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-input-bg);
+  color: var(--color-text);
+  font-size: 0.9375rem;
+  padding: 0 12px;
 }
 
 .contacts-v6-table-wrap {
   border-radius: 18px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  background: #fff;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 8px 24px -4px rgba(0, 0, 0, 0.04);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -202,26 +206,26 @@
 
 .contacts-v6-table thead th {
   text-align: left;
-  padding: 12px 18px;
-  color: #64748B;
-  font-size: 0.75rem;
+  padding: 14px 18px;
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  background: #F8FAFC;
-  border-bottom: 1px solid #E2E8F0;
+  background: var(--color-card-surface);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .contacts-v6-table tbody td {
-  padding: 14px 18px;
-  border-bottom: 1px solid #F1F5F9;
-  color: #334155;
-  font-size: 0.875rem;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
   transition: background-color 0.15s ease;
 }
 
 .contacts-v6-table tbody tr:hover td {
-  background: rgba(248, 250, 252, 0.75);
+  background: var(--color-surface-hover);
 }
 
 .contacts-v6-table tbody tr:last-child td {
@@ -231,16 +235,16 @@
 .contacts-v6-contact-cell {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .contacts-v6-avatar {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 999px;
   background: linear-gradient(135deg, #7c3aed 0%, #db2777 60%, #f97316 100%);
   color: #fff;
-  font-size: 0.86rem;
+  font-size: 0.9rem;
   font-weight: 800;
   display: inline-flex;
   align-items: center;
@@ -258,28 +262,29 @@
 .contacts-v6-contact-cell .id {
   margin: 2px 0 0;
   color: var(--color-muted);
-  font-size: 0.86rem;
+  font-size: 0.875rem;
 }
 
 .contacts-v6-table td.num {
   color: var(--color-text);
-  font-size: 1.1rem;
+  font-size: 1.125rem;
   font-weight: 700;
 }
 
 .contacts-v6-empty {
   text-align: center;
   color: var(--color-muted);
-  padding: 20px;
+  padding: 28px;
+  font-size: 0.95rem;
 }
 
 .contacts-v6-pagination {
-  margin-top: 12px;
+  margin-top: 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   color: var(--color-text-secondary);
-  font-size: 0.84rem;
+  font-size: 0.9rem;
 }
 
 .contacts-v6-pagination div {
@@ -288,16 +293,22 @@
 }
 
 .contacts-v6-pagination button {
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
   border: 1px solid var(--color-border);
-  background: #fff;
-  color: var(--color-text-secondary);
+  background: var(--color-input-bg);
+  color: var(--color-text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms ease;
 }
 
 .contacts-v6-pagination button:disabled {
   opacity: 0.45;
+  cursor: not-allowed;
 }
 
 @media (max-width: 960px) {

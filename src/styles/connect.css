@@ -1493,3 +1493,76 @@
     padding: 12px 14px;
   }
 }
+
+/* ============================================================
+   LIGHT MODE OVERRIDES FOR CONNECT PAGE
+   ============================================================ */
+html.light .connect-v5-hero,
+[data-theme="light"] .connect-v5-hero {
+  background: var(--gradient-hero);
+  border-color: #E2E8F0;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+html.light .connect-v5-title,
+[data-theme="light"] .connect-v5-title {
+  color: #0F172A;
+}
+
+html.light .connect-v5-subtitle,
+[data-theme="light"] .connect-v5-subtitle {
+  color: #475569;
+}
+
+html.light .connect-v5-kicker,
+[data-theme="light"] .connect-v5-kicker {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.25);
+  color: #4F46E5;
+}
+
+html.light .connect-v5-hero-panel,
+[data-theme="light"] .connect-v5-hero-panel {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: #E2E8F0;
+}
+
+html.light .connect-v5-stat,
+[data-theme="light"] .connect-v5-stat {
+  background: #F8FAFC;
+  border-color: #E2E8F0;
+}
+
+html.light .connect-v5-stat span,
+[data-theme="light"] .connect-v5-stat span {
+  color: #64748B;
+}
+
+html.light .connect-v5-stat strong,
+[data-theme="light"] .connect-v5-stat strong {
+  color: #0F172A;
+}
+
+html.light .connect-v4-hero,
+[data-theme="light"] .connect-v4-hero {
+  background: var(--gradient-hero);
+  border-color: #E2E8F0;
+}
+
+html.light .connect-v4-title,
+[data-theme="light"] .connect-v4-title {
+  color: #0F172A;
+}
+
+html.light .connect-v4-subtitle,
+[data-theme="light"] .connect-v4-subtitle {
+  color: #475569;
+}
+
+html.light .connect-v4-pill,
+[data-theme="light"] .connect-v4-pill {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.25);
+  color: #4F46E5;
+}
+

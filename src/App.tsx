@@ -4,6 +4,7 @@ import { getProfile } from './lib/api';
 import { AppShell } from './components/layout/AppShell';
 import { CookieBanner } from './components/ui/CookieBanner';
 import { ToastProvider } from './context/ToastContext';
+import { ThemeProvider } from './context/ThemeContext';
 import type { User } from './lib/types';
 
 const TITLE_MAP: Record<string, string> = {
@@ -224,51 +225,53 @@ const SupportRoute: React.FC = () => {
 const App: React.FC = () => (
   <BrowserRouter>
     <AppErrorBoundary>
-      <AuthProvider>
-        <ToastProvider>
-          <DocumentTitle />
-          <CookieBanner />
-          <Routes>
-            {/* Public */}
-            <Route path="/"         element={<PublicOnly><Page><LandingPage /></Page></PublicOnly>} />
-            <Route path="/login"    element={<PublicOnly><Page><LoginPage /></Page></PublicOnly>} />
-            <Route path="/register" element={<PublicOnly><Page><RegisterPage /></Page></PublicOnly>} />
-            <Route path="/auth"     element={<PublicOnly><Page><AuthPage /></Page></PublicOnly>} />
-            <Route path="/verify"   element={<PublicOnly><Page><VerifyPage /></Page></PublicOnly>} />
-            <Route path="/forgot-password" element={<Page><ForgotPasswordPage /></Page>} />
-            <Route path="/privacy"  element={<Page><PrivacyPage /></Page>} />
-            <Route path="/terms"    element={<Page><TermsPage /></Page>} />
-            <Route path="/cookies"  element={<Page><CookiePolicyPage /></Page>} />
-            <Route path="/refund-policy" element={<Page><RefundPolicyPage /></Page>} />
-            <Route path="/support"  element={<SupportRoute />} />
-            <Route path="/blog"     element={<Page><BlogPage /></Page>} />
-            <Route path="/blog/:slug" element={<Page><BlogPage /></Page>} />
+      <ThemeProvider>
+        <AuthProvider>
+          <ToastProvider>
+            <DocumentTitle />
+            <CookieBanner />
+            <Routes>
+              {/* Public */}
+              <Route path="/"         element={<PublicOnly><Page><LandingPage /></Page></PublicOnly>} />
+              <Route path="/login"    element={<PublicOnly><Page><LoginPage /></Page></PublicOnly>} />
+              <Route path="/register" element={<PublicOnly><Page><RegisterPage /></Page></PublicOnly>} />
+              <Route path="/auth"     element={<PublicOnly><Page><AuthPage /></Page></PublicOnly>} />
+              <Route path="/verify"   element={<PublicOnly><Page><VerifyPage /></Page></PublicOnly>} />
+              <Route path="/forgot-password" element={<Page><ForgotPasswordPage /></Page>} />
+              <Route path="/privacy"  element={<Page><PrivacyPage /></Page>} />
+              <Route path="/terms"    element={<Page><TermsPage /></Page>} />
+              <Route path="/cookies"  element={<Page><CookiePolicyPage /></Page>} />
+              <Route path="/refund-policy" element={<Page><RefundPolicyPage /></Page>} />
+              <Route path="/support"  element={<SupportRoute />} />
+              <Route path="/blog"     element={<Page><BlogPage /></Page>} />
+              <Route path="/blog/:slug" element={<Page><BlogPage /></Page>} />
 
-            {/* Onboarding — authenticated, no app shell */}
-            <Route path="/onboarding" element={
-              <RequireAuth shell={false}>
-                <Page><OnboardingPage /></Page>
-              </RequireAuth>
-            } />
+              {/* Onboarding — authenticated, no app shell */}
+              <Route path="/onboarding" element={
+                <RequireAuth shell={false}>
+                  <Page><OnboardingPage /></Page>
+                </RequireAuth>
+              } />
 
-            {/* Protected — user prop flows from context through AppShell */}
-            <Route path="/dashboard"    element={<RequireAuth><Page><DashboardPage /></Page></RequireAuth>} />
-            <Route path="/connect"      element={<RequireAuth><Page><ConnectPage /></Page></RequireAuth>} />
-            <Route path="/connect.html" element={<RequireAuth><Page><ConnectPage /></Page></RequireAuth>} />
-            <Route path="/rules"        element={<RequireAuth><Page><RulesPage /></Page></RequireAuth>} />
-            <Route path="/automations"  element={<Navigate to="/rules" replace />} />
-            <Route path="/contacts"     element={<RequireAuth><Page><ContactsPage /></Page></RequireAuth>} />
-            <Route path="/analytics"    element={<RequireAuth><Page><AnalyticsPage /></Page></RequireAuth>} />
-            <Route path="/billing"      element={<RequireAuth><Page><BillingPage /></Page></RequireAuth>} />
-            <Route path="/settings"     element={<RequireAuth><Page><SettingsPage /></Page></RequireAuth>} />
-            <Route path="/settings/profile" element={<RequireAuth><Page><SettingsProfileEditPage /></Page></RequireAuth>} />
-            <Route path="/refund"       element={<RequireAuth><Page><RefundPage /></Page></RequireAuth>} />
+              {/* Protected — user prop flows from context through AppShell */}
+              <Route path="/dashboard"    element={<RequireAuth><Page><DashboardPage /></Page></RequireAuth>} />
+              <Route path="/connect"      element={<RequireAuth><Page><ConnectPage /></Page></RequireAuth>} />
+              <Route path="/connect.html" element={<RequireAuth><Page><ConnectPage /></Page></RequireAuth>} />
+              <Route path="/rules"        element={<RequireAuth><Page><RulesPage /></Page></RequireAuth>} />
+              <Route path="/automations"  element={<Navigate to="/rules" replace />} />
+              <Route path="/contacts"     element={<RequireAuth><Page><ContactsPage /></Page></RequireAuth>} />
+              <Route path="/analytics"    element={<RequireAuth><Page><AnalyticsPage /></Page></RequireAuth>} />
+              <Route path="/billing"      element={<RequireAuth><Page><BillingPage /></Page></RequireAuth>} />
+              <Route path="/settings"     element={<RequireAuth><Page><SettingsPage /></Page></RequireAuth>} />
+              <Route path="/settings/profile" element={<RequireAuth><Page><SettingsProfileEditPage /></Page></RequireAuth>} />
+              <Route path="/refund"       element={<RequireAuth><Page><RefundPage /></Page></RequireAuth>} />
 
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </ToastProvider>
-      </AuthProvider>
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </ToastProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </AppErrorBoundary>
   </BrowserRouter>
 );

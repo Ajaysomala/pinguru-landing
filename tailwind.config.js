@@ -1,45 +1,59 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
+  darkMode: ['class', '[data-theme="dark"]'],
   theme: {
     extend: {
+      fontSize: {
+        '2xs': ['0.75rem', { lineHeight: '1.05rem' }],
+        xs:    ['0.8125rem', { lineHeight: '1.25rem' }],
+        sm:    ['0.9375rem', { lineHeight: '1.4rem' }],
+        base:  ['1.025rem', { lineHeight: '1.6rem' }],
+        lg:    ['1.15rem', { lineHeight: '1.75rem' }],
+        xl:    ['1.3rem', { lineHeight: '1.85rem' }],
+        '2xl': ['1.6rem', { lineHeight: '2.1rem' }],
+        '3xl': ['2rem', { lineHeight: '2.4rem' }],
+        '4xl': ['2.5rem', { lineHeight: '2.8rem' }],
+      },
       colors: {
+        canvas:   'var(--color-canvas, #09090B)',
+        surface:  'var(--color-card, #121218)',
         primary: {
-          DEFAULT: '#7C3AED',
-          hover:   '#6D28D9',
-          light:   '#EDE9FE',
+          DEFAULT: '#6366F1',
+          hover:   '#4F46E5',
+          light:   'rgba(99, 102, 241, 0.15)',
         },
         accent: {
-          DEFAULT: '#DB2777',
-          hover:   '#BE185D',
-          light:   '#FCE7F3',
+          DEFAULT: '#06B6D4',
+          hover:   '#0891B2',
+          light:   'rgba(6, 182, 212, 0.15)',
         },
-        sidebar:  '#0D0B1E',
-        canvas:   '#F8F7FF',
+        sidebar:  'var(--color-sidebar, #09090B)',
         success:  '#10B981',
         danger:   '#F43F5E',
         warning:  '#F59E0B',
         chart: {
-          indigo: '#7C3AED',
+          indigo: '#6366F1',
           teal:   '#06B6D4',
           amber:  '#F59E0B',
-          pink:   '#DB2777',
+          pink:   '#A855F7',
         }
       },
       fontFamily: {
-        sans:    ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
-        display: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        sans:    ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
         mono:    ['JetBrains Mono', 'monospace'],
       },
       borderRadius: {
-        card: '14px',
+        card: '16px',
         xl:   '18px',
         '2xl':'24px',
       },
       boxShadow: {
-        card:  '0 1px 3px rgba(15,10,30,0.08), 0 1px 2px rgba(15,10,30,0.04)',
-        modal: '0 24px 60px rgba(15,10,30,0.2)',
-        btn:   '0 4px 14px rgba(124,58,237,0.35)',
+        card:  '0 4px 24px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08)',
+        modal: '0 24px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+        btn:   '0 4px 20px rgba(99, 102, 241, 0.35)',
+        glow:  '0 0 24px rgba(6, 182, 212, 0.35)',
       },
       animation: {
         'slide-in':   'slideIn 0.25s ease-out',

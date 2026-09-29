@@ -6,6 +6,7 @@ import {
   Menu, X, Star, BookOpen, Mail, Twitter, Linkedin,
   Sparkles, Clock, Target,
 } from 'lucide-react';
+import { ThemeToggle } from '../components/ui/ThemeToggle';
 import '../styles/landing.css';
 
 // ── Navbar ─────────────────────────────────────────────────────────────────
@@ -37,6 +38,7 @@ const Navbar: React.FC = () => {
         </div>
 
         <div className="landing-nav-ctas">
+          <ThemeToggle />
           <Link to="/login" className="landing-nav-link">Log in</Link>
           <Link to="/register" className="btn-primary btn-sm">
             Get Started <ArrowRight size={14} />
@@ -61,6 +63,10 @@ const Navbar: React.FC = () => {
         <Link to="/blog"        className="mobile-nav-link" onClick={() => setMenuOpen(false)}>Blog</Link>
         <Link to="/support"     className="mobile-nav-link" onClick={() => setMenuOpen(false)}>Support</Link>
         <div className="mobile-nav-divider" />
+        <div className="flex items-center justify-between px-3 py-2">
+          <span className="text-sm font-semibold text-zinc-300">Theme</span>
+          <ThemeToggle />
+        </div>
         <Link to="/login"    className="mobile-nav-link" onClick={() => setMenuOpen(false)}>Log in</Link>
         <Link
           to="/register"

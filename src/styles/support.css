@@ -31,7 +31,7 @@
 .support-contact-card {
   border: 1px solid var(--color-border);
   border-radius: 18px;
-  background: linear-gradient(145deg, #ffffff 0%, color-mix(in srgb, var(--color-primary-light) 10%, #ffffff 90%) 100%);
+  background: var(--color-card);
   box-shadow: var(--shadow-xs);
 }
 
@@ -40,12 +40,12 @@
   align-items: center;
   gap: 6px;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--color-primary) 16%, var(--color-border) 84%);
-  background: color-mix(in srgb, var(--color-primary-light) 72%, #ffffff 28%);
-  color: var(--color-text-secondary);
-  font-size: 0.76rem;
+  border: 1px solid var(--color-primary-ring);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 0.8125rem;
   font-weight: 700;
-  padding: 6px 12px;
+  padding: 6px 14px;
 }
 
 .support-title {
@@ -57,6 +57,7 @@
 .support-meta,
 .support-card p {
   color: var(--color-text-secondary);
+  font-size: 0.95rem;
 }
 
 .support-link,
@@ -73,8 +74,8 @@
 .support-faq details {
   border: 1px solid var(--color-border);
   border-radius: 12px;
-  background: #fff;
-  padding: 10px 12px;
+  background: var(--color-card);
+  padding: 12px 16px;
 }
 
 .support-faq details + details {
@@ -86,11 +87,13 @@
   cursor: pointer;
   color: var(--color-text);
   font-weight: 700;
+  font-size: 0.95rem;
 }
 
 .support-faq details p {
   margin-top: 8px;
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
 }
 
 details > summary::-webkit-details-marker {
@@ -161,14 +164,14 @@ details > summary::-webkit-details-marker {
 
 .support-contact-card h3 {
   color: var(--color-text);
-  font-size: 0.9375rem;
+  font-size: 1.05rem;
   margin-bottom: 6px;
 }
 
 .support-contact-card p {
-  color: var(--color-muted);
-  font-size: 0.8125rem;
-  line-height: 1.5;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.6;
 }
 
 .support-card-link,
@@ -228,12 +231,12 @@ details > summary::-webkit-details-marker {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 16px;
-  background: #fff;
+  padding: 14px 18px;
+  background: var(--color-card);
   border: 1.5px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 14px;
   color: var(--color-text);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
 }
@@ -260,20 +263,20 @@ details > summary::-webkit-details-marker {
 .support-faq-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .support-faq-item {
   border: 1.5px solid var(--color-border);
   border-radius: 14px;
   overflow: hidden;
-  background: #fff;
+  background: var(--color-card);
   transition: border-color var(--transition-base), background var(--transition-base);
 }
 
 .support-faq-item.open {
-  border-color: rgba(124,58,237,0.25);
-  background: linear-gradient(135deg, rgba(124,58,237,0.03), rgba(219,39,119,0.01));
+  border-color: rgba(124,58,237,0.35);
+  background: var(--color-card);
 }
 
 .support-faq-trigger {
@@ -282,16 +285,16 @@ details > summary::-webkit-details-marker {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px 20px;
+  padding: 18px 22px;
   text-align: left;
 }
 
 .support-faq-trigger span {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   color: var(--color-text);
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .support-faq-chevron {
@@ -305,9 +308,9 @@ details > summary::-webkit-details-marker {
 }
 
 .support-faq-answer {
-  padding: 0 20px 18px;
+  padding: 0 22px 20px;
   color: var(--color-text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   line-height: 1.7;
 }
 

@@ -1485,3 +1485,150 @@
     min-width: 0;
   }
 }
+
+/* ============================================================
+   LIGHT MODE OVERRIDES FOR DASHBOARD & MOBILE DRAWER
+   ============================================================ */
+html.light .sidebar-mobile,
+[data-theme="light"] .sidebar-mobile {
+  background: #FFFFFF;
+  border-right: 1px solid #E2E8F0;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+}
+
+html.light .sidebar-mobile-head,
+[data-theme="light"] .sidebar-mobile-head {
+  border-bottom-color: #E2E8F0;
+}
+
+html.light .sidebar-mobile-close,
+[data-theme="light"] .sidebar-mobile-close {
+  color: #64748B;
+}
+
+html.light .sidebar-mobile-close:hover,
+[data-theme="light"] .sidebar-mobile-close:hover {
+  color: #0F172A;
+  background: #F1F5F9;
+}
+
+html.light .sidebar-nav-item,
+[data-theme="light"] .sidebar-nav-item {
+  color: #475569;
+}
+
+html.light .sidebar-nav-item:hover,
+[data-theme="light"] .sidebar-nav-item:hover {
+  background: #F1F5F9;
+  color: #0F172A;
+}
+
+html.light .sidebar-nav-item.active,
+[data-theme="light"] .sidebar-nav-item.active {
+  background: #EEF2FF;
+  color: #4F46E5;
+  border-color: #C7D2FE;
+}
+
+html.light .sidebar-user-name,
+[data-theme="light"] .sidebar-user-name {
+  color: #0F172A;
+}
+
+html.light .sidebar-section-label,
+[data-theme="light"] .sidebar-section-label {
+  color: #64748B;
+}
+
+html.light .sidebar-footer,
+[data-theme="light"] .sidebar-footer {
+  border-top-color: #E2E8F0;
+}
+
+html.light .stat-card,
+[data-theme="light"] .stat-card {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+html.light .stat-value,
+[data-theme="light"] .stat-value {
+  color: #0F172A;
+}
+
+html.light .stat-label,
+[data-theme="light"] .stat-label {
+  color: #64748B;
+}
+
+html.light .card,
+[data-theme="light"] .card {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+html.light .card-title,
+[data-theme="light"] .card-title {
+  color: #0F172A;
+}
+
+html.light .dashboard-v5-hero,
+[data-theme="light"] .dashboard-v5-hero {
+  background: var(--gradient-hero);
+  border-color: #E2E8F0;
+}
+
+html.light .dashboard-v5-hero h1,
+[data-theme="light"] .dashboard-v5-hero h1 {
+  color: #0F172A;
+}
+
+html.light .dashboard-v5-hero p,
+[data-theme="light"] .dashboard-v5-hero p {
+  color: #475569;
+}
+
+html.light .dashboard-v5-stat,
+[data-theme="light"] .dashboard-v5-stat {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+}
+
+html.light .dashboard-v5-stat strong,
+[data-theme="light"] .dashboard-v5-stat strong {
+  color: #0F172A;
+}
+
+html.light .dashboard-v5-stat span,
+[data-theme="light"] .dashboard-v5-stat span {
+  color: #64748B;
+}
+
+html.light .dashboard-v5-card,
+[data-theme="light"] .dashboard-v5-card {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+}
+
+html.light .dashboard-v5-card h3,
+[data-theme="light"] .dashboard-v5-card h3 {
+  color: #0F172A;
+}
+
+html.light .rule-card,
+[data-theme="light"] .rule-card {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+}
+
+html.light .rule-name,
+[data-theme="light"] .rule-name {
+  color: #0F172A;
+}
+
+html.light .rule-meta,
+[data-theme="light"] .rule-meta {
+  color: #64748B;
+}

@@ -21,7 +21,7 @@ export const MobileBottomNav: React.FC = () => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white/90 backdrop-blur-2xl border-t border-slate-200/70 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+    <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[#09090B]/90 backdrop-blur-2xl border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.7)]">
       <nav className="grid grid-cols-5 items-center h-16 px-1 safe-area-inset-bottom">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -33,16 +33,16 @@ export const MobileBottomNav: React.FC = () => {
               className="flex flex-col items-center justify-center h-full min-h-[44px] min-w-[44px] py-1 transition-all active:scale-90 relative select-none cursor-pointer"
             >
               {isActive && (
-                <span className="absolute -top-[1px] w-8 h-[2.5px] rounded-full bg-gradient-to-r from-violet-600 via-indigo-600 to-pink-500 shadow-[0_0_8px_rgba(124,58,237,0.5)]" />
+                <span className="absolute -top-[1px] w-8 h-[2.5px] rounded-full bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-400 shadow-[0_0_10px_#06B6D4]" />
               )}
               <Icon
                 className={`w-5 h-5 transition-transform duration-200 ${
-                  isActive ? 'text-violet-600 scale-110' : 'text-slate-400'
+                  isActive ? 'text-cyan-400 scale-110' : 'text-zinc-500'
                 }`}
               />
               <span
                 className={`text-[10px] mt-1 font-medium tracking-tight ${
-                  isActive ? 'text-violet-700 font-bold' : 'text-slate-500'
+                  isActive ? 'text-cyan-400 font-bold' : 'text-zinc-500'
                 }`}
               >
                 {tab.label}

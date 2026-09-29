@@ -13,6 +13,7 @@ export interface User {
   instagram_username?: string;
   instagram_user_id?: string;
   email_verified: boolean;
+  avatar_url?: string;
   onboarding_complete?: boolean;
   created_at?: string;
 }
