@@ -42,10 +42,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside 
       className={`hidden md:flex ${
         collapsed ? 'w-20' : 'w-64'
-      } transition-all duration-300 ease-in-out border-r border-white/10 bg-[#09090B]/90 backdrop-blur-xl flex-col shrink-0 select-none z-40 relative h-full`}
+      } transition-all duration-300 ease-in-out border-r border-slate-200 dark:border-white/10 bg-white/90 dark:bg-[#09090B]/90 backdrop-blur-xl flex-col shrink-0 select-none z-40 relative h-full`}
     >
       {/* Brand Header */}
-      <div className="h-16 px-4 border-b border-white/10 flex items-center justify-between">
+      <div className="h-16 px-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
         {!collapsed ? (
           <div 
             onClick={() => navigate('/dashboard')}
@@ -109,13 +109,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </nav>
 
       {/* Footer Account Status Panel */}
-      <div className="p-3 border-t border-white/10 space-y-3">
+      <div className="p-3 border-t border-slate-200 dark:border-white/10 space-y-3">
         {!collapsed ? (
           <>
             {/* Instagram Link Mini Card */}
             <div 
               onClick={() => navigate('/connect')}
-              className="p-3 rounded-2xl bg-white dark:bg-[#121218]/90 border border-slate-200 dark:border-white/10 shadow-xs space-y-2 cursor-pointer hover:border-indigo-500/40 transition-all"
+              className="p-3 rounded-2xl bg-slate-50 dark:bg-[#121218]/90 border border-slate-200 dark:border-white/10 shadow-xs space-y-2 cursor-pointer hover:border-indigo-500/40 transition-all"
             >
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-1.5">
@@ -149,7 +149,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         ) : (
           <div 
             onClick={() => navigate('/connect')}
-            className="w-10 h-10 mx-auto rounded-xl bg-[#121218] border border-white/10 shadow-xs flex items-center justify-center cursor-pointer hover:border-indigo-500/40"
+            className="w-10 h-10 mx-auto rounded-xl bg-slate-100 dark:bg-[#121218] border border-slate-200 dark:border-white/10 shadow-xs flex items-center justify-center cursor-pointer hover:border-indigo-500/40"
             title={user?.instagram_connected ? `@${user.instagram_username || 'connected'}` : 'Connect Instagram'}
           >
             <Instagram className="w-4 h-4 text-pink-400" />

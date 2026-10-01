@@ -1671,3 +1671,99 @@
     animation: none !important;
   }
 }
+
+/* ============================================================
+   DARK MODE OVERRIDES FOR AUTH & VERIFICATION PAGES
+   ============================================================ */
+
+html.dark .auth-layout,
+[data-theme="dark"] .auth-layout,
+html.dark .auth-screen,
+[data-theme="dark"] .auth-screen {
+  background: radial-gradient(circle at 12% 12%, rgba(124, 58, 237, 0.15) 0%, transparent 40%),
+              radial-gradient(circle at 88% 78%, rgba(6, 182, 212, 0.1) 0%, transparent 40%),
+              #09090b;
+}
+
+html.dark .auth-card,
+[data-theme="dark"] .auth-card,
+html.dark .auth-panel,
+[data-theme="dark"] .auth-panel,
+html.dark .auth-verify-card,
+[data-theme="dark"] .auth-verify-card {
+  background: rgba(18, 18, 24, 0.95);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+html.dark .auth-panel-title,
+[data-theme="dark"] .auth-panel-title {
+  color: #F8FAFC;
+}
+
+html.dark .auth-panel-subtitle,
+[data-theme="dark"] .auth-panel-subtitle {
+  color: #A1A1AA;
+}
+
+html.dark .form-label,
+[data-theme="dark"] .form-label {
+  color: #E2E8F0;
+}
+
+html.dark .form-input,
+[data-theme="dark"] .form-input,
+html.dark .form-select,
+[data-theme="dark"] .form-select {
+  background: #181824;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #F8FAFC;
+}
+
+html.dark .form-input::placeholder,
+[data-theme="dark"] .form-input::placeholder {
+  color: #71717A;
+}
+
+html.dark .otp-input,
+[data-theme="dark"] .otp-input {
+  background: #181824;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #F8FAFC;
+}
+
+html.dark .otp-input:focus,
+[data-theme="dark"] .otp-input:focus {
+  border-color: #818CF8;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+html.dark .otp-input.filled,
+[data-theme="dark"] .otp-input.filled {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: #818CF8;
+  color: #A5B4FC;
+}
+
+html.dark .auth-resend-btn,
+[data-theme="dark"] .auth-resend-btn {
+  color: #A1A1AA;
+}
+
+html.dark .auth-resend-btn:hover:not(:disabled),
+[data-theme="dark"] .auth-resend-btn:hover:not(:disabled) {
+  color: #F8FAFC;
+}
+
+html.dark .auth-verify-progress .bar,
+[data-theme="dark"] .auth-verify-progress .bar {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+html.dark .auth-verify-icon,
+[data-theme="dark"] .auth-verify-icon {
+  background: rgba(124, 58, 237, 0.2);
+  color: #C4B5FD;
+}
+
+

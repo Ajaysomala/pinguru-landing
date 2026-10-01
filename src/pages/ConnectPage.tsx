@@ -159,8 +159,8 @@ export const ConnectPage: React.FC = () => {
 
       {/* Main Connection Status 3D Card */}
       <Card3D intensity={4} glowColor="rgba(99, 102, 241, 0.12)">
-        <div className="bg-[#121218]/80 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6 backdrop-blur-md">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/10">
+        <div className="bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 sm:p-8 shadow-xs dark:shadow-xl space-y-6 backdrop-blur-md">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-200 dark:border-white/10">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 p-[2.5px] shadow-lg shadow-purple-500/20 shrink-0">
                 <div className="w-full h-full bg-white dark:bg-[#181822] rounded-[13px] flex items-center justify-center text-slate-900 dark:text-white text-xl font-black">
@@ -175,14 +175,14 @@ export const ConnectPage: React.FC = () => {
                   <span
                     className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold border ${
                       status?.connected
-                        ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.2)]'
-                        : 'bg-white/5 text-zinc-400 border-white/10'
+                        ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.15)]'
+                        : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-zinc-400 border border-slate-200 dark:border-white/10'
                     }`}
                   >
                     {status?.connected ? 'Connected' : 'Disconnected'}
                   </span>
                 </div>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-slate-600 dark:text-zinc-400">
                   {status?.connected
                     ? `Account ID: ${status.user_id || 'Meta Verified'}`
                     : 'Click "Connect Instagram Account" to authorize PinGuru via Meta OAuth.'}
@@ -192,16 +192,16 @@ export const ConnectPage: React.FC = () => {
 
             {/* Read-only Live Indicator Grid */}
             <div className="grid grid-cols-2 gap-3 text-xs font-mono">
-              <div className="bg-[#181822] p-3.5 rounded-xl border border-white/10">
-                <span className="text-[10px] text-zinc-400 uppercase block font-sans font-bold">API State</span>
-                <span className="text-cyan-400 font-semibold flex items-center gap-1.5 mt-1 text-[11px]">
-                  <Radio className="w-3 h-3 animate-pulse text-cyan-400" />
+              <div className="bg-slate-50 dark:bg-[#181822] p-3.5 rounded-xl border border-slate-200 dark:border-white/10">
+                <span className="text-[10px] text-slate-500 dark:text-zinc-400 uppercase block font-sans font-bold">API State</span>
+                <span className="text-cyan-600 dark:text-cyan-400 font-semibold flex items-center gap-1.5 mt-1 text-[11px]">
+                  <Radio className="w-3 h-3 animate-pulse text-cyan-500 dark:text-cyan-400" />
                   {status?.connected ? 'Active & Live' : 'Standby'}
                 </span>
               </div>
-              <div className="bg-[#181822] p-3.5 rounded-xl border border-white/10">
-                <span className="text-[10px] text-zinc-400 uppercase block font-sans font-bold">Token Expiry</span>
-                <span className="text-zinc-300 font-medium mt-1 block truncate text-[11px]">
+              <div className="bg-slate-50 dark:bg-[#181822] p-3.5 rounded-xl border border-slate-200 dark:border-white/10">
+                <span className="text-[10px] text-slate-500 dark:text-zinc-400 uppercase block font-sans font-bold">Token Expiry</span>
+                <span className="text-slate-800 dark:text-zinc-300 font-medium mt-1 block truncate text-[11px]">
                   {status?.token_expires_at || (status?.connected ? '60 Days Lifetime' : 'N/A')}
                 </span>
               </div>
@@ -211,10 +211,10 @@ export const ConnectPage: React.FC = () => {
           {/* Permissions & Scopes Matrix */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">
                 Approved Meta Graph API Permissions
               </h3>
-              <span className="text-[11px] text-cyan-400 font-mono font-bold">
+              <span className="text-[11px] text-cyan-600 dark:text-cyan-400 font-mono font-bold">
                 {status?.connected ? 'Active' : 'Pending Authorization'}
               </span>
             </div>
@@ -240,15 +240,15 @@ export const ConnectPage: React.FC = () => {
               ].map((p) => (
                 <div 
                   key={p.scope}
-                  className="p-4 bg-[#181822] border border-white/10 rounded-xl space-y-1.5"
+                  className="p-4 bg-slate-50 dark:bg-[#181822] border border-slate-200 dark:border-white/10 rounded-xl space-y-1.5"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono text-indigo-400 font-bold truncate">
+                    <span className="text-xs font-mono text-indigo-600 dark:text-indigo-400 font-bold truncate">
                       {p.scope}
                     </span>
-                    <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
                   </div>
-                  <p className="text-[11px] text-zinc-400 leading-normal">
+                  <p className="text-[11px] text-slate-600 dark:text-zinc-400 leading-normal">
                     {p.description}
                   </p>
                 </div>
@@ -259,8 +259,8 @@ export const ConnectPage: React.FC = () => {
       </Card3D>
 
       {/* Security & Architecture Marker */}
-      <div className="p-4 bg-[#121218]/80 border border-white/10 rounded-2xl text-[11px] text-zinc-400 flex items-center gap-2 backdrop-blur-md shadow-xl">
-        <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0" />
+      <div className="p-4 bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 rounded-2xl text-[11px] text-slate-600 dark:text-zinc-400 flex items-center gap-2 backdrop-blur-md shadow-xs dark:shadow-xl">
+        <ShieldCheck className="w-4 h-4 text-cyan-500 dark:text-cyan-400 shrink-0" />
         <span>Meta Graph API v20.0 official connection. End-to-end webhook verification managed automatically.</span>
       </div>
     </div>

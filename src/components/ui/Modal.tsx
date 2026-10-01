@@ -72,7 +72,7 @@ export const Modal: React.FC<ModalProps> = ({
         </div>
         <div className="px-5 sm:px-6 py-4 sm:py-5 overflow-y-auto flex-1">{children}</div>
         {footer && (
-          <div className="px-5 sm:px-6 py-4 border-t border-white/10 flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 flex-shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <div className="px-5 sm:px-6 py-4 border-t border-slate-200 dark:border-white/10 flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 flex-shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
             {footer}
           </div>
         )}

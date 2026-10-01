@@ -122,7 +122,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
   const strength = calculatePasswordStrength(mode === 'login' ? loginPassword : regPassword);
 
   return (
-    <div className="min-h-screen w-full bg-[#F8FAFC] flex flex-col justify-center items-center p-4 sm:p-6 lg:p-8 relative overflow-hidden selection:bg-violet-500/20 selection:text-violet-700">
+    <div className="min-h-screen w-full bg-[#F8FAFC] dark:bg-[#09090B] flex flex-col justify-center items-center p-4 sm:p-6 lg:p-8 relative overflow-hidden selection:bg-violet-500/20 selection:text-violet-700">
       {/* 3D Ambient Glowing Mesh Background Orbs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
         <div className="absolute -top-24 -left-24 w-[450px] h-[450px] rounded-full bg-[#C084FC] opacity-25 blur-[140px] transform-gpu" />
@@ -135,26 +135,26 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
         {/* Brand Header */}
         <div className="text-center space-y-2">
           <Link to="/" className="inline-flex items-center justify-center w-14 h-14 rounded-3xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-pink-500 shadow-lg shadow-violet-500/25 p-[2px] mb-1 group hover:scale-105 transition-transform">
-            <div className="w-full h-full bg-white rounded-[22px] flex items-center justify-center text-violet-600 shadow-inner">
-              <Sparkles className="w-7 h-7 text-violet-600 group-hover:rotate-12 transition-transform" />
+            <div className="w-full h-full bg-white dark:bg-[#121218] rounded-[22px] flex items-center justify-center text-violet-600 shadow-inner">
+              <Sparkles className="w-7 h-7 text-violet-600 dark:text-violet-400 group-hover:rotate-12 transition-transform" />
             </div>
           </Link>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
             PinGuru{' '}
             <span className="bg-gradient-to-r from-violet-600 via-indigo-600 to-pink-600 bg-clip-text text-transparent">
               Automation
             </span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 max-w-xs mx-auto">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 max-w-xs mx-auto">
             Instagram Direct Message & Comment automation for creators, brands, and agencies.
           </p>
         </div>
 
         {/* 3D Auth Card */}
         <Card3D intensity={6} glowColor="rgba(124, 58, 237, 0.08)">
-          <div className="bg-white/90 border border-slate-200/80 rounded-[32px] p-6 sm:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.02),0_16px_40px_-6px_rgba(0,0,0,0.06)] space-y-6 backdrop-blur-xl">
+          <div className="bg-white/95 dark:bg-[#121218]/90 border border-slate-200/80 dark:border-white/10 rounded-[32px] p-6 sm:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.02),0_16px_40px_-6px_rgba(0,0,0,0.06)] dark:shadow-2xl space-y-6 backdrop-blur-xl">
             {/* Segmented Auth Mode Switcher */}
-            <div className="bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/60 flex items-center gap-1">
+            <div className="bg-slate-100/90 dark:bg-white/5 p-1.5 rounded-2xl border border-slate-200/60 dark:border-white/10 flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => {
@@ -163,8 +163,8 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
                 }}
                 className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all min-h-[44px] flex items-center justify-center ${
                   mode === 'login'
-                    ? 'bg-white text-slate-900 shadow-sm border border-slate-200/40'
-                    : 'text-slate-500 hover:text-slate-900'
+                    ? 'bg-white dark:bg-[#1e1e2d] text-slate-900 dark:text-white shadow-sm border border-slate-200/40 dark:border-white/10'
+                    : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 Sign In
@@ -177,8 +177,8 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
                 }}
                 className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all min-h-[44px] flex items-center justify-center ${
                   mode === 'register'
-                    ? 'bg-white text-slate-900 shadow-sm border border-slate-200/40'
-                    : 'text-slate-500 hover:text-slate-900'
+                    ? 'bg-white dark:bg-[#1e1e2d] text-slate-900 dark:text-white shadow-sm border border-slate-200/40 dark:border-white/10'
+                    : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 Create Account
@@ -186,12 +186,12 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
             </div>
 
             {errorMsg && (
-              <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-700 flex items-start gap-2.5 animate-in fade-in">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
+              <div className="p-3.5 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-2xl text-xs text-rose-700 dark:text-rose-300 flex items-start gap-2.5 animate-in fade-in">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400 mt-0.5" />
                 <div>
                   <div className="font-semibold">{errorMsg}</div>
                   {remainingAttempts !== null && remainingAttempts <= 3 && (
-                    <div className="text-[11px] text-rose-600/80 mt-1">
+                    <div className="text-[11px] text-rose-600/80 dark:text-rose-400/80 mt-1">
                       {remainingAttempts} attempt{remainingAttempts !== 1 ? 's' : ''} remaining before temporary lockout.
                     </div>
                   )}
@@ -203,48 +203,48 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
             {mode === 'login' ? (
               <form onSubmit={handleLoginSubmit} className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-700">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300">
                     Email Address
                   </label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Mail className="w-4 h-4 text-slate-400 dark:text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="email"
                       required
                       value={loginEmail}
                       onChange={(e) => setLoginEmail(e.target.value)}
                       placeholder="you@domain.com"
-                      className="w-full bg-slate-50/70 border border-slate-200 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-100 min-h-[44px] transition-all"
+                      className="w-full bg-slate-50/70 dark:bg-[#09090B] border border-slate-200 dark:border-white/10 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-[#09090B] focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-100 dark:focus:ring-violet-900/30 min-h-[44px] transition-all"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <label className="block text-xs font-bold text-slate-700">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300">
                       Password
                     </label>
                     <Link
                       to="/forgot-password"
-                      className="text-[11px] text-violet-600 hover:text-violet-700 font-semibold min-h-[30px] flex items-center"
+                      className="text-[11px] text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-semibold min-h-[30px] flex items-center"
                     >
                       Forgot?
                     </Link>
                   </div>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Lock className="w-4 h-4 text-slate-400 dark:text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
                       placeholder="Enter your password"
-                      className="w-full bg-slate-50/70 border border-slate-200 rounded-2xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-100 min-h-[44px] transition-all"
+                      className="w-full bg-slate-50/70 dark:bg-[#09090B] border border-slate-200 dark:border-white/10 rounded-2xl pl-10 pr-10 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-[#09090B] focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-100 dark:focus:ring-violet-900/30 min-h-[44px] transition-all"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-zinc-500 dark:hover:text-zinc-300"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -271,23 +271,23 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
               <form onSubmit={handleRegisterSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-700">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300">
                       First Name
                     </label>
                     <div className="relative">
-                      <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <User className="w-4 h-4 text-slate-400 dark:text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
                         required
                         value={regFirstName}
                         onChange={(e) => setRegFirstName(e.target.value)}
                         placeholder="First Name"
-                        className="w-full bg-slate-50/70 border border-slate-200 rounded-2xl pl-9 pr-3 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-100 min-h-[44px] transition-all"
+                        className="w-full bg-slate-50/70 dark:bg-[#09090B] border border-slate-200 dark:border-white/10 rounded-2xl pl-9 pr-3 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-[#09090B] focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-100 dark:focus:ring-violet-900/30 min-h-[44px] transition-all"
                       />
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-700">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300">
                       Last Name
                     </label>
                     <input
@@ -295,46 +295,46 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
                       value={regLastName}
                       onChange={(e) => setRegLastName(e.target.value)}
                       placeholder="Last Name"
-                      className="w-full bg-slate-50/70 border border-slate-200 rounded-2xl px-3 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-100 min-h-[44px] transition-all"
+                      className="w-full bg-slate-50/70 dark:bg-[#09090B] border border-slate-200 dark:border-white/10 rounded-2xl px-3 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-[#09090B] focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-100 dark:focus:ring-violet-900/30 min-h-[44px] transition-all"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-700">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300">
                     Work Email
                   </label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Mail className="w-4 h-4 text-slate-400 dark:text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="email"
                       required
                       value={regEmail}
                       onChange={(e) => setRegEmail(e.target.value)}
                       placeholder="you@domain.com"
-                      className="w-full bg-slate-50/70 border border-slate-200 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-100 min-h-[44px] transition-all"
+                      className="w-full bg-slate-50/70 dark:bg-[#09090B] border border-slate-200 dark:border-white/10 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-[#09090B] focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-100 dark:focus:ring-violet-900/30 min-h-[44px] transition-all"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-700">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300">
                     Create Password
                   </label>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Lock className="w-4 h-4 text-slate-400 dark:text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
                       placeholder="Min 8 characters"
-                      className="w-full bg-slate-50/70 border border-slate-200 rounded-2xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-100 min-h-[44px] transition-all"
+                      className="w-full bg-slate-50/70 dark:bg-[#09090B] border border-slate-200 dark:border-white/10 rounded-2xl pl-10 pr-10 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-[#09090B] focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-100 dark:focus:ring-violet-900/30 min-h-[44px] transition-all"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-zinc-500 dark:hover:text-zinc-300"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -343,9 +343,9 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
 
                 {/* Password Strength Indicator */}
                 <div className="space-y-1">
-                  <div className="flex items-center justify-between text-[10px] text-slate-500">
+                  <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-zinc-400">
                     <span>Password Security</span>
-                    <span className="font-sans text-violet-600 font-bold">
+                    <span className="font-sans text-violet-600 dark:text-violet-400 font-bold">
                       {strength <= 1 ? 'Weak' : strength <= 3 ? 'Good' : 'Strong'}
                     </span>
                   </div>
@@ -356,7 +356,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
                         className={`h-1.5 rounded-full transition-colors ${
                           strength >= step
                             ? 'bg-gradient-to-r from-violet-500 to-pink-500'
-                            : 'bg-slate-200'
+                            : 'bg-slate-200 dark:bg-white/10'
                         }`}
                       />
                     ))}
@@ -364,26 +364,26 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-slate-700">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300">
                     Business / Industry (Optional)
                   </label>
                   <div className="relative">
-                    <Briefcase className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Briefcase className="w-4 h-4 text-slate-400 dark:text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       value={regCategory}
                       onChange={(e) => setRegCategory(e.target.value)}
                       placeholder="e.g. Creator / E-commerce / Fitness"
-                      className="w-full bg-slate-50/70 border border-slate-200 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-100 min-h-[44px] transition-all"
+                      className="w-full bg-slate-50/70 dark:bg-[#09090B] border border-slate-200 dark:border-white/10 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-[#09090B] focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-100 dark:focus:ring-violet-900/30 min-h-[44px] transition-all"
                     />
                   </div>
                 </div>
 
-                <div className="text-[11px] text-slate-500 leading-relaxed">
+                <div className="text-[11px] text-slate-500 dark:text-zinc-400 leading-relaxed">
                   By creating an account, you agree to the{' '}
-                  <Link to="/terms" className="text-violet-600 hover:underline font-medium">Terms of Service</Link>{' '}
+                  <Link to="/terms" className="text-violet-600 dark:text-violet-400 hover:underline font-medium">Terms of Service</Link>{' '}
                   and{' '}
-                  <Link to="/privacy" className="text-violet-600 hover:underline font-medium">Privacy Policy</Link>.
+                  <Link to="/privacy" className="text-violet-600 dark:text-violet-400 hover:underline font-medium">Privacy Policy</Link>.
                 </div>
 
                 <button
@@ -399,8 +399,8 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
         </Card3D>
 
         {/* Security & Meta Compliance Marker */}
-        <div className="flex items-center justify-center gap-2 text-[11px] text-slate-500">
-          <ShieldCheck className="w-4 h-4 text-emerald-600" />
+        <div className="flex items-center justify-center gap-2 text-[11px] text-slate-500 dark:text-zinc-400">
+          <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           <span>Meta Graph API v20.0 Compliant & Encrypted</span>
         </div>
       </div>

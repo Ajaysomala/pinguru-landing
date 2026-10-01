@@ -87,27 +87,27 @@ export const TriggerSimulator: React.FC<TriggerSimulatorProps> = ({
 
   return (
     <Card3D intensity={5} glowColor="rgba(6, 182, 212, 0.15)" className="w-full">
-      <div className="relative rounded-[28px] sm:rounded-[36px] p-1.5 sm:p-2 bg-gradient-to-b from-[#222230] via-[#161622] to-[#0A0A0F] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] border border-white/10 overflow-hidden">
+      <div className="relative rounded-[28px] sm:rounded-[36px] p-1.5 sm:p-2 bg-gradient-to-b from-slate-200 via-slate-100 to-slate-200 dark:from-[#222230] dark:via-[#161622] dark:to-[#0A0A0F] shadow-xl dark:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] border border-slate-300 dark:border-white/10 overflow-hidden">
         {/* Device Notch */}
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-28 h-4 bg-[#09090B] rounded-full z-20 flex items-center justify-center gap-2 border border-white/10">
-          <span className="w-2 h-2 rounded-full bg-zinc-800" />
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-950" />
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-28 h-4 bg-slate-300 dark:bg-[#09090B] rounded-full z-20 flex items-center justify-center gap-2 border border-slate-400/40 dark:border-white/10">
+          <span className="w-2 h-2 rounded-full bg-slate-400 dark:bg-zinc-800" />
+          <span className="w-1.5 h-1.5 rounded-full bg-slate-500 dark:bg-cyan-950" />
         </div>
 
         {/* Screen Glass Container */}
-        <div className="bg-[#09090B] rounded-[22px] sm:rounded-[30px] overflow-hidden flex flex-col pt-6 sm:pt-7 border border-white/10">
+        <div className="bg-slate-50 dark:bg-[#09090B] rounded-[22px] sm:rounded-[30px] overflow-hidden flex flex-col pt-6 sm:pt-7 border border-slate-200 dark:border-white/10">
           {/* Instagram Header */}
-          <div className="px-3.5 sm:px-5 py-3 border-b border-white/10 bg-[#121218]/95 backdrop-blur-md flex items-center justify-between">
+          <div className="px-3.5 sm:px-5 py-3 border-b border-slate-200 dark:border-white/10 bg-white/95 dark:bg-[#121218]/95 backdrop-blur-md flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 via-violet-600 to-cyan-500 p-[1.5px] shadow-xs">
-                <div className="w-full h-full bg-[#09090B] rounded-full flex items-center justify-center text-white text-[11px] font-bold">
+                <div className="w-full h-full bg-white dark:bg-[#09090B] rounded-full flex items-center justify-center text-slate-900 dark:text-white text-[11px] font-bold">
                   PG
                 </div>
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
                   <span className="text-xs font-bold text-slate-900 dark:text-white font-mono">@{instagramUsername}</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#06B6D4] animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 dark:bg-cyan-400 shadow-[0_0_8px_#06B6D4] animate-pulse" />
                 </div>
                 <p className="text-[10px] text-slate-500 dark:text-zinc-400">Instagram DM Simulator</p>
               </div>
@@ -157,7 +157,7 @@ export const TriggerSimulator: React.FC<TriggerSimulatorProps> = ({
                     className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-xs leading-relaxed ${
                       m.sender === 'user'
                         ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-tr-none shadow-md'
-                        : 'bg-slate-100 dark:bg-[#181824] text-slate-800 dark:text-zinc-100 border border-slate-200 dark:border-white/10 rounded-tl-none shadow-xs'
+                        : 'bg-white dark:bg-[#181824] text-slate-900 dark:text-zinc-100 border border-slate-200 dark:border-white/10 rounded-tl-none shadow-xs'
                     }`}
                   >
                     <p className="whitespace-pre-wrap">{m.text}</p>
@@ -168,7 +168,7 @@ export const TriggerSimulator: React.FC<TriggerSimulatorProps> = ({
             )}
 
             {isTyping && (
-              <div className="flex items-center gap-1.5 p-2.5 bg-slate-100 dark:bg-[#181824] rounded-2xl w-14 border border-slate-200 dark:border-white/10 shadow-xs">
+              <div className="flex items-center gap-1.5 p-2.5 bg-white dark:bg-[#181824] rounded-2xl w-14 border border-slate-200 dark:border-white/10 shadow-xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-cyan-400 animate-bounce" />
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-cyan-400 animate-bounce [animation-delay:0.2s]" />
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-cyan-400 animate-bounce [animation-delay:0.4s]" />
@@ -177,21 +177,21 @@ export const TriggerSimulator: React.FC<TriggerSimulatorProps> = ({
           </div>
 
           {lastMatchResult && (
-            <div className="px-3.5 py-1.5 bg-cyan-500/10 border-t border-cyan-500/30 text-[10px] text-cyan-600 dark:text-cyan-400 flex items-center gap-1 font-mono font-semibold">
+            <div className="px-3.5 py-1.5 bg-cyan-50 dark:bg-cyan-500/10 border-t border-cyan-200 dark:border-cyan-500/30 text-[10px] text-cyan-700 dark:text-cyan-400 flex items-center gap-1 font-mono font-semibold">
               <CheckCircle2 className="w-3 h-3 text-cyan-600 dark:text-cyan-400 shrink-0" />
               <span className="truncate">{lastMatchResult}</span>
             </div>
           )}
 
           {/* Chat Input Bar */}
-          <div className="p-2.5 sm:p-3 bg-slate-50 dark:bg-[#121218] border-t border-slate-200 dark:border-white/10 flex items-center gap-2">
+          <div className="p-2.5 sm:p-3 bg-white dark:bg-[#121218] border-t border-slate-200 dark:border-white/10 flex items-center gap-2">
             <input
               type="text"
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder="Type test keyword or message..."
-              className="flex-1 bg-white dark:bg-[#09090B] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-[#09090B] focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 min-h-[38px]"
+              className="flex-1 bg-slate-50 dark:bg-[#09090B] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-[#09090B] focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 min-h-[38px]"
             />
             <button
               onClick={handleSend}

@@ -330,10 +330,47 @@
   background: var(--color-primary-light);
 }
 
-.wizard-media-thumb {
-  width: 82px;
+.wizard-media-thumb-container {
+  width: 100%;
   aspect-ratio: 3 / 4;
   border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+html.dark .wizard-media-thumb-container,
+.dark .wizard-media-thumb-container,
+[data-theme="dark"] .wizard-media-thumb-container {
+  background: #181824;
+}
+
+.wizard-media-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.wizard-media-badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: rgba(15, 23, 42, 0.75);
+  color: white;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.wizard-media-thumb {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -351,9 +388,20 @@
 }
 
 .wizard-media-label {
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.72rem;
+  font-weight: 600;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
   color: var(--color-text-secondary);
+}
+
+html.dark .wizard-media-label,
+.dark .wizard-media-label,
+[data-theme="dark"] .wizard-media-label {
+  color: #cbd5e1;
 }
 
 .wizard-show-more {
@@ -3067,4 +3115,46 @@ html.light .rules-studio-chip,
   border-color: #E2E8F0;
   color: #475569;
 }
+
+/* Rule Builder Modal Theme Overrides */
+html.light .rb-field-shell,
+[data-theme="light"] .rb-field-shell {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+html.light .rb-field-shell:hover,
+[data-theme="light"] .rb-field-shell:hover {
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.08);
+}
+
+html.light .rb-template-shell,
+[data-theme="light"] .rb-template-shell {
+  background: #FFFFFF;
+}
+
+html.light .rb-var-chip,
+[data-theme="light"] .rb-var-chip {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+  color: #6366F1;
+}
+
+html.dark .rb-var-chip,
+.dark .rb-var-chip,
+[data-theme="dark"] .rb-var-chip {
+  background: #181824;
+  border-color: rgba(99, 102, 241, 0.35);
+  color: #818CF8;
+}
+
+html.dark .rb-guide-shell,
+.dark .rb-guide-shell,
+[data-theme="dark"] .rb-guide-shell {
+  background: #181822;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
 

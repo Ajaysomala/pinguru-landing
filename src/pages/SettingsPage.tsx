@@ -98,7 +98,7 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* Settings Navigation Tabs */}
-      <div className="bg-[#121218]/80 border border-white/10 p-1.5 rounded-2xl flex items-center gap-1.5 overflow-x-auto text-xs no-scrollbar backdrop-blur-md">
+      <div className="bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 p-1.5 rounded-2xl flex items-center gap-1.5 overflow-x-auto text-xs no-scrollbar backdrop-blur-md shadow-xs dark:shadow-xl">
         {[
           { id: 'profile', label: 'Workspace & Profile', icon: User },
           { id: 'compliance', label: 'Compliance & Safety', icon: ShieldCheck },
@@ -112,11 +112,11 @@ export const SettingsPage: React.FC = () => {
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
               className={`min-h-[40px] px-4 py-2 rounded-xl font-semibold transition-all flex items-center gap-2 whitespace-nowrap active:scale-95 shrink-0 cursor-pointer ${
                 isActive
-                  ? 'bg-gradient-to-r from-indigo-600/30 to-violet-600/20 text-white border border-indigo-500/40 shadow-sm'
+                  ? 'bg-gradient-to-r from-indigo-600/30 to-violet-600/20 text-indigo-700 dark:text-white border border-indigo-500/40 shadow-xs'
                   : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
               }`}
             >
-              <Icon className={`w-4 h-4 ${isActive ? 'text-cyan-400' : 'text-zinc-500'}`} />
+              <Icon className={`w-4 h-4 ${isActive ? 'text-indigo-600 dark:text-cyan-400' : 'text-slate-400 dark:text-zinc-500'}`} />
               <span>{tab.label}</span>
             </button>
           );
@@ -125,16 +125,16 @@ export const SettingsPage: React.FC = () => {
 
       {/* Tab 1: Profile & Workspace */}
       {activeTab === 'profile' && (
-        <form onSubmit={handleSaveProfile} className="bg-[#121218]/80 border border-white/10 rounded-2xl p-6 lg:p-8 space-y-6 shadow-xl backdrop-blur-md max-w-2xl">
-          <div className="border-b border-white/5 pb-4">
+        <form onSubmit={handleSaveProfile} className="bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 lg:p-8 space-y-6 shadow-xs dark:shadow-xl backdrop-blur-md max-w-2xl">
+          <div className="border-b border-slate-200 dark:border-white/5 pb-4">
             <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">Account Information</h2>
             <p className="text-xs text-slate-600 dark:text-zinc-400 mt-0.5">Update your public profile and workspace identity.</p>
           </div>
 
           {/* Profile Photo Preview Widget */}
-          <div className="flex items-center justify-between p-4 bg-[#09090B]/60 border border-white/10 rounded-2xl">
+          <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-[#09090B]/60 border border-slate-200 dark:border-white/10 rounded-2xl">
             <div className="flex items-center gap-3.5">
-              <div className="w-14 h-14 rounded-full border border-indigo-500/40 overflow-hidden flex items-center justify-center bg-[#121218] shrink-0">
+              <div className="w-14 h-14 rounded-full border border-indigo-500/40 overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-[#121218] shrink-0">
                 {avatarUrl ? (
                   <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover rounded-full" />
                 ) : (
@@ -151,7 +151,7 @@ export const SettingsPage: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/settings/profile')}
-              className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-cyan-400 text-xs font-semibold transition-colors cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-indigo-600 dark:text-cyan-400 text-xs font-semibold transition-colors cursor-pointer"
             >
               Change Photo
             </button>
@@ -167,7 +167,7 @@ export const SettingsPage: React.FC = () => {
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="e.g. Alex Rivera"
-                className="w-full bg-white dark:bg-[#09090B] border border-slate-300 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 min-h-[42px] transition-all"
+                className="w-full bg-slate-50 dark:bg-[#09090B] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-[#09090B] focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 min-h-[42px] transition-all"
               />
             </div>
 
@@ -180,7 +180,7 @@ export const SettingsPage: React.FC = () => {
                   type="text"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full bg-white dark:bg-[#09090B] border border-slate-300 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 min-h-[42px] transition-all"
+                  className="w-full bg-slate-50 dark:bg-[#09090B] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-[#09090B] focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 min-h-[42px] transition-all"
                 />
               </div>
               <div>
@@ -191,7 +191,7 @@ export const SettingsPage: React.FC = () => {
                   type="text"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-full bg-white dark:bg-[#09090B] border border-slate-300 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 min-h-[42px] transition-all"
+                  className="w-full bg-slate-50 dark:bg-[#09090B] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-[#09090B] focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 min-h-[42px] transition-all"
                 />
               </div>
             </div>
@@ -212,7 +212,7 @@ export const SettingsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-white/5 flex justify-end">
+          <div className="pt-4 border-t border-slate-200 dark:border-white/5 flex justify-end">
             <button
               type="submit"
               disabled={isSaving}
@@ -227,8 +227,8 @@ export const SettingsPage: React.FC = () => {
 
       {/* Tab 2: Compliance & Safety */}
       {activeTab === 'compliance' && (
-        <div className="bg-[#121218]/80 border border-white/10 rounded-2xl p-6 lg:p-8 space-y-6 shadow-xl backdrop-blur-md max-w-2xl">
-          <div className="border-b border-white/5 pb-4">
+        <div className="bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 lg:p-8 space-y-6 shadow-xs dark:shadow-xl backdrop-blur-md max-w-2xl">
+          <div className="border-b border-slate-200 dark:border-white/5 pb-4">
             <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">Instagram Community & Anti-Spam Compliance</h2>
             <p className="text-xs text-slate-600 dark:text-zinc-400 mt-0.5">
               Guarantees your account complies with Meta’s anti-spam rules and message frequency guidelines.
@@ -237,7 +237,7 @@ export const SettingsPage: React.FC = () => {
 
           <div className="space-y-4">
             {/* Safety Buffer Switch */}
-            <div className="p-4 bg-[#09090B]/60 rounded-2xl border border-white/10 flex items-center justify-between gap-4">
+            <div className="p-4 bg-slate-50 dark:bg-[#09090B]/60 rounded-2xl border border-slate-200 dark:border-white/10 flex items-center justify-between gap-4">
               <div>
                 <span className="text-xs font-bold text-slate-900 dark:text-white block">
                   Meta Rate-Limit Safety Buffer
@@ -255,7 +255,7 @@ export const SettingsPage: React.FC = () => {
                   className={`w-12 h-6 flex items-center rounded-full p-1 transition-all ${
                     enableSafetyBuffer 
                       ? 'bg-gradient-to-r from-indigo-600 to-violet-600 justify-end shadow-[0_0_10px_rgba(99,102,241,0.4)]' 
-                      : 'bg-white/10 justify-start'
+                      : 'bg-slate-300 dark:bg-white/10 justify-start'
                   }`}
                 >
                   <span className="w-4 h-4 rounded-full bg-white shadow-xs" />
@@ -293,7 +293,7 @@ export const SettingsPage: React.FC = () => {
                   onChange={(e) => setNewBlockedKw(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddBlockedKeyword())}
                   placeholder="Add blocked keyword or phrase..."
-                  className="flex-1 bg-white dark:bg-[#09090B] border border-slate-300 dark:border-white/10 rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 min-h-[40px] transition-all"
+                  className="flex-1 bg-slate-50 dark:bg-[#09090B] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:bg-white dark:focus:bg-[#09090B] focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 min-h-[40px] transition-all"
                 />
                 <button
                   type="button"
@@ -310,8 +310,8 @@ export const SettingsPage: React.FC = () => {
 
       {/* Tab 3: Plan & Billing */}
       {activeTab === 'billing' && (
-        <div className="bg-[#121218]/80 border border-white/10 rounded-2xl p-6 lg:p-8 space-y-6 shadow-xl backdrop-blur-md max-w-2xl">
-          <div className="flex items-center justify-between border-b border-white/5 pb-4">
+        <div className="bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 lg:p-8 space-y-6 shadow-xs dark:shadow-xl backdrop-blur-md max-w-2xl">
+          <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-4">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">Subscription & Plan Tier</h2>
               <p className="text-xs text-slate-600 dark:text-zinc-400 mt-0.5">View your active quotas and billing invoice status.</p>
@@ -324,10 +324,10 @@ export const SettingsPage: React.FC = () => {
             </button>
           </div>
 
-          <div className="p-4 bg-[#09090B]/60 rounded-2xl border border-white/10 space-y-3">
+          <div className="p-4 bg-slate-50 dark:bg-[#09090B]/60 rounded-2xl border border-slate-200 dark:border-white/10 space-y-3">
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-600 dark:text-zinc-400">Active Tier:</span>
-              <span className="font-bold text-cyan-500 dark:text-cyan-400 uppercase font-mono">
+              <span className="font-bold text-cyan-600 dark:text-cyan-400 uppercase font-mono">
                 {planStatus?.current_plan || user?.plan || 'Free'} Plan
               </span>
             </div>
@@ -342,8 +342,8 @@ export const SettingsPage: React.FC = () => {
               </span>
             </div>
             <div className="flex items-center justify-between text-xs">
-              <span className="text-zinc-400">Billing Cycle:</span>
-              <span className="text-zinc-200 capitalize font-medium">
+              <span className="text-slate-600 dark:text-zinc-400">Billing Cycle:</span>
+              <span className="text-slate-900 dark:text-zinc-200 capitalize font-medium">
                 {planStatus?.current_billing_cycle || 'Monthly'}
               </span>
             </div>

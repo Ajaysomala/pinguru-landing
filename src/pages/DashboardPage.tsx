@@ -108,28 +108,28 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* 3D Hero Welcome Banner — Dark Luxury Glass Container */}
+      {/* 3D Hero Welcome Banner — Adaptive Luxury Glass Container */}
       <Card3D intensity={4} glowColor="rgba(99, 102, 241, 0.15)">
-        <div className="relative rounded-2xl p-6 lg:p-8 overflow-hidden border border-white/10 shadow-xl bg-[#121218]/80 backdrop-blur-md">
+        <div className="relative rounded-2xl p-6 lg:p-8 overflow-hidden border border-slate-200 dark:border-white/10 shadow-xs dark:shadow-xl bg-white/90 dark:bg-[#121218]/80 backdrop-blur-md">
           <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-indigo-600/20 via-purple-600/10 to-transparent rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 left-10 w-60 h-60 bg-gradient-to-tr from-cyan-500/15 to-transparent rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-2.5 max-w-xl">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.15)]">
+                  <span className="w-2 h-2 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-ping" />
                   Meta Webhooks Live
                 </span>
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-white/10 shadow-2xs">
-                  <Flame className="w-3 h-3 text-pink-400" />
+                  <Flame className="w-3 h-3 text-pink-500 dark:text-pink-400" />
                   Avg Latency: &lt; 1.0s
                 </span>
               </div>
 
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                 Welcome back,{' '}
-                <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-500 dark:from-indigo-400 dark:via-violet-400 dark:to-cyan-400 bg-clip-text text-transparent">
                   {displayName}
                 </span>
                 !
@@ -175,10 +175,10 @@ export const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* KPI 1 */}
         <Card3D intensity={3} glowColor="rgba(99, 102, 241, 0.15)">
-          <div className="bg-[#121218]/80 border border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-md hover:border-indigo-500/40 hover:-translate-y-1 transition-all duration-300 space-y-3">
+          <div className="bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xs dark:shadow-xl backdrop-blur-md hover:border-indigo-500/40 hover:-translate-y-1 transition-all duration-300 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-slate-600 dark:text-zinc-400">DMs Automated</span>
-              <div className="p-2 rounded-xl bg-indigo-500/10 text-cyan-400 border border-indigo-500/20">
+              <div className="p-2 rounded-xl bg-indigo-500/10 text-cyan-600 dark:text-cyan-400 border border-indigo-500/20">
                 <MessageSquare className="w-4 h-4" />
               </div>
             </div>
@@ -186,8 +186,8 @@ export const DashboardPage: React.FC = () => {
               <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight font-sans">
                 {dmsSent.toLocaleString()}
               </div>
-              <div className="inline-flex items-center gap-1.5 text-[11px] text-cyan-500 dark:text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 rounded-full px-2 py-0.5 mt-1.5 font-semibold">
-                <TrendingUp className="w-3 h-3 text-cyan-500 dark:text-cyan-400" />
+              <div className="inline-flex items-center gap-1.5 text-[11px] text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 rounded-full px-2 py-0.5 mt-1.5 font-semibold">
+                <TrendingUp className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
                 <span>This billing cycle</span>
               </div>
             </div>
@@ -196,10 +196,10 @@ export const DashboardPage: React.FC = () => {
 
         {/* KPI 2 */}
         <Card3D intensity={3} glowColor="rgba(99, 102, 241, 0.15)">
-          <div className="bg-[#121218]/80 border border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-md hover:border-indigo-500/40 hover:-translate-y-1 transition-all duration-300 space-y-3">
+          <div className="bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xs dark:shadow-xl backdrop-blur-md hover:border-indigo-500/40 hover:-translate-y-1 transition-all duration-300 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400">Active Rules</span>
-              <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
                 <Zap className="w-4 h-4" />
               </div>
             </div>
@@ -216,10 +216,10 @@ export const DashboardPage: React.FC = () => {
 
         {/* KPI 3 */}
         <Card3D intensity={3} glowColor="rgba(168, 85, 247, 0.15)">
-          <div className="bg-[#121218]/80 border border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-md hover:border-indigo-500/40 hover:-translate-y-1 transition-all duration-300 space-y-3">
+          <div className="bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xs dark:shadow-xl backdrop-blur-md hover:border-indigo-500/40 hover:-translate-y-1 transition-all duration-300 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400">DM Quota</span>
-              <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+              <div className="p-2 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
                 <Clock className="w-4 h-4" />
               </div>
             </div>
@@ -236,10 +236,10 @@ export const DashboardPage: React.FC = () => {
 
         {/* KPI 4 */}
         <Card3D intensity={3} glowColor="rgba(6, 182, 212, 0.15)">
-          <div className="bg-[#121218]/80 border border-white/10 rounded-2xl p-6 shadow-xl backdrop-blur-md hover:border-indigo-500/40 hover:-translate-y-1 transition-all duration-300 space-y-3">
+          <div className="bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-xs dark:shadow-xl backdrop-blur-md hover:border-indigo-500/40 hover:-translate-y-1 transition-all duration-300 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400">Delivery Rate</span>
-              <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+              <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
                 <CheckCircle2 className="w-4 h-4" />
               </div>
             </div>
@@ -247,7 +247,7 @@ export const DashboardPage: React.FC = () => {
               <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight font-sans">
                 {successRate}
               </div>
-              <div className="inline-flex items-center gap-1.5 text-[11px] text-cyan-500 dark:text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 rounded-full px-2 py-0.5 mt-1.5 font-semibold">
+              <div className="inline-flex items-center gap-1.5 text-[11px] text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 rounded-full px-2 py-0.5 mt-1.5 font-semibold">
                 <span>Meta API 100% policy-safe</span>
               </div>
             </div>
@@ -256,13 +256,13 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* Main Interactive Studio: Live Simulator & Rules */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pt-2 border-t border-white/5">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pt-2 border-t border-slate-200 dark:border-white/5">
         {/* Left Column: Live Trigger & Keyword Simulator */}
         <div className="lg:col-span-6 space-y-4">
           <div className="flex items-center justify-between px-1">
             <div>
               <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
+                <Sparkles className="w-4 h-4 text-cyan-500 dark:text-cyan-400" />
                 Live DM Simulator
               </h2>
               <p className="text-xs text-slate-600 dark:text-zinc-400">
@@ -282,7 +282,7 @@ export const DashboardPage: React.FC = () => {
           <div className="flex items-center justify-between px-1">
             <div>
               <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-                <Zap className="w-4 h-4 text-indigo-400" />
+                <Zap className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
                 Active Automation Rules
               </h2>
               <p className="text-xs text-slate-600 dark:text-zinc-400">
@@ -292,17 +292,17 @@ export const DashboardPage: React.FC = () => {
 
             <button
               onClick={() => navigate('/rules')}
-              className="text-xs font-semibold text-cyan-500 dark:text-cyan-400 hover:text-cyan-600 dark:hover:text-cyan-300 flex items-center gap-1 transition-colors cursor-pointer"
+              className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 flex items-center gap-1 transition-colors cursor-pointer"
             >
               <span>Manage all ({rules.length})</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="bg-[#121218]/80 border border-white/10 rounded-2xl p-6 backdrop-blur-md shadow-xl space-y-3">
+          <div className="bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 backdrop-blur-md shadow-xs dark:shadow-xl space-y-3">
             {rules.length === 0 ? (
               <div className="py-12 text-center space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center mx-auto">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center mx-auto">
                   <Zap className="w-6 h-6" />
                 </div>
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">No Rules Configured</h3>
@@ -320,18 +320,18 @@ export const DashboardPage: React.FC = () => {
               rules.slice(0, 5).map((rule) => (
                 <div
                   key={rule.id}
-                  className="p-3.5 rounded-xl bg-[#09090B]/60 border border-white/5 hover:border-indigo-500/40 transition-all flex items-center justify-between gap-3 group"
+                  className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#09090B]/60 border border-slate-200/80 dark:border-white/5 hover:border-indigo-500/40 transition-all flex items-center justify-between gap-3 group"
                 >
                   <div className="space-y-1 min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-slate-900 dark:text-white truncate">{rule.name}</span>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 capitalize font-semibold">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 capitalize font-semibold">
                         {rule.trigger_type.replace('_', ' ')}
                       </span>
                     </div>
                     <div className="flex flex-wrap gap-1">
                       {(rule.keywords || []).slice(0, 3).map((kw) => (
-                        <span key={kw} className="text-[10px] font-mono text-slate-700 dark:text-zinc-300 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-1.5 py-0.5 rounded">
+                        <span key={kw} className="text-[10px] font-mono text-slate-700 dark:text-zinc-300 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 px-1.5 py-0.5 rounded">
                           #{kw}
                         </span>
                       ))}
@@ -347,7 +347,7 @@ export const DashboardPage: React.FC = () => {
                         className={`w-10 h-5 flex items-center rounded-full p-0.5 transition-all ${
                           rule.is_active 
                             ? 'bg-gradient-to-r from-indigo-600 to-violet-600 justify-end shadow-[0_0_8px_rgba(99,102,241,0.4)]' 
-                            : 'bg-white/10 justify-start'
+                            : 'bg-slate-300 dark:bg-white/10 justify-start'
                         }`}
                       >
                         <span className="w-4 h-4 rounded-full bg-white shadow-xs" />

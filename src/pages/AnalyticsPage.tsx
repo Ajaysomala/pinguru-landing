@@ -159,39 +159,39 @@ export const AnalyticsPage: React.FC = () => {
           {/* KPI Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
             <Card3D intensity={3} glowColor="rgba(99, 102, 241, 0.12)">
-              <div className="bg-[#121218]/80 border border-white/10 rounded-2xl p-6 lg:p-7 shadow-xl hover:shadow-[0_12px_32px_rgba(0,0,0,0.5)] hover:-translate-y-1 transition-all duration-300 space-y-2 backdrop-blur-md">
+              <div className="bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 lg:p-7 shadow-xs dark:shadow-xl hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_12px_32px_rgba(0,0,0,0.5)] hover:-translate-y-1 transition-all duration-300 space-y-2 backdrop-blur-md">
                 <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400">Total DMs in Period</span>
                 <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white font-sans tracking-tight">
                   {totalDms.toLocaleString()}
                 </div>
-                <div className="inline-flex items-center gap-1.5 text-[11px] text-indigo-500 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/30 rounded-full px-2.5 py-0.5 font-semibold">
-                  <TrendingUp className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
+                <div className="inline-flex items-center gap-1.5 text-[11px] text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/30 rounded-full px-2.5 py-0.5 font-semibold">
+                  <TrendingUp className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                   <span>Last {days} days activity</span>
                 </div>
               </div>
             </Card3D>
 
             <Card3D intensity={3} glowColor="rgba(6, 182, 212, 0.12)">
-              <div className="bg-[#121218]/80 border border-white/10 rounded-2xl p-6 lg:p-7 shadow-xl hover:shadow-[0_12px_32px_rgba(0,0,0,0.5)] hover:-translate-y-1 transition-all duration-300 space-y-2 backdrop-blur-md">
+              <div className="bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 lg:p-7 shadow-xs dark:shadow-xl hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_12px_32px_rgba(0,0,0,0.5)] hover:-translate-y-1 transition-all duration-300 space-y-2 backdrop-blur-md">
                 <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400">Successful Deliveries</span>
                 <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white font-sans tracking-tight">
                   {totalSuccess.toLocaleString()}
                 </div>
-                <div className="inline-flex items-center gap-1.5 text-[11px] text-cyan-500 dark:text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 rounded-full px-2.5 py-0.5 font-semibold shadow-[0_0_10px_rgba(6,182,212,0.15)]">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-cyan-500 dark:text-cyan-400" />
+                <div className="inline-flex items-center gap-1.5 text-[11px] text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 rounded-full px-2.5 py-0.5 font-semibold shadow-[0_0_10px_rgba(6,182,212,0.15)]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
                   <span>Verified by Meta Webhook</span>
                 </div>
               </div>
             </Card3D>
 
             <Card3D intensity={3} glowColor="rgba(168, 85, 247, 0.12)">
-              <div className="bg-[#121218]/80 border border-white/10 rounded-2xl p-6 lg:p-7 shadow-xl hover:shadow-[0_12px_32px_rgba(0,0,0,0.5)] hover:-translate-y-1 transition-all duration-300 space-y-2 backdrop-blur-md">
+              <div className="bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 lg:p-7 shadow-xs dark:shadow-xl hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_12px_32px_rgba(0,0,0,0.5)] hover:-translate-y-1 transition-all duration-300 space-y-2 backdrop-blur-md">
                 <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400">Delivery Success Rate</span>
                 <div className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white font-sans tracking-tight">
                   {overallSuccessRate}%
                 </div>
-                <div className="inline-flex items-center gap-1.5 text-[11px] text-violet-500 dark:text-violet-400 bg-violet-500/10 border border-violet-500/30 rounded-full px-2.5 py-0.5 font-semibold">
-                  <Zap className="w-3.5 h-3.5 text-violet-500 dark:text-violet-400" />
+                <div className="inline-flex items-center gap-1.5 text-[11px] text-violet-600 dark:text-violet-400 bg-violet-500/10 border border-violet-500/30 rounded-full px-2.5 py-0.5 font-semibold">
+                  <Zap className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
                   <span>Policy-compliant</span>
                 </div>
               </div>
@@ -200,7 +200,7 @@ export const AnalyticsPage: React.FC = () => {
 
           {/* Interactive Volume Trend Chart */}
           <Card3D intensity={3} glowColor="rgba(99, 102, 241, 0.12)">
-            <div className="bg-[#121218]/80 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6 backdrop-blur-md">
+            <div className="bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 rounded-2xl p-6 sm:p-8 shadow-xs dark:shadow-xl space-y-6 backdrop-blur-md">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Automated DM Volume Trend</h2>
@@ -210,11 +210,11 @@ export const AnalyticsPage: React.FC = () => {
 
               {totalDms === 0 ? (
                 <div className="py-16 text-center space-y-2">
-                  <Sparkles className="w-8 h-8 text-zinc-500 mx-auto" />
-                  <p className="text-xs text-zinc-400">
+                  <Sparkles className="w-8 h-8 text-slate-400 dark:text-zinc-500 mx-auto" />
+                  <p className="text-xs text-slate-600 dark:text-zinc-400">
                     No automated DM activity recorded in the selected period.
                   </p>
-                  <p className="text-[11px] text-zinc-500">
+                  <p className="text-[11px] text-slate-500 dark:text-zinc-500">
                     Once followers trigger keywords on your Instagram account, volume metrics will appear here.
                   </p>
                 </div>

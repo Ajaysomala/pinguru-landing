@@ -130,12 +130,12 @@ const SettingsProfileEditPage: React.FC = () => {
 
   return (
     <div className="page-wrapper settings-edit-page space-y-6">
-      <section className="pg-surface-hero settings-edit-hero bg-[#121218]/80 border border-white/10 backdrop-blur-md rounded-2xl p-6 lg:p-8">
+      <section className="pg-surface-hero settings-edit-hero bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 backdrop-blur-md rounded-2xl p-6 lg:p-8 shadow-xs dark:shadow-xl">
         <Link to="/settings" className="settings-back-link text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5 text-xs font-semibold mb-3">
           <ArrowLeft size={14} />
           Back to Settings
         </Link>
-        <p className="pg-surface-kicker text-cyan-400 font-mono text-xs flex items-center gap-1.5 font-bold"><Sparkles size={12} /> Profile Studio</p>
+        <p className="pg-surface-kicker text-cyan-600 dark:text-cyan-400 font-mono text-xs flex items-center gap-1.5 font-bold"><Sparkles size={12} /> Profile Studio</p>
         <h1 className="pg-surface-title text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-1">Edit Profile</h1>
         <p className="pg-surface-subtitle text-slate-600 dark:text-zinc-400 text-xs sm:text-sm mt-1">Update your account details and business category so onboarding and account health stay accurate.</p>
       </section>
@@ -153,10 +153,10 @@ const SettingsProfileEditPage: React.FC = () => {
         </div>
       )}
 
-      <div className="settings-section settings-edit-shell bg-[#121218]/80 border border-white/10 backdrop-blur-md rounded-2xl p-6 lg:p-8 space-y-6">
-        <div className="settings-section-header border-b border-white/5 pb-4">
+      <div className="settings-section settings-edit-shell bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 backdrop-blur-md rounded-2xl p-6 lg:p-8 space-y-6 shadow-xs dark:shadow-xl">
+        <div className="settings-section-header border-b border-slate-200 dark:border-white/5 pb-4">
           <div className="flex items-center gap-2">
-            <User size={16} className="text-cyan-400" />
+            <User size={16} className="text-cyan-600 dark:text-cyan-400" />
             <h3 className="settings-section-title text-base font-bold text-slate-900 dark:text-white tracking-tight">Profile Details</h3>
           </div>
           <p className="settings-section-desc text-xs text-slate-600 dark:text-zinc-400 mt-1">This information appears throughout your dashboard and automation funnels.</p>
@@ -164,9 +164,9 @@ const SettingsProfileEditPage: React.FC = () => {
 
         <div className="settings-section-body space-y-6">
           {/* Profile Photo Upload & Preview Section */}
-          <div className="flex flex-col sm:flex-row items-center gap-5 p-5 bg-[#09090B]/60 border border-white/10 rounded-2xl">
+          <div className="flex flex-col sm:flex-row items-center gap-5 p-5 bg-slate-50 dark:bg-[#09090B]/60 border border-slate-200 dark:border-white/10 rounded-2xl">
             <div className="relative group shrink-0">
-              <div className="w-20 h-20 rounded-full border-2 border-indigo-500/40 hover:border-indigo-400 transition-all overflow-hidden flex items-center justify-center bg-[#121218] shadow-lg">
+              <div className="w-20 h-20 rounded-full border-2 border-indigo-500/40 hover:border-indigo-400 transition-all overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-[#121218] shadow-lg">
                 {avatarPreview ? (
                   <img src={avatarPreview} alt={user?.display_name || 'User'} className="w-full h-full object-cover rounded-full" />
                 ) : (
@@ -200,7 +200,7 @@ const SettingsProfileEditPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleRemoveAvatar}
-                    className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 text-xs font-medium border border-white/10 transition-all cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-zinc-300 text-xs font-medium border border-slate-200 dark:border-white/10 transition-all cursor-pointer"
                   >
                     Remove
                   </button>
@@ -210,16 +210,16 @@ const SettingsProfileEditPage: React.FC = () => {
           </div>
 
           <div className="settings-summary-grid grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="settings-summary-card p-4 rounded-xl bg-[#09090B]/50 border border-white/5">
+            <div className="settings-summary-card p-4 rounded-xl bg-slate-50 dark:bg-[#09090B]/50 border border-slate-200 dark:border-white/5">
               <div>
                 <p className="settings-summary-label text-[11px] font-semibold text-slate-600 dark:text-zinc-400">Email Address</p>
                 <p className="settings-summary-value text-xs font-mono text-slate-900 dark:text-white mt-0.5">{user?.email}</p>
               </div>
             </div>
-            <div className="settings-summary-card p-4 rounded-xl bg-[#09090B]/50 border border-white/5">
+            <div className="settings-summary-card p-4 rounded-xl bg-slate-50 dark:bg-[#09090B]/50 border border-slate-200 dark:border-white/5">
               <div>
-                <p className="settings-summary-label text-[11px] font-semibold text-zinc-400">Instagram Handle</p>
-                <p className="settings-summary-value text-xs font-mono text-cyan-400 mt-0.5">
+                <p className="settings-summary-label text-[11px] font-semibold text-slate-600 dark:text-zinc-400">Instagram Handle</p>
+                <p className="settings-summary-value text-xs font-mono text-cyan-600 dark:text-cyan-400 mt-0.5">
                   {user?.instagram_connected ? (user.instagram_username ? `@${user.instagram_username}` : 'Connected') : 'Not connected'}
                 </p>
               </div>

@@ -76,7 +76,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewRuleModal }) => {
   const planLabel = user?.plan ? `${user.plan.toUpperCase()} Tier` : 'Pro Tier';
 
   return (
-    <header className="h-16 px-4 sm:px-8 lg:px-12 border-b border-white/10 bg-[#09090B]/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between gap-3 shadow-xs">
+    <header className="h-16 px-4 sm:px-8 lg:px-12 border-b border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#09090B]/80 backdrop-blur-md sticky top-0 z-30 flex items-center justify-between gap-3 shadow-xs">
       {/* Zone 1: Brand & Page Title */}
       <div className="flex items-center gap-3 min-w-0">
         <div 
@@ -103,13 +103,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewRuleModal }) => {
       {/* Zone 2: Search & Live Status */}
       <div className="flex-1 max-w-md mx-2 hidden sm:block">
         <div className="relative">
-          <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-slate-400 dark:text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search keywords, rules, campaigns..."
-            className="w-full bg-white dark:bg-[#121218]/90 border border-slate-200 dark:border-white/10 focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 rounded-xl pl-10 pr-4 py-2 text-xs min-h-[38px] transition-all outline-none"
+            className="w-full bg-slate-50 dark:bg-[#121218]/90 border border-slate-200 dark:border-white/10 focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/20 text-slate-900 dark:text-zinc-100 placeholder:text-slate-400 dark:placeholder:text-zinc-500 rounded-xl pl-10 pr-4 py-2 text-xs min-h-[38px] transition-all outline-none"
           />
         </div>
       </div>
@@ -145,9 +145,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewRuleModal }) => {
             onClick={() => setShowUserMenu(!showUserMenu)}
             aria-label="User account menu"
             aria-expanded={showUserMenu}
-            className="flex items-center gap-2.5 p-1 rounded-full hover:bg-white/5 transition-all cursor-pointer min-h-[42px] focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+            className="flex items-center gap-2.5 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-white/5 transition-all cursor-pointer min-h-[42px] focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
           >
-            <div className="w-10 h-10 rounded-full border border-indigo-500/30 hover:border-indigo-500 transition-all cursor-pointer overflow-hidden flex items-center justify-center bg-[#121218] relative group shrink-0">
+            <div className="w-10 h-10 rounded-full border border-indigo-500/30 hover:border-indigo-500 transition-all cursor-pointer overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-[#121218] relative group shrink-0">
               {avatarUrl ? (
                 <img 
                   src={avatarUrl} 
@@ -163,9 +163,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenNewRuleModal }) => {
 
             <div className="hidden xl:block text-left text-xs leading-tight">
               <div className="font-bold text-slate-900 dark:text-white truncate max-w-[120px]">{displayName}</div>
-              <div className="text-[10px] text-cyan-500 dark:text-cyan-400 font-mono font-medium">{planLabel}</div>
+              <div className="text-[10px] text-cyan-600 dark:text-cyan-400 font-mono font-medium">{planLabel}</div>
             </div>
-            <ChevronDown className="w-3.5 h-3.5 text-zinc-400 hidden xl:block" />
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-400 hidden xl:block" />
           </button>
 
           {/* User Dropdown */}

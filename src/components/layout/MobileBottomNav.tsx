@@ -21,7 +21,7 @@ export const MobileBottomNav: React.FC = () => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[#09090B]/90 backdrop-blur-2xl border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.7)]">
+    <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white/95 dark:bg-[#09090B]/90 backdrop-blur-2xl border-t border-slate-200 dark:border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.7)]">
       <nav className="grid grid-cols-5 items-center h-16 px-1 safe-area-inset-bottom">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -37,12 +37,12 @@ export const MobileBottomNav: React.FC = () => {
               )}
               <Icon
                 className={`w-5 h-5 transition-transform duration-200 ${
-                  isActive ? 'text-cyan-400 scale-110' : 'text-zinc-500'
+                  isActive ? 'text-indigo-600 dark:text-cyan-400 scale-110' : 'text-slate-400 dark:text-zinc-500'
                 }`}
               />
               <span
                 className={`text-[10px] mt-1 font-medium tracking-tight ${
-                  isActive ? 'text-cyan-400 font-bold' : 'text-zinc-500'
+                  isActive ? 'text-indigo-600 dark:text-cyan-400 font-bold' : 'text-slate-500 dark:text-zinc-500'
                 }`}
               >
                 {tab.label}

@@ -291,12 +291,12 @@ const PhonePreview: React.FC<{
           </div>
         </div>
       </div>
-      <div style={{ width:250,background:'white',border:'1px solid var(--color-border)',borderRadius:12,padding:'12px 14px' }}>
-        <div style={{ fontSize:'0.65rem',fontWeight:700,color:'var(--color-muted)',marginBottom:8,textTransform:'uppercase',letterSpacing:'0.06em' }}>Variables preview as</div>
+      <div className="w-[250px] bg-slate-50 dark:bg-[#181824] border border-slate-200 dark:border-white/10 rounded-xl p-3.5 shadow-xs">
+        <div className="text-[10px] font-bold text-slate-500 dark:text-zinc-400 mb-2 uppercase tracking-wider">Variables preview as</div>
         {Object.entries(PREVIEW_VALUES).map(([key,val])=>(
-          <div key={key} style={{ display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:5,fontSize:'0.72rem' }}>
-            <code style={{ background:'rgba(124,58,237,0.08)',color:'var(--color-primary)',padding:'2px 6px',borderRadius:5,fontFamily:'var(--font-mono)',fontWeight:600,fontSize:'0.7rem' }}>{key}</code>
-            <span style={{ color:'var(--color-text-secondary)',fontWeight:500 }}>→ "{val}"</span>
+          <div key={key} className="flex items-center justify-between mb-1.5 text-xs">
+            <code className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded font-mono font-semibold text-[11px]">{key}</code>
+            <span className="text-slate-600 dark:text-zinc-300 font-medium">→ "{val}"</span>
           </div>
         ))}
       </div>
@@ -592,6 +592,8 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
       }))
       .filter(b => b.title.length > 0);
 
+    const selectedItem = mediaItems.find(m => m.id === selectedMediaId);
+
     const payload:RuleCreatePayload={
       name:name.trim()||`${TRIGGER_OPTIONS.find(t=>t.value===triggerType)?.label} Rule`,
       trigger_type:triggerType,
@@ -600,6 +602,10 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
       ...(triggerType==='comment'&&{
         comment_target_type:commentTarget,
         comment_media_id:commentTarget==='specific'?selectedMediaId:undefined,
+        comment_media_permalink:commentTarget==='specific'?(selectedItem?.permalink || initialRule?.comment_media_permalink):undefined,
+        comment_media_caption:commentTarget==='specific'?(selectedItem?.caption || initialRule?.comment_media_caption):undefined,
+        comment_media_type:commentTarget==='specific'?(selectedItem?.media_type || initialRule?.comment_media_type):undefined,
+        comment_media_filter:commentTarget==='specific'?(commentFilter || initialRule?.comment_media_filter):undefined,
         any_comment_keyword:anyCommentKeyword,
         public_comment_reply_enabled:publicCommentReplyEnabled,
         public_comment_reply_template:publicCommentReplyEnabled ? (cleanTemplates[0] || normalizeTemplateVariables(publicCommentReplyTemplate)) : undefined,
@@ -642,16 +648,24 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
           <p style={{ fontSize:'0.875rem',color:'var(--color-muted)',marginBottom:16 }}>Choose what event should trigger your automated DM:</p>
           <div style={{ display:'flex',flexDirection:'column',gap:10 }}>
             {TRIGGER_OPTIONS.map(opt=>(
-              <button key={opt.value} type="button" onClick={()=>{setTriggerType(opt.value);setStep('details');}}
-                style={{ display:'flex',alignItems:'center',gap:14,padding:'14px 16px',background:'white',border:'1.5px solid var(--color-border)',borderRadius:14,cursor:'pointer',textAlign:'left',transition:'all 180ms',width:'100%' }}
-                onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.borderColor='rgba(124,58,237,0.4)';el.style.background='linear-gradient(135deg,rgba(124,58,237,0.05),rgba(219,39,119,0.02))';}}
-                onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.borderColor='var(--color-border)';el.style.background='white';}}>
-                <div style={{ width:40,height:40,borderRadius:11,background:'linear-gradient(135deg,#EDE9FE,#DDD6FE)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--color-primary)',flexShrink:0 }}>{opt.icon}</div>
-                <div style={{ flex:1 }}>
-                  <div style={{ fontFamily:'var(--font-display)',fontWeight:700,fontSize:'0.9rem',color:'var(--color-text)',marginBottom:2 }}>{opt.label}</div>
-                  <div style={{ fontSize:'0.8rem',color:'var(--color-muted)' }}>{opt.desc}</div>
+              <button
+                key={opt.value}
+                type="button"
+                onClick={()=>{setTriggerType(opt.value);setStep('details');}}
+                className="group flex items-center gap-3.5 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/80 dark:bg-white/5 hover:bg-indigo-50/70 dark:hover:bg-white/10 hover:border-indigo-400 dark:hover:border-indigo-500/40 text-left transition-all duration-200 cursor-pointer w-full"
+              >
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  {opt.icon}
                 </div>
-                <ArrowRight size={15} style={{ color:'var(--color-muted)',flexShrink:0 }}/>
+                <div className="flex-1 min-w-0">
+                  <div className="font-display font-bold text-sm text-slate-900 dark:text-white mb-0.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                    {opt.label}
+                  </div>
+                  <div className="text-xs text-slate-500 dark:text-zinc-400">
+                    {opt.desc}
+                  </div>
+                </div>
+                <ArrowRight size={16} className="text-slate-400 dark:text-zinc-500 shrink-0 group-hover:translate-x-0.5 transition-transform" />
               </button>
             ))}
           </div>
@@ -805,12 +819,50 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                         </div>
                       ) : (
                         <div className="wizard-media-grid">
-                          {mediaItems.filter(item=>commentFilter==='all'||item.media_type===commentFilter).map(item=>(
-                            <button key={item.id} type="button" onClick={()=>setSelectedMediaId(item.id)} className={`wizard-media-card ${selectedMediaId===item.id?'active':''}`}>
-                              <span className={`wizard-media-thumb ${item.media_type}`}>{item.media_type==='post'?'▣':'▶'}</span>
-                              <span className="wizard-media-label">{item.media_type}</span>
-                            </button>
-                          ))}
+                          {mediaItems.filter(item=>commentFilter==='all'||item.media_type===commentFilter).map(item=>{
+                            const thumbUrl = item.thumbnail_url || item.media_url;
+                            const isReel = item.media_type === 'reel';
+                            return (
+                              <button
+                                key={item.id}
+                                type="button"
+                                onClick={()=>setSelectedMediaId(item.id)}
+                                className={`wizard-media-card ${selectedMediaId===item.id?'active':''}`}
+                                title={item.caption || (isReel ? 'Reel' : 'Post')}
+                              >
+                                <div className="wizard-media-thumb-container">
+                                  {thumbUrl ? (
+                                    <img
+                                      src={thumbUrl}
+                                      alt={item.caption || (isReel ? 'Reel' : 'Post')}
+                                      className="wizard-media-img"
+                                      referrerPolicy="no-referrer"
+                                      loading="lazy"
+                                      onError={(e)=>{
+                                        e.currentTarget.style.display = 'none';
+                                        const fb = e.currentTarget.parentElement?.querySelector('.wizard-media-fallback');
+                                        if (fb) (fb as HTMLElement).style.display = 'flex';
+                                      }}
+                                    />
+                                  ) : null}
+                                  <span
+                                    className={`wizard-media-thumb ${item.media_type} wizard-media-fallback`}
+                                    style={{ display: thumbUrl ? 'none' : 'flex' }}
+                                  >
+                                    {isReel ? '▶' : '▣'}
+                                  </span>
+                                  <span className="wizard-media-badge">
+                                    {isReel ? 'Reel' : 'Post'}
+                                  </span>
+                                </div>
+                                <span className="wizard-media-label" title={item.caption || (isReel ? 'Reel' : 'Post')}>
+                                  {item.caption
+                                    ? (item.caption.trim().length > 18 ? `${item.caption.trim().slice(0, 18)}...` : item.caption.trim())
+                                    : (isReel ? 'Reel' : 'Post')}
+                                </span>
+                              </button>
+                            );
+                          })}
                           {mediaItems.filter(item=>commentFilter==='all'||item.media_type===commentFilter).length === 0 && (
                             <div style={{ gridColumn: '1 / -1', padding: '16px', textAlign: 'center', color: 'var(--color-muted)', fontSize: '0.85rem' }}>
                               No {commentFilter === 'all' ? 'posts or reels' : commentFilter + 's'} found.
@@ -908,7 +960,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                   </p>
 
                   {dmButtons.map((btn, bIdx) => (
-                    <div key={bIdx} style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '10px 12px', marginBottom: 8 }}>
+                    <div key={bIdx} className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-3 mb-2">
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                         <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--color-primary)' }}>Button #{bIdx + 1}</span>
                         <button
@@ -923,7 +975,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                            <label style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>Button Title</label>
+                            <label className="text-[11px] font-semibold text-slate-700 dark:text-zinc-300">Button Title</label>
                             <span style={{ fontSize: '0.65rem', color: btn.title.length >= 20 ? '#EF4444' : 'var(--color-muted)' }}>
                               {btn.title.length}/20
                             </span>
@@ -944,7 +996,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                         </div>
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                            <label style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>Website URL (HTTPS)</label>
+                            <label className="text-[11px] font-semibold text-slate-700 dark:text-zinc-300">Website URL (HTTPS)</label>
                           </div>
                           <input
                             type="url"
@@ -1100,9 +1152,9 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                   </p>
 
                   {captureEmailEnabled && isStarterOrPro && (
-                    <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 10, background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 12, padding: '12px' }}>
+                    <div className="mt-2.5 flex flex-col gap-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-3">
                       <div>
-                        <label className="form-label" style={{ marginBottom: 4, fontSize: '0.76rem' }}>
+                        <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                           Email Capture Prompt
                         </label>
                         <input
@@ -1115,7 +1167,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                         />
                       </div>
                       <div>
-                        <label className="form-label" style={{ marginBottom: 4, fontSize: '0.76rem' }}>
+                        <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">
                           Thank You / Confirmation Message
                         </label>
                         <input
@@ -1151,18 +1203,11 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                         key={opt.sec}
                         type="button"
                         onClick={() => setReplyDelaySeconds(opt.sec)}
-                        style={{
-                          flex: 1,
-                          padding: '6px 4px',
-                          borderRadius: 8,
-                          fontSize: '0.7rem',
-                          fontWeight: replyDelaySeconds === opt.sec ? 700 : 500,
-                          border: replyDelaySeconds === opt.sec ? '1.5px solid var(--color-primary)' : '1px solid #E2E8F0',
-                          background: replyDelaySeconds === opt.sec ? 'rgba(124, 58, 237, 0.08)' : '#FFFFFF',
-                          color: replyDelaySeconds === opt.sec ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-                          cursor: 'pointer',
-                          transition: 'all 120ms'
-                        }}
+                        className={`flex-1 py-1.5 px-1 rounded-lg text-xs transition-all cursor-pointer ${
+                          replyDelaySeconds === opt.sec
+                            ? 'bg-indigo-500/10 border-1.5 border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold'
+                            : 'bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white font-medium'
+                        }`}
                       >
                         {opt.label}
                       </button>
@@ -1220,9 +1265,9 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                 </div>
                 <div className="rb-guide-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10 }}>
                   {currentGuide.cards.map((item) => (
-                    <div key={item.title} className="rb-guide-card" style={{ borderRadius: 14, border: '1px solid rgba(226,232,240,0.9)', background: '#fff', padding: '12px' }}>
-                      <p style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--color-text)', marginBottom: 4 }}>{item.title}</p>
-                      <p style={{ fontSize: '0.75rem', lineHeight: 1.55, color: 'var(--color-muted)' }}>{item.desc}</p>
+                    <div key={item.title} className="rb-guide-card rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#181822] p-3 shadow-2xs">
+                      <p className="text-xs font-bold text-slate-900 dark:text-white mb-1">{item.title}</p>
+                      <p className="text-[11px] leading-relaxed text-slate-500 dark:text-zinc-400">{item.desc}</p>
                     </div>
                   ))}
                 </div>
@@ -1235,8 +1280,16 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                 </div>
               )}
 
-              <button type="button" onClick={handleSubmit} disabled={loading||!canSubmit()}
-                style={{ width:'100%',padding:'13px',background:canSubmit()?'linear-gradient(135deg,#7C3AED 0%,#6366F1 50%,#EC4899 100%)':'#F1F5F9',color:canSubmit()?'white':'#94A3B8',border:canSubmit()?'none':'1px solid #E2E8F0',borderRadius:14,fontFamily:'var(--font-display)',fontWeight:700,fontSize:'0.9375rem',cursor:canSubmit()?'pointer':'not-allowed',transition:'all 200ms',display:'flex',alignItems:'center',justifyContent:'center',gap:8,boxShadow:canSubmit()?'0 8px 20px -4px rgba(124,58,237,0.35)':'none' }}>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading || !canSubmit()}
+                className={`w-full py-3.5 px-4 rounded-xl font-display font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                  canSubmit()
+                    ? 'bg-gradient-to-r from-indigo-600 via-violet-600 to-pink-600 text-white shadow-[0_8px_20px_-4px_rgba(99,102,241,0.4)] hover:shadow-[0_12px_24px_-4px_rgba(124,58,237,0.5)] hover:-translate-y-0.5 active:translate-y-0'
+                    : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-zinc-600 border border-slate-200 dark:border-white/10 cursor-not-allowed'
+                }`}
+              >
                 {loading ? (
                   <><RefreshCw size={16} className="animate-spin"/> {editing ? 'Saving...' : 'Creating rule...'}</>
                 ) : (
