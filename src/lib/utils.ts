@@ -79,48 +79,6 @@ export function isTokenExpired(expiresAt?: string | number | null): boolean {
   return date < new Date();
 }
 
-// Login attempt lockout helpers (localStorage)
-const MAX_ATTEMPTS = 5;
-const LOCKOUT_MINUTES = 15;
-
-export function recordLoginAttempt(): { remaining: number; locked: boolean } {
-  const now = Date.now();
-  const raw = localStorage.getItem('pg_login_attempts');
-  const data = raw ? JSON.parse(raw) : { count: 0, since: now };
-
-  data.count += 1;
-
-  if (data.count >= MAX_ATTEMPTS) {
-    localStorage.setItem('pg_lockout_until', String(now + LOCKOUT_MINUTES * 60 * 1000));
-    localStorage.removeItem('pg_login_attempts');
-    return { remaining: 0, locked: true };
-  }
-
-  localStorage.setItem('pg_login_attempts', JSON.stringify(data));
-  return { remaining: MAX_ATTEMPTS - data.count, locked: false };
-}
-
-export function isLockedOut(): { locked: boolean; remainingMs: number } {
-  const until = localStorage.getItem('pg_lockout_until');
-  if (!until) return { locked: false, remainingMs: 0 };
-  const remainingMs = parseInt(until) - Date.now();
-  if (remainingMs <= 0) {
-    localStorage.removeItem('pg_lockout_until');
-    return { locked: false, remainingMs: 0 };
-  }
-  return { locked: true, remainingMs };
-}
-
-export function resetLoginAttempts(): void {
-  localStorage.removeItem('pg_login_attempts');
-  localStorage.removeItem('pg_lockout_until');
-}
-
-export function formatLockoutTime(ms: number): string {
-  const minutes = Math.ceil(ms / 60000);
-  return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
-}
-
 // Plan helpers
 export const PLAN_DM_LIMITS: Record<string, number> = {
   free:    -1,

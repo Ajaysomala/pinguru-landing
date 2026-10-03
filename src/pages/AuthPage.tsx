@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../App';
 import { loginUser, registerUser } from '../lib/api';
-import { recordLoginAttempt, isLockedOut, resetLoginAttempts, formatLockoutTime } from '../lib/utils';
 import { Card3D } from '../components/ui/Card3D';
 
 interface AuthPageProps {
@@ -47,7 +46,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [remainingAttempts, setRemainingAttempts] = useState<number | null>(null);
 
   const calculatePasswordStrength = (pass: string) => {
     let score = 0;
@@ -62,30 +60,18 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
     e.preventDefault();
     setErrorMsg(null);
 
-    const { locked, remainingMs } = isLockedOut();
-    if (locked) {
-      setErrorMsg(`Too many attempts. Try again in ${formatLockoutTime(remainingMs)}.`);
-      return;
-    }
-
     setIsLoading(true);
     try {
       await loginUser(loginEmail, loginPassword);
       await refresh();
-      resetLoginAttempts();
       navigate('/dashboard');
     } catch (err: unknown) {
-      const result = recordLoginAttempt();
-      if (result.locked) {
-        setErrorMsg('Too many attempts. Locked for 15 minutes.');
-      } else {
-        setRemainingAttempts(result.remaining);
-        const msg = err instanceof Error ? err.message : 'Invalid credentials';
-        setErrorMsg(msg);
-        if (msg.toLowerCase().includes('not verified')) {
-          localStorage.setItem('pg_verify_email', loginEmail);
-          setTimeout(() => navigate(`/verify?email=${encodeURIComponent(loginEmail)}`), 1500);
-        }
+      // Rate limiting (429) and Google-only accounts are enforced by the backend; show its message as-is.
+      const msg = err instanceof Error ? err.message : 'Invalid credentials';
+      setErrorMsg(msg);
+      if (msg.toLowerCase().includes('not verified')) {
+        localStorage.setItem('pg_verify_email', loginEmail);
+        setTimeout(() => navigate(`/verify?email=${encodeURIComponent(loginEmail)}`), 1500);
       }
     } finally {
       setIsLoading(false);
@@ -190,11 +176,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
                 <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400 mt-0.5" />
                 <div>
                   <div className="font-semibold">{errorMsg}</div>
-                  {remainingAttempts !== null && remainingAttempts <= 3 && (
-                    <div className="text-[11px] text-rose-600/80 dark:text-rose-400/80 mt-1">
-                      {remainingAttempts} attempt{remainingAttempts !== 1 ? 's' : ''} remaining before temporary lockout.
-                    </div>
-                  )}
                 </div>
               </div>
             )}
