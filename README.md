@@ -20,7 +20,7 @@ npm run dev
 
 Environment:
 
-- `VITE_API_URL=/api` (proxied in Vite)
+- `VITE_API_BASE_URL=/api` (proxied in Vite; the old name `VITE_API_URL` is still read as a fallback, then `https://api.pinguru.me` in production builds)
 - `VITE_API_TARGET=https://api.pinguru.me`
 
 ## Scripts

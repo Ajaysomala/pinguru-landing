@@ -1,174 +1,133 @@
 import React from 'react';
-import { ArrowLeft, Shield } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import '../styles/landing.css';
-import '../styles/legal.css';
+import { LegalShell } from '../components/legal/LegalShell';
+import { LEGAL_EMAIL, SUPPORT_EMAIL } from '../lib/links';
 
-const LAST_UPDATED = 'August 10, 2026';
-const SUPPORT_EMAIL = 'support@pinguru.me';
-const LEGAL_EMAIL = 'legal@pinguru.me';
+const LAST_UPDATED = 'October 11, 2026';
+
+const PROCESSORS = [
+  { name: 'Meta Platforms (Instagram Graph API)', purpose: 'Receives and sends Instagram messages, comments and story mentions for the account you connect.' },
+  { name: 'Razorpay', purpose: 'Processes subscription payments, invoices and refunds in INR.' },
+  { name: 'Resend', purpose: 'Delivers transactional email such as verification codes, password reset links and billing notices.' },
+  { name: 'MongoDB Atlas', purpose: 'Stores account, automation, contact and log data in our application database.' },
+  { name: 'Hosting providers', purpose: 'Serve this website (GitHub Pages, moving to Cloudflare Pages) and run the PinGuru API servers.' },
+];
+
+const RETENTION = [
+  { data: 'DM logs (message delivery records)', period: '90 days, then deleted automatically' },
+  { data: 'Instagram webhook events', period: '48 hours, then deleted automatically' },
+  { data: 'Accounts that never verify their email', period: '24 hours, then deleted automatically' },
+  { data: 'Account, rules, settings and captured contacts', period: 'While your account is active, or until you delete them' },
+  { data: 'Billing records (invoices, payment references)', period: 'As long as Indian tax and accounting law requires' },
+];
 
 const PrivacyPage: React.FC = () => (
-  <div className="landing-page">
-    <nav className="landing-nav">
-      <div className="landing-nav-inner">
-        <Link to="/" className="landing-nav-logo" aria-label="PinGuru home">
-          <div className="landing-nav-logo-mark">PG</div>
-          <span className="landing-nav-logo-text">PinGuru</span>
-        </Link>
-        <Link to="/" className="landing-nav-link inline-flex items-center gap-1.5">
-          <ArrowLeft size={14} /> Back to home
-        </Link>
-      </div>
-    </nav>
+  <LegalShell
+    icon={<Shield size={24} className="text-primary" />}
+    title="Privacy Policy"
+    lastUpdated={LAST_UPDATED}
+    intro="This Privacy Policy explains what PinGuru collects, why, who processes it for us, how long we keep it, and the rights you have over it."
+  >
+    <section className="legal-section">
+      <h2>1. Who operates PinGuru</h2>
+      <p>PinGuru is an Instagram DM automation service operated from Bengaluru, Karnataka, India. In this policy, "PinGuru", "we", "us" and "our" refer to the operator of the service at pinguru.me.</p>
+      <p>For privacy questions, contact <a href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a>. For account or product support, contact <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.</p>
+    </section>
 
-    <main className="legal-page">
-      <div className="legal-header">
-        <div className="legal-header-icon">
-          <Shield size={24} className="text-primary" />
-        </div>
-        <div>
-          <h1 className="legal-title">Privacy Policy</h1>
-          <p className="legal-meta">Last updated: {LAST_UPDATED}</p>
-        </div>
-      </div>
+    <section className="legal-section">
+      <h2>2. What we collect</h2>
+      <ul>
+        <li><strong>Your account:</strong> email address, name, business category, password hash or Google sign-in identifier, and your settings.</li>
+        <li><strong>Your Instagram account:</strong> Instagram username, account ID, profile picture, account type, follower count, connection and token status, and the permissions you granted.</li>
+        <li><strong>Your contacts:</strong> the Instagram handles of people who interact with your automations, and any email addresses or phone numbers that your own rules ask them to share.</li>
+        <li><strong>DM logs:</strong> which rule fired, for which contact, when, and whether the message was delivered.</li>
+        <li><strong>Billing identifiers:</strong> your plan, Razorpay customer, subscription and payment references, and refund status. We never see or store full card numbers, UPI PINs or bank credentials.</li>
+        <li><strong>Technical data:</strong> IP address, browser and device details, and security logs used to protect your account.</li>
+      </ul>
+    </section>
 
-      <div className="legal-intro">
-        This Privacy Policy explains how PinGuru collects, uses, stores, shares, and deletes personal data for our Instagram DM automation SaaS available at pinguru.me.
-      </div>
+    <section className="legal-section">
+      <h2>3. Why we use it</h2>
+      <ul>
+        <li>To create and secure your account and sign you in.</li>
+        <li>To connect your Instagram account and run the automations you configure.</li>
+        <li>To show you dashboards, contacts and analytics for your own account.</li>
+        <li>To bill subscriptions, issue invoices and process refunds.</li>
+        <li>To prevent spam, abuse and fraud, and to comply with law and Meta Platform Terms.</li>
+      </ul>
+      <p>We do not sell personal data, and we do not use Meta Platform Data for advertising profiles or any purpose unrelated to running your automations.</p>
+    </section>
 
-      <div className="legal-body">
-        <section className="legal-section">
-          <h2>1. Who operates PinGuru</h2>
-          <p>PinGuru is operated from Bengaluru, Karnataka, India. In this policy, "PinGuru", "we", "us", and "our" refer to the operator of the PinGuru service.</p>
-          <p>For privacy questions, contact <a href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a>. For account or product support, contact <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.</p>
-        </section>
+    <section className="legal-section">
+      <h2>4. Processors we share data with</h2>
+      <p>We share only what each provider needs to do its job for us:</p>
+      <ul>
+        {PROCESSORS.map((p) => (
+          <li key={p.name}><strong>{p.name}:</strong> {p.purpose}</li>
+        ))}
+      </ul>
+      <p>We may also disclose data when the law requires it, to respond to valid legal process, or to protect users and the service.</p>
+    </section>
 
-        <section className="legal-section">
-          <h2>2. Information we collect</h2>
-          <p>We collect information needed to create your account, operate your automations, secure the service, and respond to requests.</p>
-          <ul>
-            <li>Account details such as name, email address, password authentication records, business category, profile settings, and communication preferences.</li>
-            <li>Workspace and automation data such as rules, triggers, templates, message status, usage counts, contacts, logs, and dashboard activity.</li>
-            <li>Technical data such as IP address, device and browser details, pages visited, diagnostic logs, security events, and approximate location inferred from network information.</li>
-            <li>Support and compliance data you send to us, including messages, attachments, deletion requests, refund requests, and related correspondence.</li>
-          </ul>
-        </section>
+    <section className="legal-section">
+      <h2>5. How long we keep it</h2>
+      <ul>
+        {RETENTION.map((r) => (
+          <li key={r.data}><strong>{r.data}:</strong> {r.period}.</li>
+        ))}
+      </ul>
+      <p>Encrypted backups roll over on a fixed schedule, so deleted data can remain in a backup for a short time before it is overwritten.</p>
+    </section>
 
-        <section className="legal-section">
-          <h2>3. Meta and Instagram platform data</h2>
-          <p>When you connect an Instagram professional account, we process Meta Platform Data only as needed to provide the automation features you request.</p>
-          <ul>
-            <li>Instagram account identifiers, usernames, profile metadata, page or business connection details, access token metadata, permissions, and connection status.</li>
-            <li>Incoming messaging events, sender or contact identifiers, message text or metadata, comment or story mention triggers where enabled, and automation delivery status.</li>
-            <li>Operational records required to honor Meta rate limits, policy requirements, deauthorization events, and data deletion requests.</li>
-          </ul>
-          <p>We do not sell Meta Platform Data, use it to build unrelated advertising profiles, or share it except as needed to provide PinGuru, comply with law, or comply with Meta requirements.</p>
-        </section>
+    <section className="legal-section">
+      <h2>6. Cookies</h2>
+      <p>We use essential cookies to keep you signed in and protect forms against cross-site request forgery. See the <Link to="/cookies">Cookie Policy</Link> for details and controls.</p>
+    </section>
 
-        <section className="legal-section">
-          <h2>4. How we use information</h2>
-          <p>We use the information described above to:</p>
-          <ul>
-            <li>Create, authenticate, secure, and support your account.</li>
-            <li>Connect your Instagram account and run the DM automations you configure.</li>
-            <li>Display dashboards, contacts, billing status, settings, audit logs, and product notices.</li>
-            <li>Process subscriptions, invoices, refunds, abuse prevention, and service communications.</li>
-            <li>Detect fraud, spam, policy violations, security incidents, and technical problems.</li>
-            <li>Comply with applicable law, enforce our <Link to="/terms">Terms of Service</Link>, and meet Meta Platform obligations.</li>
-          </ul>
-        </section>
+    <section className="legal-section">
+      <h2>7. Your rights</h2>
+      <p>Under India's Digital Personal Data Protection Act, 2023 and other applicable law, you can:</p>
+      <ul>
+        <li><strong>Access</strong> a summary of the personal data we hold about you and how we use it.</li>
+        <li><strong>Correct</strong> inaccurate or incomplete data. Most profile fields can be edited in Settings.</li>
+        <li><strong>Erase</strong> your data. See <Link to="/data-deletion">Data Deletion</Link> for the steps.</li>
+        <li><strong>Withdraw consent</strong> at any time, for example by disconnecting Instagram or deleting your account. Withdrawal does not affect processing that already happened.</li>
+        <li><strong>Raise a grievance</strong> with our grievance officer (section 9) and, if unresolved, with the Data Protection Board of India.</li>
+      </ul>
+      <p>Email <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> from your account email address to make a request. We may ask you to confirm your identity first.</p>
+    </section>
 
-        <section className="legal-section">
-          <h2>5. Cookies and similar technologies</h2>
-          <p>We use essential cookies and local storage to keep you signed in, protect forms from CSRF, remember cookie choices, and operate core product features. If you consent, we may also use optional analytics cookies to understand aggregate product usage.</p>
-          <p>For details and controls, see our <Link to="/cookies">Cookie Policy</Link>.</p>
-        </section>
+    <section className="legal-section">
+      <h2>8. Data deletion</h2>
+      <p>You can delete your account and data, and remove PinGuru's access to Instagram, at any time. The <Link to="/data-deletion">Data Deletion</Link> page explains each step and what happens when Instagram tells us you removed the app.</p>
+    </section>
 
-        <section className="legal-section">
-          <h2>6. Billing and Razorpay payments</h2>
-          <p>Paid subscriptions are processed through Razorpay in Indian Rupees (INR). We may store plan, invoice, subscription status, transaction reference, refund status, tax, and billing contact details.</p>
-          <p>Razorpay processes payment credentials and related payment data under its own terms and privacy practices. PinGuru does not store full card numbers, UPI credentials, or banking authentication secrets.</p>
-          <p>Refund eligibility is described in our <Link to="/refund-policy">Refund Policy</Link>.</p>
-        </section>
+    <section className="legal-section">
+      <h2>9. Grievance officer</h2>
+      <p>If you have a complaint about how we handle your personal data, write to our Grievance Officer at <a href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a> with the subject "Grievance". Include your account email and a description of the issue.</p>
+    </section>
 
-        <section className="legal-section">
-          <h2>7. Sharing and service providers</h2>
-          <p>We share limited data with service providers who help us host, secure, monitor, email, analyze, bill, and support PinGuru. These providers may include cloud infrastructure, database, email, logging, analytics, customer support, Razorpay, and Meta integrations.</p>
-          <p>We may also disclose information if required by law, to protect users or the service, to respond to valid legal process, or in connection with a business transfer such as merger, acquisition, financing, or asset sale.</p>
-        </section>
+    <section className="legal-section">
+      <h2>10. Security</h2>
+      <p>We use access controls, encryption in transit, httpOnly session cookies, CSRF protection and provider security controls. No online service is perfectly secure, so please keep your password private and tell us promptly about any suspected unauthorised access.</p>
+    </section>
 
-        <section className="legal-section">
-          <h2>8. Retention</h2>
-          <p>We keep personal data only for as long as needed to provide PinGuru, maintain security, comply with law, resolve disputes, enforce agreements, and satisfy tax or accounting obligations.</p>
-          <p>Account, automation, contact, and message log data are generally retained while your account is active. Billing records may be retained for statutory accounting periods. Security logs and backups may remain for a limited period before deletion or rotation.</p>
-        </section>
+    <section className="legal-section">
+      <h2>11. Children</h2>
+      <p>PinGuru is for business users aged 18 or older. We do not knowingly collect personal data from children.</p>
+    </section>
 
-        <section className="legal-section">
-          <h2>9. Deletion, deauthorization, and Meta User Data Deletion</h2>
-          <p>You can request deletion from product settings where available, including Settings &gt; Data &amp; Privacy &gt; Delete My Data, or by emailing <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.</p>
-          <p>You can disconnect or deauthorize Meta/Instagram access through PinGuru product settings where available, through Meta controls, or by contacting support. We handle Meta User Data Deletion and deauthorization requests through these product settings and support channels.</p>
-          <p>After a verified deletion request, we delete or anonymize account, automation, contact, DM log, and Instagram connection data from active systems, subject to legal, billing, fraud prevention, security, backup, and dispute-resolution retention requirements.</p>
-        </section>
+    <section className="legal-section">
+      <h2>12. International transfers</h2>
+      <p>Some processors listed above may store or process data outside India. We use providers that apply appropriate safeguards to that data.</p>
+    </section>
 
-        <section className="legal-section">
-          <h2>10. Security</h2>
-          <p>We use administrative, technical, and organizational safeguards designed to protect personal data, including access controls, encryption in transit where applicable, secure authentication practices, monitoring, and provider controls.</p>
-          <p>No internet service can be guaranteed fully secure. You are responsible for keeping your login credentials safe and promptly telling us about suspected unauthorized access.</p>
-        </section>
-
-        <section className="legal-section">
-          <h2>11. Children under 18</h2>
-          <p>PinGuru is intended for business and professional users who are at least 18 years old. We do not knowingly collect personal data from children under 18. If you believe a child has provided personal data to us, contact us so we can take appropriate action.</p>
-        </section>
-
-        <section className="legal-section">
-          <h2>12. International transfers</h2>
-          <p>PinGuru is operated from India, and our service providers may process data in India and other countries where they operate. These countries may have privacy laws different from your location. Where required, we use appropriate safeguards for international transfers.</p>
-        </section>
-
-        <section className="legal-section">
-          <h2>13. Your choices and rights</h2>
-          <ul>
-            <li>Update profile and account information in product settings.</li>
-            <li>Manage cookie choices through our cookie banner or your browser settings.</li>
-            <li>Disconnect Instagram access or request data deletion as described above.</li>
-            <li>Contact us to request access, correction, deletion, or other rights available under applicable law.</li>
-          </ul>
-        </section>
-
-        <section className="legal-section">
-          <h2>14. Changes to this policy</h2>
-          <p>We may update this Privacy Policy from time to time. If changes are material, we will provide notice by updating this page and, where appropriate, by email or in-product notice.</p>
-        </section>
-
-        <section className="legal-section">
-          <h2>15. Contact</h2>
-          <p>Email privacy and legal questions to <a href={`mailto:${LEGAL_EMAIL}`}>{LEGAL_EMAIL}</a>. Email account, deletion, or support requests to <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.</p>
-        </section>
-      </div>
-
-      <div className="legal-footer-links">
-        <Link to="/terms" className="text-sm text-primary hover:underline">Terms of Service</Link>
-        <Link to="/cookies" className="text-sm text-primary hover:underline">Cookie Policy</Link>
-        <Link to="/refund-policy" className="text-sm text-primary hover:underline">Refund Policy</Link>
-      </div>
-    </main>
-
-    <footer className="landing-footer">
-      <div className="footer-inner">
-        <div className="footer-bottom">
-          <p className="footer-copyright">© {new Date().getFullYear()} PinGuru. All rights reserved.</p>
-          <div className="footer-bottom-links">
-            <Link to="/privacy" className="footer-bottom-link">Privacy</Link>
-            <Link to="/terms" className="footer-bottom-link">Terms</Link>
-            <Link to="/cookies" className="footer-bottom-link">Cookies</Link>
-            <Link to="/refund-policy" className="footer-bottom-link">Refunds</Link>
-          </div>
-        </div>
-      </div>
-    </footer>
-  </div>
+    <section className="legal-section">
+      <h2>13. Changes</h2>
+      <p>If we change this policy materially, we will update the date above and tell you by email or in the product.</p>
+    </section>
+  </LegalShell>
 );
 
 export default PrivacyPage;

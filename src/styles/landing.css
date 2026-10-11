@@ -1581,6 +1581,11 @@
   transform: translateY(-2px);
 }
 
+.footer-social-link:focus-visible {
+  outline: 2px solid #C4B5FD;
+  outline-offset: 2px;
+}
+
 .footer-col-title {
   font-family: var(--font-display);
   font-size: 0.8125rem;
@@ -2082,6 +2087,11 @@ html.light .footer-social-link,
   background: #FFFFFF;
   border-color: #CBD5E1;
   color: #475569;
+}
+
+html.light .footer-social-link:focus-visible,
+[data-theme="light"] .footer-social-link:focus-visible {
+  outline-color: #4F46E5;
 }
 
 html.light .footer-social-link:hover,

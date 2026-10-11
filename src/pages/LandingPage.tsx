@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import {
   Zap, ShieldCheck, BarChart2, MessageSquare,
   Check, ArrowRight, Instagram, ChevronDown,
-  Menu, X, Star, BookOpen, Mail, Twitter, Linkedin,
+  Menu, X, Star, BookOpen, Mail, Github, Globe, Linkedin,
   Sparkles, Clock, Target,
 } from 'lucide-react';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
+import { EXTERNAL_LINK_PROPS, SOCIAL_LINKS, SUPPORT_EMAIL } from '../lib/links';
 import '../styles/landing.css';
 
 // ── Navbar ─────────────────────────────────────────────────────────────────
@@ -690,16 +691,16 @@ const LandingPage: React.FC = () => {
                 Automate your Instagram DMs with smart, compliance-first rules. Built for creators and businesses.
               </p>
               <div className="footer-social">
-                <a href="https://twitter.com/pinguru" target="_blank" rel="noopener noreferrer" className="footer-social-link" aria-label="Twitter">
-                  <Twitter size={15} />
+                <a href={SOCIAL_LINKS.github} {...EXTERNAL_LINK_PROPS} className="footer-social-link" aria-label="GitHub (opens in a new tab)">
+                  <Github size={15} aria-hidden="true" />
                 </a>
-                <a href="https://instagram.com/pinguru" target="_blank" rel="noopener noreferrer" className="footer-social-link" aria-label="Instagram">
-                  <Instagram size={15} />
+                <a href={SOCIAL_LINKS.linkedin} {...EXTERNAL_LINK_PROPS} className="footer-social-link" aria-label="LinkedIn (opens in a new tab)">
+                  <Linkedin size={15} aria-hidden="true" />
                 </a>
-                <a href="https://linkedin.com/company/pinguru" target="_blank" rel="noopener noreferrer" className="footer-social-link" aria-label="LinkedIn">
-                  <Linkedin size={15} />
+                <a href={SOCIAL_LINKS.portfolio} {...EXTERNAL_LINK_PROPS} className="footer-social-link" aria-label="Portfolio (opens in a new tab)">
+                  <Globe size={15} aria-hidden="true" />
                 </a>
-                <a href="mailto:support@pinguru.me" className="footer-social-link" aria-label="Email">
+                <a href={`mailto:${SUPPORT_EMAIL}`} className="footer-social-link" aria-label="Email support">
                   <Mail size={15} />
                 </a>
               </div>
@@ -736,6 +737,8 @@ const LandingPage: React.FC = () => {
                 <Link to="/terms"   className="footer-col-link">Terms of Service</Link>
                 <Link to="/cookies" className="footer-col-link">Cookie Policy</Link>
                 <Link to="/refund-policy" className="footer-col-link">Refund Policy</Link>
+                <Link to="/data-deletion" className="footer-col-link">Data Deletion</Link>
+                <Link to="/contact" className="footer-col-link">Contact</Link>
               </div>
 
               {/* Newsletter */}
@@ -774,7 +777,7 @@ const LandingPage: React.FC = () => {
             <div className="footer-bottom-links">
               <Link to="/privacy" className="footer-bottom-link">Privacy</Link>
               <Link to="/terms"   className="footer-bottom-link">Terms</Link>
-              <a href="mailto:support@pinguru.me" className="footer-bottom-link">support@pinguru.me</a>
+              <a href={`mailto:${SUPPORT_EMAIL}`} className="footer-bottom-link">{SUPPORT_EMAIL}</a>
             </div>
           </div>
         </div>

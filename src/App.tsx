@@ -6,42 +6,16 @@ import { CookieBanner } from './components/ui/CookieBanner';
 import { ToastProvider } from './context/ToastContext';
 import { ThemeProvider } from './context/ThemeContext';
 import type { User } from './lib/types';
+import { SEO } from './components/SEO';
+import { ROUTE_SEO, FALLBACK_SEO } from './lib/seo';
 
-const TITLE_MAP: Record<string, string> = {
-  '/': 'PinGuru – Instagram DM Automation',
-  '/login': 'Sign in · PinGuru',
-  '/register': 'Create account · PinGuru',
-  '/auth': 'Authentication · PinGuru',
-  '/verify': 'Verify email · PinGuru',
-  '/forgot-password': 'Reset password · PinGuru',
-  '/onboarding': 'Welcome · PinGuru',
-  '/dashboard': 'Dashboard · PinGuru',
-  '/connect': 'Connect Instagram · PinGuru',
-  '/rules': 'Automation Rules · PinGuru',
-  '/contacts': 'Contacts · PinGuru',
-  '/analytics': 'Analytics · PinGuru',
-  '/billing': 'Billing · PinGuru',
-  '/settings': 'Settings · PinGuru',
-  '/settings/profile': 'Edit profile · PinGuru',
-  '/refund': 'Request refund · PinGuru',
-  '/privacy': 'Privacy Policy · PinGuru',
-  '/terms': 'Terms of Service · PinGuru',
-  '/cookies': 'Cookie Policy · PinGuru',
-  '/refund-policy': 'Refund Policy · PinGuru',
-  '/support': 'Support · PinGuru',
-  '/blog': 'Blog · PinGuru',
-};
-
-const DocumentTitle: React.FC = () => {
+// Head tags for every route except /blog/:slug, which sets its own.
+const RouteSEO: React.FC = () => {
   const { pathname } = useLocation();
-  useEffect(() => {
-    if (pathname.startsWith('/blog/')) {
-      document.title = 'Blog · PinGuru';
-      return;
-    }
-    document.title = TITLE_MAP[pathname] || 'PinGuru – Instagram DM Automation';
-  }, [pathname]);
-  return null;
+  if (pathname.startsWith('/blog/')) return null;
+  const path = pathname !== '/' ? pathname.replace(/\/$/, '') : '/';
+  const entry = ROUTE_SEO[path] ?? FALLBACK_SEO;
+  return <SEO {...entry} path={ROUTE_SEO[path] ? path : '/'} />;
 };
 
 class AppErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; message: string }> {
@@ -195,6 +169,8 @@ const PrivacyPage    = lazyWithRetry(() => import('./pages/PrivacyPage'));
 const TermsPage      = lazyWithRetry(() => import('./pages/TermsPage'));
 const CookiePolicyPage = lazyWithRetry(() => import('./pages/CookiePolicyPage'));
 const RefundPolicyPage = lazyWithRetry(() => import('./pages/RefundPolicyPage'));
+const DataDeletionPage = lazyWithRetry(() => import('./pages/DataDeletionPage'));
+const ContactPage    = lazyWithRetry(() => import('./pages/ContactPage'));
 const SupportPage    = lazyWithRetry(() => import('./pages/SupportPage'));
 
 const Page: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -228,7 +204,7 @@ const App: React.FC = () => (
       <ThemeProvider>
         <AuthProvider>
           <ToastProvider>
-            <DocumentTitle />
+            <RouteSEO />
             <CookieBanner />
             <Routes>
               {/* Public */}
@@ -242,6 +218,8 @@ const App: React.FC = () => (
               <Route path="/terms"    element={<Page><TermsPage /></Page>} />
               <Route path="/cookies"  element={<Page><CookiePolicyPage /></Page>} />
               <Route path="/refund-policy" element={<Page><RefundPolicyPage /></Page>} />
+              <Route path="/data-deletion" element={<Page><DataDeletionPage /></Page>} />
+              <Route path="/contact"  element={<Page><ContactPage /></Page>} />
               <Route path="/support"  element={<SupportRoute />} />
               <Route path="/blog"     element={<Page><BlogPage /></Page>} />
               <Route path="/blog/:slug" element={<Page><BlogPage /></Page>} />
