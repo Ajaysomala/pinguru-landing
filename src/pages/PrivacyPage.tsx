@@ -11,7 +11,7 @@ const PROCESSORS = [
   { name: 'Razorpay', purpose: 'Processes subscription payments, invoices and refunds in INR.' },
   { name: 'Resend', purpose: 'Delivers transactional email such as verification codes, password reset links and billing notices.' },
   { name: 'MongoDB Atlas', purpose: 'Stores account, automation, contact and log data in our application database.' },
-  { name: 'Hosting providers', purpose: 'Serve this website (GitHub Pages, moving to Cloudflare Pages) and run the PinGuru API servers.' },
+  { name: 'Hosting providers', purpose: 'Serve this website (Cloudflare Pages) and run the PinGuru API servers.' },
 ];
 
 const RETENTION = [

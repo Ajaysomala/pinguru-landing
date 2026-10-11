@@ -1,4 +1,4 @@
-# Cloudflare Pages response headers. GitHub Pages ignores this file.
+# Cloudflare Pages response headers, applied to every path.
 # Razorpay hosts are required by the checkout script that BillingPage loads.
 /*
   Content-Security-Policy: default-src 'self'; script-src 'self' https://checkout.razorpay.com; connect-src 'self' https://api.pinguru.me https://api.razorpay.com https://lumberjack.razorpay.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'

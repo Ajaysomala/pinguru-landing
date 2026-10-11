@@ -35,7 +35,6 @@ hostile glob patterns or CSS, which our own repository does not contain.
 - **Tailwind 3 → 4**: removes the chokidar / micromatch / fast-glob / postcss-nested chain.
   Scheduled with the design-system phase (P5/P6), where the styling is being reworked anyway.
 - **gh-pages / globby**: resolved in P2. The `gh-pages` devDependency and its `deploy` /
-  `predeploy` scripts were removed; GitHub Pages deploys through `actions/deploy-pages` in
-  `.github/workflows/deploy-pages.yml`, which never used the package.
+  `predeploy` scripts were removed. Hosting has since moved to Cloudflare Pages (P2b).
 
 Re-check this list whenever the full audit output changes.
