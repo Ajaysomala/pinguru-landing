@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowRight, Clock, Search, BookOpen, Tag, ChevronRight } from 'lucide-react';
+import { SEO, SITE_NAME, SITE_URL } from '../components/SEO';
+import { BuiltByCard } from '../components/BuiltByCard';
+import { SOCIAL_LINKS } from '../lib/links';
 import '../styles/landing.css';
 
 const CATEGORIES = ['All', 'Tutorial', 'Strategy', 'Compliance', 'Case Study', 'Product'];
@@ -22,6 +25,8 @@ const POSTS = [
       'After launch, watch the dashboard for message volume and early replies. You do not need a complicated funnel on day one. Once the first rule reliably delivers value, duplicate the pattern for your next offer and improve based on the questions people actually ask in DMs.',
     ],
     date: 'Apr 10, 2025',
+    published: '2025-04-10',
+    modified: '2025-04-10',
     readTime: '4 min read',
     featured: true,
   },
@@ -41,6 +46,8 @@ const POSTS = [
       'Measure the funnel by outcomes, not just message count. Track which triggers generate replies, which templates earn clicks, and where people stop responding. Those signals help you refine the public call to action and the private DM path together.',
     ],
     date: 'Mar 28, 2025',
+    published: '2025-03-28',
+    modified: '2025-03-28',
     readTime: '7 min read',
     featured: false,
   },
@@ -60,6 +67,8 @@ const POSTS = [
       'Compliance is also a trust strategy. When followers receive the link, answer, or resource they asked for, they are more likely to reply, buy, and keep engaging. Treat policy rules as guardrails for a better customer experience, not just a technical requirement.',
     ],
     date: 'Mar 14, 2025',
+    published: '2025-03-14',
+    modified: '2025-03-14',
     readTime: '5 min read',
     featured: false,
   },
@@ -79,6 +88,8 @@ const POSTS = [
       'Review keyword performance after each campaign. If a keyword brings in volume but few replies, update the public call to action or simplify the DM. If a lower-volume keyword produces better buyers, build more content around that intent.',
     ],
     date: 'Feb 20, 2025',
+    published: '2025-02-20',
+    modified: '2025-02-20',
     readTime: '6 min read',
     featured: false,
   },
@@ -98,6 +109,8 @@ const POSTS = [
       'Keep the message concise and avoid over-selling. A story mention already signals interest; your job is to make the person feel seen and guide them toward the next useful action.',
     ],
     date: 'Feb 8, 2025',
+    published: '2025-02-08',
+    modified: '2025-02-08',
     readTime: '5 min read',
     featured: false,
   },
@@ -117,10 +130,31 @@ const POSTS = [
       'Use analytics as a weekly feedback loop. Keep the rules that create qualified conversations, pause the ones that no longer serve a campaign, and test one improvement at a time so you know what actually changed performance.',
     ],
     date: 'Jan 25, 2025',
+    published: '2025-01-25',
+    modified: '2025-01-25',
     readTime: '4 min read',
     featured: false,
   },
 ];
+
+type Post = (typeof POSTS)[number];
+
+function articleJsonLd(post: Post): Record<string, unknown> {
+  const url = `${SITE_URL}/blog/${post.slug}`;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.excerpt,
+    datePublished: post.published,
+    dateModified: post.modified,
+    mainEntityOfPage: url,
+    url,
+    image: `${SITE_URL}/og-image.png`,
+    author: { '@type': 'Person', name: 'Somala Ajay', url: SOCIAL_LINKS.portfolio },
+    publisher: { '@type': 'Organization', name: SITE_NAME, url: `${SITE_URL}/` },
+  };
+}
 
 const BlogPage: React.FC = () => {
   const { slug } = useParams();
@@ -140,6 +174,7 @@ const BlogPage: React.FC = () => {
     if (!articlePost) {
       return (
         <div className="landing-page blog-detail-page">
+          <SEO title="Article not found · PinGuru" description="This PinGuru blog article could not be found." path={`/blog/${slug}`} noindex />
           <section className="blog-detail-hero">
             <div className="blog-detail-hero-inner">
               <span className="blog-detail-kicker"><BookOpen size={12} /> Article not found</span>
@@ -154,6 +189,13 @@ const BlogPage: React.FC = () => {
 
     return (
       <div className="landing-page blog-detail-page">
+        <SEO
+          title={`${articlePost.title} · PinGuru Blog`}
+          description={articlePost.excerpt}
+          path={`/blog/${articlePost.slug}`}
+          type="article"
+          jsonLd={articleJsonLd(articlePost)}
+        />
         <section className="blog-detail-hero">
           <div className="blog-detail-hero-inner">
             <Link to="/blog" className="blog-detail-back muted"><ChevronRight size={14} /> Blog</Link>
@@ -186,6 +228,7 @@ const BlogPage: React.FC = () => {
             </div>
             <Link to="/register" className="btn-primary">Get started free <ArrowRight size={16} /></Link>
           </div>
+          <BuiltByCard />
         </main>
       </div>
     );
@@ -404,6 +447,8 @@ const BlogPage: React.FC = () => {
             Get started free <ArrowRight size={16} />
           </Link>
         </div>
+
+        <BuiltByCard />
       </div>
     </div>
   );

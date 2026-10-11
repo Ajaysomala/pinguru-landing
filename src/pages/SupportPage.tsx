@@ -6,6 +6,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { SUPPORT_EMAIL } from '../lib/links';
+import { BuiltByCard } from '../components/BuiltByCard';
 import '../styles/dashboard.css';
 import '../styles/support.css';
 
@@ -145,6 +146,8 @@ const SupportPage: React.FC = () => {
           </Link>
         </div>
       </section>
+
+      <BuiltByCard />
     </div>
   );
 };

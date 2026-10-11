@@ -10,6 +10,8 @@ export interface SEOProps {
   path: string;
   type?: 'website' | 'article';
   noindex?: boolean;
+  /** Structured data for this page, rendered as <script type="application/ld+json">. */
+  jsonLd?: Record<string, unknown>;
 }
 
 function upsertMeta(attr: 'name' | 'property', key: string, content: string) {
@@ -33,7 +35,9 @@ function upsertCanonical(href: string) {
 }
 
 /** Sets the document title and social/SEO head tags for the current page. */
-export const SEO: FC<SEOProps> = ({ title, description, path, type = 'website', noindex = false }) => {
+export const SEO: FC<SEOProps> = ({ title, description, path, type = 'website', noindex = false, jsonLd }) => {
+  const jsonLdText = jsonLd ? JSON.stringify(jsonLd) : '';
+
   useEffect(() => {
     const url = `${SITE_URL}${path === '/' ? '/' : path}`;
     document.title = title;
@@ -48,6 +52,17 @@ export const SEO: FC<SEOProps> = ({ title, description, path, type = 'website', 
     upsertMeta('name', 'twitter:title', title);
     upsertMeta('name', 'twitter:description', description);
   }, [title, description, path, type, noindex]);
+
+  useEffect(() => {
+    if (!jsonLdText) return;
+    const el = document.createElement('script');
+    el.type = 'application/ld+json';
+    el.dataset.seo = 'page';
+    el.textContent = jsonLdText;
+    document.head.appendChild(el);
+    return () => el.remove();
+  }, [jsonLdText]);
+
   return null;
 };
 
