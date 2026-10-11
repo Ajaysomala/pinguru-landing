@@ -8,10 +8,11 @@ const ForgotPasswordPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const emailParam = useMemo(() => searchParams.get('email') || '', [searchParams]);
-  const tokenParam = useMemo(() => searchParams.get('token') || '', [searchParams]);
 
   const [email, setEmail] = useState(emailParam);
-  const [resetToken, setResetToken] = useState(tokenParam);
+  // Read the emailed reset token once; it is removed from the URL below so it
+  // doesn't linger in history, screenshots or Referer headers.
+  const [resetToken] = useState(() => searchParams.get('token') || '');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,8 +22,14 @@ const ForgotPasswordPage: React.FC = () => {
 
   useEffect(() => {
     if (emailParam) setEmail(emailParam);
-    if (tokenParam) setResetToken(tokenParam);
-  }, [emailParam, tokenParam]);
+  }, [emailParam]);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has('token')) return;
+    url.searchParams.delete('token');
+    window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+  }, []);
 
   const isResetMode = Boolean(resetToken);
 

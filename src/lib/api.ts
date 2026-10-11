@@ -140,6 +140,46 @@ function createApiRequestError(status: number, detail: unknown, fallback: string
   return err;
 }
 
+// ── CSRF ──────────────────────────────────────────────────────────────────────
+// The backend returns `csrf_token` from login, verify-email, the Google callback
+// and GET /auth/csrf. In production the CSRF cookie lives on the API host and is
+// not readable from JS, so the token is kept in memory (never in storage).
+// Older backends without /auth/csrf fall back to the readable pg_csrf cookie.
+
+let csrfToken = '';
+let csrfRefresh: Promise<string> | null = null;
+
+export function setCsrfToken(token: unknown): void {
+  if (typeof token === 'string' && token) csrfToken = token;
+}
+
+function captureCsrfToken(data: unknown): void {
+  if (data && typeof data === 'object') setCsrfToken((data as Record<string, unknown>).csrf_token);
+}
+
+function currentCsrfToken(): string {
+  return csrfToken || readCookie('pg_csrf') || readCookie('pg_admin_csrf');
+}
+
+/** Fetch a fresh CSRF token. Resolves to '' when unsupported (404) or offline. */
+export function refreshCsrfToken(): Promise<string> {
+  if (!csrfRefresh) {
+    csrfRefresh = (async () => {
+      try {
+        const res = await fetch(`${API}/auth/csrf`, { credentials: 'include' });
+        if (!res.ok) return '';
+        captureCsrfToken(await res.json().catch(() => null));
+        return csrfToken;
+      } catch {
+        return '';
+      } finally {
+        csrfRefresh = null;
+      }
+    })();
+  }
+  return csrfRefresh;
+}
+
 async function authFetch(path: string, options: RequestInit = {}): Promise<Response> {
   const method = (options.method || 'GET').toUpperCase();
   const isStateChanging = !['GET', 'HEAD', 'OPTIONS', 'TRACE'].includes(method);
@@ -149,16 +189,38 @@ async function authFetch(path: string, options: RequestInit = {}): Promise<Respo
   if (!(options.body instanceof FormData) && !headers['Content-Type']) {
     headers['Content-Type'] = 'application/json';
   }
-  if (isStateChanging) {
-    const csrfToken = readCookie('pg_csrf') || readCookie('pg_admin_csrf');
-    if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
-  }
 
-  return fetch(`${API}${path}`, {
+  const send = () => fetch(`${API}${path}`, {
     credentials: 'include',
     ...options,
     headers,
   });
+
+  if (!isStateChanging) return send();
+
+  // Don't race a token refresh that is already in flight (e.g. app startup).
+  if (csrfRefresh) await csrfRefresh;
+  const sentToken = currentCsrfToken();
+  if (sentToken) headers['X-CSRF-Token'] = sentToken;
+
+  const res = await send();
+  if (res.status !== 403) return res;
+
+  // Token may be stale or missing: refresh once and retry once.
+  await refreshCsrfToken();
+  const retryToken = currentCsrfToken();
+  if (!retryToken || retryToken === sentToken) return res;
+  headers['X-CSRF-Token'] = retryToken;
+  return send();
+}
+
+async function readJson(res: Response): Promise<Record<string, unknown> | null> {
+  return res.json().catch(() => null);
+}
+
+function rateLimitAwareMessage(res: Response, data: unknown, fallback: string): string {
+  if (res.status === 429 && !data) return 'Too many attempts. Please wait a few minutes and try again.';
+  return asErrorMessage(data, fallback);
 }
 
 export async function submitRefundRequest(formData: FormData): Promise<{ message: string }> {
@@ -173,8 +235,9 @@ export async function submitRefundRequest(formData: FormData): Promise<{ message
 
 export async function loginUser(email: string, password: string) {
   const res = await authFetch('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.detail || 'Login failed');
+  const data = await readJson(res);
+  if (!res.ok) throw createApiRequestError(res.status, rateLimitAwareMessage(res, data, 'Login failed'), 'Login failed');
+  captureCsrfToken(data);
   return data;
 }
 
@@ -199,8 +262,9 @@ export const register = registerUser;
 
 export async function verifyEmailOtp(email: string, otp: string) {
   const res = await authFetch('/auth/verify-email', { method: 'POST', body: JSON.stringify({ email, otp }) });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.detail || 'OTP verification failed');
+  const data = await readJson(res);
+  if (!res.ok) throw createApiRequestError(res.status, rateLimitAwareMessage(res, data, 'OTP verification failed'), 'OTP verification failed');
+  captureCsrfToken(data);
 }
 
 export async function resendEmailOtp(email: string) {
@@ -209,7 +273,7 @@ export async function resendEmailOtp(email: string) {
   if (!res.ok) throw new Error(data.detail || 'Failed to resend OTP');
 }
 
-export async function requestPasswordReset(email: string): Promise<{ message: string; reset_token?: string; reset_url?: string }> {
+export async function requestPasswordReset(email: string): Promise<{ message: string }> {
   const res = await authFetch('/auth/forgot-password/request', { method: 'POST', body: JSON.stringify({ email }) });
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'Failed to request password reset');
@@ -230,6 +294,7 @@ export async function logout() {
   try { await authFetch('/auth/logout', { method: 'POST' }); } catch {
     // Ignore network failures — still clear local session redirect.
   }
+  csrfToken = '';
   window.location.href = '/login';
 }
 
