@@ -13,7 +13,7 @@ Never run `npm audit fix --force`: it jumps Tailwind to a new major version and 
 Plain `npm audit fix` is fine and was applied on 2026-10-11 (fixed `source-map-js` 1.2.1 → 1.2.2,
 bumped `tailwindcss` 3.4.6 → 3.4.19 within the same major).
 
-## Accepted dev-only advisories (as of 2026-10-11)
+## Accepted dev-only advisories (updated with P2)
 
 All remaining advisories are in build-time tooling. None of these packages is imported by
 `src/`, so none of them is in the `dist/` bundle that is served to users. The risk is limited to
@@ -25,9 +25,7 @@ hostile glob patterns or CSS, which our own repository does not contain.
 | braces | 3.0.3 | high | [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) | chokidar, micromatch |
 | chokidar | 3.6.0 | high | via braces | tailwindcss |
 | micromatch | 4.0.8 | high | via braces | tailwindcss, fast-glob |
-| fast-glob | 3.3.3 | high | via micromatch | tailwindcss, globby |
-| globby | 11.1.0 | high | via fast-glob | gh-pages |
-| gh-pages | 6.3.0 | high | via globby | direct devDependency (`npm run deploy`) |
+| fast-glob | 3.3.3 | high | via micromatch | tailwindcss |
 | tailwindcss | 3.4.19 | high | via chokidar, fast-glob, micromatch, postcss-nested, postcss-selector-parser | direct devDependency |
 | postcss-selector-parser | 6.1.4 | moderate | [GHSA-rj75-hqrm-r3gf](https://github.com/advisories/GHSA-rj75-hqrm-r3gf) | tailwindcss, postcss-nested |
 | postcss-nested | 6.2.0 | moderate | via postcss-selector-parser | tailwindcss |
@@ -36,7 +34,8 @@ hostile glob patterns or CSS, which our own repository does not contain.
 
 - **Tailwind 3 → 4**: removes the chokidar / micromatch / fast-glob / postcss-nested chain.
   Scheduled with the design-system phase (P5/P6), where the styling is being reworked anyway.
-- **gh-pages**: becomes unnecessary once hosting moves to Cloudflare Pages (P2); remove the
-  devDependency and the `deploy` / `predeploy` scripts at cutover.
+- **gh-pages / globby**: resolved in P2. The `gh-pages` devDependency and its `deploy` /
+  `predeploy` scripts were removed; GitHub Pages deploys through `actions/deploy-pages` in
+  `.github/workflows/deploy-pages.yml`, which never used the package.
 
 Re-check this list whenever the full audit output changes.

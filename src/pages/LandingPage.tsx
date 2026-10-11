@@ -7,6 +7,7 @@ import {
   Sparkles, Clock, Target,
 } from 'lucide-react';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
+import { SUPPORT_EMAIL } from '../lib/links';
 import '../styles/landing.css';
 
 // ── Navbar ─────────────────────────────────────────────────────────────────
@@ -699,7 +700,7 @@ const LandingPage: React.FC = () => {
                 <a href="https://linkedin.com/company/pinguru" target="_blank" rel="noopener noreferrer" className="footer-social-link" aria-label="LinkedIn">
                   <Linkedin size={15} />
                 </a>
-                <a href="mailto:support@pinguru.me" className="footer-social-link" aria-label="Email">
+                <a href={`mailto:${SUPPORT_EMAIL}`} className="footer-social-link" aria-label="Email support">
                   <Mail size={15} />
                 </a>
               </div>
@@ -736,6 +737,8 @@ const LandingPage: React.FC = () => {
                 <Link to="/terms"   className="footer-col-link">Terms of Service</Link>
                 <Link to="/cookies" className="footer-col-link">Cookie Policy</Link>
                 <Link to="/refund-policy" className="footer-col-link">Refund Policy</Link>
+                <Link to="/data-deletion" className="footer-col-link">Data Deletion</Link>
+                <Link to="/contact" className="footer-col-link">Contact</Link>
               </div>
 
               {/* Newsletter */}
@@ -774,7 +777,7 @@ const LandingPage: React.FC = () => {
             <div className="footer-bottom-links">
               <Link to="/privacy" className="footer-bottom-link">Privacy</Link>
               <Link to="/terms"   className="footer-bottom-link">Terms</Link>
-              <a href="mailto:support@pinguru.me" className="footer-bottom-link">support@pinguru.me</a>
+              <a href={`mailto:${SUPPORT_EMAIL}`} className="footer-bottom-link">{SUPPORT_EMAIL}</a>
             </div>
           </div>
         </div>

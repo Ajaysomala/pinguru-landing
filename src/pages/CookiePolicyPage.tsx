@@ -1,11 +1,12 @@
 import React from 'react';
 import { ArrowLeft, Cookie } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { SUPPORT_EMAIL } from '../lib/links';
+import { LegalFooter } from '../components/legal/LegalShell';
 import '../styles/landing.css';
 import '../styles/legal.css';
 
 const LAST_UPDATED = 'August 10, 2026';
-const SUPPORT_EMAIL = 'support@pinguru.me';
 
 const CookiePolicyPage: React.FC = () => (
   <div className="landing-page">
@@ -82,19 +83,7 @@ const CookiePolicyPage: React.FC = () => (
       </div>
     </main>
 
-    <footer className="landing-footer">
-      <div className="footer-inner">
-        <div className="footer-bottom">
-          <p className="footer-copyright">© {new Date().getFullYear()} PinGuru. All rights reserved.</p>
-          <div className="footer-bottom-links">
-            <Link to="/privacy" className="footer-bottom-link">Privacy</Link>
-            <Link to="/terms" className="footer-bottom-link">Terms</Link>
-            <Link to="/cookies" className="footer-bottom-link">Cookies</Link>
-            <Link to="/refund-policy" className="footer-bottom-link">Refunds</Link>
-          </div>
-        </div>
-      </div>
-    </footer>
+    <LegalFooter />
   </div>
 );
 

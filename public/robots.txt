@@ -24,4 +24,20 @@ Disallow: /
 
 User-agent: *
 Allow: /
+# Signed-in app pages (also marked noindex)
+Disallow: /dashboard
+Disallow: /connect
+Disallow: /rules
+Disallow: /automations
+Disallow: /contacts
+Disallow: /analytics
+Disallow: /billing
+Disallow: /settings
+Disallow: /refund$
+Allow: /refund-policy
+Disallow: /onboarding
+Disallow: /verify
+Disallow: /auth
+Disallow: /forgot-password
+
 Sitemap: https://pinguru.me/sitemap.xml

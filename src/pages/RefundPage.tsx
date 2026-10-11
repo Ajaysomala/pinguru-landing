@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, AlertTriangle, Upload, X } from 'lucide-react';
 import { submitRefundRequest } from '../lib/api';
+import { SUPPORT_EMAIL } from '../lib/links';
 
 const RefundPage: React.FC = () => {
   const [reason, setReason]       = useState('');
@@ -153,7 +154,7 @@ const RefundPage: React.FC = () => {
             </button>
 
             <p className="text-xs text-[var(--color-muted)] text-center">
-              Questions? Email <a href="mailto:support@pinguru.me" className="text-primary hover:underline">support@pinguru.me</a>
+              Questions? Email <a href={`mailto:${SUPPORT_EMAIL}`} className="text-primary hover:underline">{SUPPORT_EMAIL}</a>
             </p>
           </div>
         </div>
@@ -166,7 +167,7 @@ const RefundPage: React.FC = () => {
             <p><strong>Non-refundable cases:</strong> Refunds will not be issued if automation rules have been active and DMs have been sent during the billing period, or if the request is made after 7 days from payment.</p>
             <p><strong>Process:</strong> Submit this form with your payment ID. Our team reviews within 5 business days. Approved refunds are returned to your original Razorpay/UPI/card within 5–7 additional business days.</p>
             <p><strong>Cancellation:</strong> You can cancel your subscription anytime from Billing settings. Cancellation stops future charges but does not automatically trigger a refund for the current period.</p>
-            <p><strong>Contact:</strong> For urgent billing issues email <a href="mailto:support@pinguru.me" className="text-primary hover:underline">support@pinguru.me</a> with subject "Refund Request".</p>
+            <p><strong>Contact:</strong> For urgent billing issues email <a href={`mailto:${SUPPORT_EMAIL}`} className="text-primary hover:underline">{SUPPORT_EMAIL}</a> with subject "Refund Request".</p>
           </div>
         </div>
 

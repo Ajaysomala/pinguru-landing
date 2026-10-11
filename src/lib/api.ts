@@ -1,6 +1,11 @@
 import type { User, DashboardStats, Rule, RuleCreatePayload, AnalyticsData, PlanStatus, InstagramMediaResponse, RuleButton } from './types';
 
-const API = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://api.pinguru.me' : '/api')).replace(/\/$/, '');
+// VITE_API_BASE_URL is the current name; VITE_API_URL is still read for older .env files.
+const API = (
+  import.meta.env.VITE_API_BASE_URL
+  || import.meta.env.VITE_API_URL
+  || (import.meta.env.PROD ? 'https://api.pinguru.me' : '/api')
+).replace(/\/$/, '');
 
 type BackendRule = {
   _id?: string;
