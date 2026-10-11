@@ -34,7 +34,14 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Audit dependencies (high+)
+      # Blocking: only packages that ship in the production bundle.
+      - name: Audit production dependencies (high+)
+        run: npm audit --omit=dev --audit-level=high
+
+      # Non-blocking: keeps build-tool advisories visible in the logs.
+      # See docs/security-notes.md for the accepted dev-only advisories.
+      - name: Audit all dependencies incl. dev tools (high+, informational)
+        continue-on-error: true
         run: npm audit --audit-level=high
 
   dependency-review:
