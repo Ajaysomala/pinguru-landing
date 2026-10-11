@@ -16,6 +16,14 @@ export interface User {
   avatar_url?: string;
   onboarding_complete?: boolean;
   created_at?: string;
+  // Instagram connection health. Sent by newer backends only; every field may be absent.
+  ig_connection_status?: 'active' | 'needs_reauth' | 'expired' | null;
+  ig_connected_at?: string | null;
+  ig_last_refreshed_at?: string | null;
+  ig_profile_picture_url?: string | null;
+  ig_account_type?: string | null;
+  ig_followers_count?: number | null;
+  webhook_subscribed?: boolean | null;
 }
 
 export interface DashboardStats {
@@ -69,6 +77,8 @@ export interface Rule {
   is_active: boolean;
   created_at: string;
   dm_count?: number;
+  /** Set by the backend when it changed the saved rule, e.g. a plan downgrade of the match mode. */
+  warning?: string;
   analytics?: {
     triggers: number;
     dms_sent: number;
@@ -116,6 +126,8 @@ export interface Contact {
   last_seen_at: string;
   captured_email?: string | null;
   email?: string | null;
+  /** Present only on backends that track opt-outs. */
+  opted_out?: boolean;
 }
 
 export interface InstagramMediaItem {
@@ -157,6 +169,12 @@ export interface InstagramStatus {
   user_id?: string;
   token_expires_at?: string;
   profile_picture?: string;
+  connection_status?: 'active' | 'needs_reauth' | 'expired';
+  profile_picture_url?: string;
+  account_type?: string;
+  followers_count?: number;
+  /** undefined when the backend does not report it (older backend or legacy connection). */
+  webhook_subscribed?: boolean;
 }
 
 export interface ApiError {
@@ -173,6 +191,8 @@ export interface PlanStatus {
   is_active_paid: boolean;
   is_checkout_pending: boolean;
   payment_provider: string | null;
+  /** Optional message from newer backends to show above the upgrade buttons. */
+  upgrade_notice?: string | null;
 }
 
 export type TriggerType = 'keyword' | 'story_mention' | 'comment' | 'new_dm';

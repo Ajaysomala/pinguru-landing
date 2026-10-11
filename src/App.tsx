@@ -171,6 +171,7 @@ const CookiePolicyPage = lazyWithRetry(() => import('./pages/CookiePolicyPage'))
 const RefundPolicyPage = lazyWithRetry(() => import('./pages/RefundPolicyPage'));
 const DataDeletionPage = lazyWithRetry(() => import('./pages/DataDeletionPage'));
 const ContactPage    = lazyWithRetry(() => import('./pages/ContactPage'));
+const AccountDeletedPage = lazyWithRetry(() => import('./pages/AccountDeletedPage'));
 const SupportPage    = lazyWithRetry(() => import('./pages/SupportPage'));
 
 const Page: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -220,6 +221,7 @@ const App: React.FC = () => (
               <Route path="/refund-policy" element={<Page><RefundPolicyPage /></Page>} />
               <Route path="/data-deletion" element={<Page><DataDeletionPage /></Page>} />
               <Route path="/contact"  element={<Page><ContactPage /></Page>} />
+              <Route path="/account-deleted" element={<Page><AccountDeletedPage /></Page>} />
               <Route path="/support"  element={<SupportRoute />} />
               <Route path="/blog"     element={<Page><BlogPage /></Page>} />
               <Route path="/blog/:slug" element={<Page><BlogPage /></Page>} />

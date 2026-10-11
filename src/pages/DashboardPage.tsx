@@ -14,8 +14,9 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useAuth } from '../App';
-import { getDashboardStats, getRules, getInstagramStatus, toggleRule } from '../lib/api';
-import type { DashboardStats, Rule } from '../lib/types';
+import { getDashboardStats, getRules, getInstagramStatus, getInstagramAuthUrl, toggleRule } from '../lib/api';
+import type { DashboardStats, InstagramStatus, Rule } from '../lib/types';
+import { ReconnectBanner, WebhookWarning } from '../components/instagram/InstagramHealth';
 import { TriggerSimulator } from '../components/dashboard/TriggerSimulator';
 import { Card3D } from '../components/ui/Card3D';
 import { useToast } from '../context/ToastContext';
@@ -27,7 +28,8 @@ export const DashboardPage: React.FC = () => {
 
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [rules, setRules] = useState<Rule[]>([]);
-  const [igStatus, setIgStatus] = useState<{ connected: boolean; username?: string } | null>(null);
+  const [igStatus, setIgStatus] = useState<InstagramStatus | null>(null);
+  const [reconnecting, setReconnecting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,6 +66,16 @@ export const DashboardPage: React.FC = () => {
       showToast(`Automation rule is now ${res.is_active ? 'Active' : 'Paused'}.`);
     } catch {
       showToast('Failed to update rule status. Please try again.');
+    }
+  };
+
+  const handleReconnect = async () => {
+    setReconnecting(true);
+    try {
+      window.location.href = await getInstagramAuthUrl();
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to start Instagram connection');
+      setReconnecting(false);
     }
   };
 
@@ -108,6 +120,9 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <ReconnectBanner status={igStatus} onReconnect={handleReconnect} busy={reconnecting} />
+      <WebhookWarning status={igStatus} />
+
       {/* 3D Hero Welcome Banner — Adaptive Luxury Glass Container */}
       <Card3D intensity={4} glowColor="rgba(99, 102, 241, 0.15)">
         <div className="relative rounded-2xl p-6 lg:p-8 overflow-hidden border border-slate-200 dark:border-white/10 shadow-xs dark:shadow-xl bg-white/90 dark:bg-[#121218]/80 backdrop-blur-md">

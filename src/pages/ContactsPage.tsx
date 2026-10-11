@@ -5,20 +5,7 @@ import { Badge } from '../components/ui/Badge';
 import { useAuth } from '../App';
 import '../styles/dashboard.css';
 import '../styles/contacts.css';
-import type { DashboardStats } from '../lib/types';
-
-interface Contact {
-  id: string;
-  ig_user_id: string;
-  ig_username?: string;
-  display_name?: string;
-  trigger_type?: string;
-  dm_count: number;
-  first_seen_at: string;
-  last_seen_at: string;
-  captured_email?: string | null;
-  email?: string | null;
-}
+import type { Contact, DashboardStats } from '../lib/types';
 
 interface ContactStats {
   total: number;
@@ -36,17 +23,24 @@ const ContactsPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [triggerFilter, setTriggerFilter] = useState('all');
   const [isExporting, setIsExporting] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const LIMIT = 20;
 
   const load = useCallback(async (p: number) => {
     setLoading(true);
-    const [data, s, ds] = await Promise.all([getContacts(p), getContactStats(), getDashboardStats()]);
-    setContacts(data.contacts);
-    setTotal(data.total);
-    setStats(s);
-    setDashboardStats(ds);
-    setLoading(false);
+    setLoadError(null);
+    try {
+      const [data, s, ds] = await Promise.all([getContacts(p), getContactStats(), getDashboardStats().catch(() => null)]);
+      setContacts(data.contacts);
+      setTotal(data.total);
+      setStats(s);
+      setDashboardStats(ds);
+    } catch (err: unknown) {
+      setLoadError(err instanceof Error ? err.message : 'Failed to load contacts');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -172,9 +166,20 @@ const ContactsPage: React.FC = () => {
               <tr>
                 <td colSpan={5} className="contacts-v6-empty">Loading contacts...</td>
               </tr>
+            ) : loadError ? (
+              <tr>
+                <td colSpan={5} className="contacts-v6-empty" role="alert">
+                  {loadError}{' '}
+                  <button type="button" onClick={() => load(page)} style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'underline' }}>Retry</button>
+                </td>
+              </tr>
             ) : filteredContacts.length === 0 ? (
               <tr>
-                <td colSpan={5} className="contacts-v6-empty">No contacts found.</td>
+                <td colSpan={5} className="contacts-v6-empty">
+                  {contacts.length === 0 && !search && triggerFilter === 'all'
+                    ? 'No contacts yet. People who trigger your automations will appear here.'
+                    : 'No contacts match your search.'}
+                </td>
               </tr>
             ) : (
               filteredContacts.map((contact) => (
@@ -183,7 +188,12 @@ const ContactsPage: React.FC = () => {
                     <div className="contacts-v6-contact-cell">
                       <div className="contacts-v6-avatar">{initialsFrom(contact)}</div>
                       <div>
-                        <p className="name">@{contact.ig_username || contact.ig_user_id}</p>
+                        <p className="name">
+                          @{contact.ig_username || contact.ig_user_id}
+                          {contact.opted_out === true && (
+                            <Badge variant="red" className="ml-2">Opted out</Badge>
+                          )}
+                        </p>
                         <p className="id">{contact.ig_user_id}</p>
                       </div>
                     </div>

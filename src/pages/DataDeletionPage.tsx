@@ -25,11 +25,11 @@ const DataDeletionPage: React.FC = () => (
     <section className="legal-section">
       <h2>2. Delete your PinGuru account and data</h2>
       <ol>
-        <li>Email <a href={`mailto:${SUPPORT_EMAIL}?subject=${DELETION_SUBJECT}`}>{SUPPORT_EMAIL}</a> from the email address on your account, with the subject "Delete my PinGuru account".</li>
-        <li>We confirm the request by replying to that address.</li>
-        <li>We then delete your account, automation rules, captured contacts, DM logs and Instagram connection data.</li>
+        <li>Sign in and open <strong>Settings → Data &amp; Privacy</strong>.</li>
+        <li>Under <strong>Delete my data</strong>, type your account email to confirm and choose <strong>Permanently delete my data</strong>.</li>
+        <li>We immediately delete your account details, Instagram connection, captured contacts, automation rules, DM logs and webhook history, then sign you out.</li>
       </ol>
-      <p>An in-app delete button in Settings is on the way. Until then, email is the way to request full deletion, including if you can no longer sign in.</p>
+      <p>If you can no longer sign in, email <a href={`mailto:${SUPPORT_EMAIL}?subject=${DELETION_SUBJECT}`}>{SUPPORT_EMAIL}</a> from the email address on your account, with the subject "Delete my PinGuru account". We confirm the request by replying to that address before deleting.</p>
     </section>
 
     <section className="legal-section">
@@ -55,7 +55,7 @@ const DataDeletionPage: React.FC = () => (
 
     <section className="legal-section">
       <h2>5. How long deletion takes</h2>
-      <p>Disconnecting stops automations straight away. Deletion from our live systems is completed within 30 days of a confirmed request. Encrypted backups roll over on a fixed schedule and are overwritten after that.</p>
+      <p>Disconnecting stops automations straight away. Deleting from Settings removes your data from our live systems immediately. Requests made by email are completed within 30 days of confirmation. Encrypted backups roll over on a fixed schedule and are overwritten after that.</p>
       <p>We keep billing records (invoices and payment references) for as long as Indian tax and accounting law requires, even after your account is deleted. See the <Link to="/privacy">Privacy Policy</Link> for all retention periods.</p>
     </section>
 

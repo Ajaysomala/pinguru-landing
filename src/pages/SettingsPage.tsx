@@ -5,8 +5,10 @@ import {
   User, 
   ShieldCheck, 
   CreditCard, 
-  Check
+  Check,
+  Lock
 } from 'lucide-react';
+import { DeleteMyData } from '../components/settings/DeleteMyData';
 import { useAuth } from '../App';
 import { updateProfile, getPlanStatus } from '../lib/api';
 import type { PlanStatus } from '../lib/types';
@@ -17,7 +19,7 @@ export const SettingsPage: React.FC = () => {
   const { user, refresh } = useAuth();
   const { showToast } = useToast();
 
-  const [activeTab, setActiveTab] = useState<'profile' | 'compliance' | 'billing'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'compliance' | 'billing' | 'privacy'>('profile');
 
   // Profile Form State - sourced from real user
   const [displayName, setDisplayName] = useState(user?.display_name || '');
@@ -103,6 +105,7 @@ export const SettingsPage: React.FC = () => {
           { id: 'profile', label: 'Workspace & Profile', icon: User },
           { id: 'compliance', label: 'Compliance & Safety', icon: ShieldCheck },
           { id: 'billing', label: 'Plan & Billing', icon: CreditCard },
+          { id: 'privacy', label: 'Data & Privacy', icon: Lock },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -350,6 +353,9 @@ export const SettingsPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Tab 4: Data & Privacy */}
+      {activeTab === 'privacy' && <DeleteMyData />}
     </div>
   );
 };

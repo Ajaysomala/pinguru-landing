@@ -18,8 +18,44 @@ import {
 import { getRules, deleteRule, toggleRule } from '../lib/api';
 import type { Rule } from '../lib/types';
 import { Card3D } from '../components/ui/Card3D';
-import { RuleBuilderModal } from '../components/rules/RuleBuilderModal';
+import { RuleBuilderModal, type RuleSeed } from '../components/rules/RuleBuilderModal';
 import { useToast } from '../context/ToastContext';
+
+const RULE_PRESETS: { id: string; label: string; description: string; seed: RuleSeed }[] = [
+  {
+    id: 'link',
+    label: 'Link request',
+    description: 'Send a link when someone DMs "link".',
+    seed: {
+      name: 'Send link on request',
+      trigger_type: 'keyword',
+      keywords: ['link'],
+      response_template: "Hi {{name}}! Here's the link you asked for: [paste your link here]",
+    },
+  },
+  {
+    id: 'price',
+    label: 'Price request',
+    description: 'Answer "price" and "cost" questions instantly.',
+    seed: {
+      name: 'Price enquiry reply',
+      trigger_type: 'keyword',
+      keywords: ['price', 'cost'],
+      response_template: 'Hi {{name}}! Thanks for asking. Our pricing starts at [your price]. Reply here if you have any questions.',
+    },
+  },
+  {
+    id: 'join',
+    label: 'Join / offer',
+    description: 'Share your offer when someone DMs "join".',
+    seed: {
+      name: 'Join offer',
+      trigger_type: 'keyword',
+      keywords: ['join', 'offer'],
+      response_template: "Hey {{name}}! Great to have you. Here's how to join and claim the offer: [paste your link here]",
+    },
+  },
+];
 
 export const RulesPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -35,6 +71,7 @@ export const RulesPage: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRule, setEditingRule] = useState<Rule | null>(null);
+  const [seed, setSeed] = useState<RuleSeed | null>(null);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 
   const fetchRules = useCallback(async () => {
@@ -147,6 +184,7 @@ export const RulesPage: React.FC = () => {
         <button
           onClick={() => {
             setEditingRule(null);
+            setSeed(null);
             setIsModalOpen(true);
           }}
           className="min-h-[42px] px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-sm font-semibold rounded-xl shadow-[0_8px_20px_-4px_rgba(99,102,241,0.4)] hover:shadow-[0_12px_24px_-4px_rgba(124,58,237,0.5)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
@@ -155,6 +193,28 @@ export const RulesPage: React.FC = () => {
           <span>Create New Automation</span>
         </button>
       </div>
+
+      {/* Preset templates: one click opens the builder prefilled */}
+      <section aria-labelledby="rule-presets-title" className="space-y-2">
+        <h2 id="rule-presets-title" className="text-xs font-bold text-slate-600 dark:text-zinc-400 uppercase tracking-wider">Start from a template</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {RULE_PRESETS.map((preset) => (
+            <button
+              key={preset.id}
+              type="button"
+              onClick={() => {
+                setEditingRule(null);
+                setSeed(preset.seed);
+                setIsModalOpen(true);
+              }}
+              className="min-h-[44px] text-left p-4 bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 hover:border-indigo-500/50 rounded-2xl transition-colors cursor-pointer"
+            >
+              <span className="block text-sm font-bold text-slate-900 dark:text-white">{preset.label}</span>
+              <span className="block text-xs text-slate-600 dark:text-zinc-400 mt-0.5">{preset.description}</span>
+            </button>
+          ))}
+        </div>
+      </section>
 
       {/* Filter & Search Bar */}
       <div className="bg-white/90 dark:bg-[#121218]/80 border border-slate-200 dark:border-white/10 backdrop-blur-md rounded-2xl p-4 sm:p-5 space-y-3 shadow-xs dark:shadow-xl">
@@ -230,6 +290,7 @@ export const RulesPage: React.FC = () => {
           <button
             onClick={() => {
               setEditingRule(null);
+              setSeed(null);
               setIsModalOpen(true);
             }}
             className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-semibold rounded-xl shadow-[0_8px_20px_-4px_rgba(99,102,241,0.4)] hover:shadow-[0_12px_24px_-4px_rgba(124,58,237,0.5)] transition-all cursor-pointer"
@@ -431,16 +492,18 @@ export const RulesPage: React.FC = () => {
         onClose={() => {
           setIsModalOpen(false);
           setEditingRule(null);
+          setSeed(null);
         }}
         onCreated={(newRule) => {
           setRules((prev) => [newRule, ...prev]);
-          showToast(`Rule "${newRule.name}" created successfully!`);
+          showToast(newRule.warning ? `Rule "${newRule.name}" saved. ${newRule.warning}` : `Rule "${newRule.name}" created successfully!`);
         }}
         onUpdated={(updatedRule) => {
           setRules((prev) => prev.map((r) => (r.id === updatedRule.id ? updatedRule : r)));
-          showToast(`Rule "${updatedRule.name}" updated successfully.`);
+          showToast(updatedRule.warning ? `Rule "${updatedRule.name}" saved. ${updatedRule.warning}` : `Rule "${updatedRule.name}" updated successfully.`);
         }}
         initialRule={editingRule}
+        seed={seed}
       />
     </div>
   );

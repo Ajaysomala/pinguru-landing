@@ -24,6 +24,7 @@ export const ROUTE_SEO: Record<string, RouteSEO> = {
   '/cookies': { title: 'Cookie Policy · PinGuru', description: 'How PinGuru uses cookies and browser storage, and how to control them.' },
   '/refund-policy': { title: 'Refund Policy · PinGuru', description: 'When PinGuru subscriptions are eligible for a refund and how to request one.' },
   '/data-deletion': { title: 'Data Deletion · PinGuru', description: 'How to delete your PinGuru account and data, remove the Instagram connection, and what our Meta deletion callback does.' },
+  '/account-deleted': { title: 'Data deleted · PinGuru', description: 'Your PinGuru data has been deleted.', noindex: true },
   // Signed-in pages: titled, never indexed.
   '/onboarding': { title: 'Welcome · PinGuru', description: DEFAULT_DESCRIPTION, noindex: true },
   '/dashboard': { title: 'Dashboard · PinGuru', description: DEFAULT_DESCRIPTION, noindex: true },

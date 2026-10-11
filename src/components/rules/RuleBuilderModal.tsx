@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import {
   AlertCircle, ArrowLeft, Check, X, RefreshCw, Lock,
   Smartphone, Zap, MessageSquare, ArrowRight, Eye, EyeOff,
@@ -561,7 +562,15 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
 
   const lockBadge = (unlocked: boolean, tier: string) => {
     if (unlocked) return null;
-    return <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 7px', borderRadius: 999, background: '#F1F5F9', color: '#64748B', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}><Lock size={9} />{tier}</span>;
+    const tierName = tier === 'pro' ? 'Pro' : 'Starter';
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 7px', borderRadius: 999, background: '#F1F5F9', color: '#64748B', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}><Lock size={9} />{tier}</span>
+        <Link to="/billing" onClick={onClose} style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--color-primary)', textDecoration: 'underline' }}>
+          Upgrade to {tierName}
+        </Link>
+      </span>
+    );
   };
 
   const canSubmit = (): boolean => {
@@ -611,7 +620,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
         public_comment_reply_template:publicCommentReplyEnabled ? (cleanTemplates[0] || normalizeTemplateVariables(publicCommentReplyTemplate)) : undefined,
         public_comment_reply_templates:publicCommentReplyEnabled ? cleanTemplates.map(normalizeTemplateVariables) : undefined,
       }),
-      dm_buttons: validButtons.length > 0 ? validButtons : undefined,
+      dm_buttons: isStarterOrPro && validButtons.length > 0 ? validButtons : undefined,
       capture_email_enabled: isStarterOrPro && captureEmailEnabled,
       email_capture_prompt: isStarterOrPro && captureEmailEnabled ? (emailCapturePrompt.trim() || undefined) : undefined,
       email_capture_success_message: isStarterOrPro && captureEmailEnabled ? (emailCaptureSuccessMessage.trim() || undefined) : undefined,
@@ -939,6 +948,12 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                 </p>
                 <textarea ref={textareaRef} className="template-textarea" placeholder="Hi {{name}}! Thanks for reaching out. Here's what you need to know..." value={template} onChange={e=>setTemplate(e.target.value.slice(0, 1000))} rows={4} maxLength={1000}/>
                 <p style={{ fontSize:'0.75rem',color:'var(--color-muted)',textAlign:'right',marginTop:4 }}>{template.length} / 1000</p>
+                {plan === 'free' && (
+                  <p style={{ fontSize:'0.75rem', color:'var(--color-muted)', marginTop:4 }}>
+                    On the Free plan, every DM ends with a short "© PinGuru" footer.{' '}
+                    <Link to="/billing" onClick={onClose} style={{ color:'var(--color-primary)', fontWeight:600, textDecoration:'underline' }}>Upgrade to Starter</Link> to remove it.
+                  </p>
+                )}
 
                 {/* Interactive DM Buttons Builder */}
                 <div style={{ marginTop: 14, borderTop: '1px dashed rgba(226, 232, 240, 0.9)', paddingTop: 12 }}>
@@ -947,6 +962,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                       <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-text)' }}>
                         Interactive DM Buttons
                       </span>
+                      {lockBadge(isStarterOrPro, 'starter')}
                       <span style={{ fontSize: '0.7rem', color: 'var(--color-muted)' }}>
                         (Max 3 links)
                       </span>
@@ -1015,7 +1031,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                     </div>
                   ))}
 
-                  {dmButtons.length < 3 && (
+                  {dmButtons.length < 3 && isStarterOrPro && (
                     <button
                       type="button"
                       onClick={() => {

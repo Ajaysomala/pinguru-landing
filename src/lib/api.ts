@@ -1,4 +1,4 @@
-import type { User, DashboardStats, Rule, RuleCreatePayload, AnalyticsData, PlanStatus, InstagramMediaResponse, RuleButton } from './types';
+import type { User, DashboardStats, Rule, RuleCreatePayload, AnalyticsData, PlanStatus, InstagramMediaResponse, InstagramStatus, RuleButton, Contact } from './types';
 
 // VITE_API_BASE_URL is the current name; VITE_API_URL is still read for older .env files.
 const API = (
@@ -348,10 +348,21 @@ export async function updateProfile(payload: Partial<User>) {
   return data as User;
 }
 
-export async function requestDataDeletion() {
+export async function requestDataDeletion(): Promise<{ message: string }> {
   const res = await authFetch('/auth/data-deletion', { method: 'POST' });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.detail || 'Failed to request data deletion');
+  const data = await readJson(res);
+  if (!res.ok) {
+    throw createApiRequestError(res.status, rateLimitAwareMessage(res, data, 'Failed to delete your data'), 'Failed to delete your data');
+  }
+  return { message: typeof data?.message === 'string' ? data.message : 'Your data has been deleted.' };
+}
+
+/** Best-effort sign-out without a redirect; forgets the in-memory CSRF token. */
+export async function endSessionQuietly(): Promise<void> {
+  try { await authFetch('/auth/logout', { method: 'POST' }); } catch {
+    // The session may already be gone (e.g. after data deletion).
+  }
+  csrfToken = '';
 }
 
 export async function getDashboardStats(): Promise<DashboardStats | null> {
@@ -396,6 +407,14 @@ export async function getRules(): Promise<{ rules: Rule[] }> {
   return { rules };
 }
 
+/** The backend may report a change it made to a saved rule (e.g. a plan downgrade). */
+function readWarning(data: unknown): string | undefined {
+  if (!data || typeof data !== 'object') return undefined;
+  const obj = data as { warning?: unknown; rule?: { warning?: unknown } };
+  const value = obj.warning ?? obj.rule?.warning;
+  return typeof value === 'string' && value.trim() ? value : undefined;
+}
+
 export async function createRule(payload: RuleCreatePayload): Promise<Rule> {
   const commentTemplates = payload.public_comment_reply_templates && payload.public_comment_reply_templates.length > 0
     ? payload.public_comment_reply_templates
@@ -428,7 +447,9 @@ export async function createRule(payload: RuleCreatePayload): Promise<Rule> {
   const res = await authFetch('/automation/rules', { method: 'POST', body: JSON.stringify(backendPayload) });
   const data = await res.json();
   if (!res.ok) throw new Error(asErrorMessage(data, 'Failed to create rule'));
-  return mapRule((data?.rule ?? data) as BackendRule);
+  const created = mapRule((data?.rule ?? data) as BackendRule);
+  const warning = readWarning(data);
+  return warning ? { ...created, warning } : created;
 }
 
 export async function updateRule(ruleId: string, payload: Partial<RuleCreatePayload>): Promise<Rule> {
@@ -464,10 +485,11 @@ export async function updateRule(ruleId: string, payload: Partial<RuleCreatePayl
   const res = await authFetch(`/automation/rules/${ruleId}`, { method: 'PUT', body: JSON.stringify(backendPayload) });
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || 'Failed to update rule');
+  const warning = readWarning(data);
   const refreshed = await getRules();
   const found = refreshed.rules.find((r) => r.id === ruleId);
   if (!found) throw new Error('Rule updated but could not refresh latest state');
-  return found;
+  return warning ? { ...found, warning } : found;
 }
 
 export async function toggleRule(ruleId: string): Promise<{ rule_id: string; is_active: boolean }> {
@@ -614,7 +636,7 @@ export async function requestRefund(reason: string, paymentId?: string): Promise
   return data;
 }
 
-export async function getInstagramStatus() {
+export async function getInstagramStatus(): Promise<InstagramStatus | null> {
   const [meRes, statsRes] = await Promise.all([
     authFetch('/auth/me'),
     authFetch('/dashboard/stats'),
@@ -626,12 +648,23 @@ export async function getInstagramStatus() {
 
   if (!meRes.ok) return null;
 
+  const connectionStatus = ['active', 'needs_reauth', 'expired'].includes(me.ig_connection_status)
+    ? (me.ig_connection_status as InstagramStatus['connection_status'])
+    : undefined;
+
   return {
     connected: Boolean(me.instagram_connected),
     username: me.instagram_username || undefined,
     user_id: me.instagram_user_id || undefined,
     profile_picture: me.profile_picture || undefined,
     token_expires_at: stats?.ig_token_expires_at ?? undefined,
+    connection_status: connectionStatus,
+    profile_picture_url: typeof me.ig_profile_picture_url === 'string' && me.ig_profile_picture_url ? me.ig_profile_picture_url : undefined,
+    account_type: typeof me.ig_account_type === 'string' && me.ig_account_type ? me.ig_account_type : undefined,
+    followers_count: typeof me.ig_followers_count === 'number' ? me.ig_followers_count : undefined,
+    // Backends default this to false for connections made before it was tracked, so it is
+    // only meaningful alongside ig_connection_status.
+    webhook_subscribed: connectionStatus && typeof me.webhook_subscribed === 'boolean' ? me.webhook_subscribed : undefined,
   };
 }
 
@@ -676,19 +709,15 @@ export async function injectInstagramToken(_token: string, _igUserId: string) {
   throw new Error('Direct token injection is disabled. Use the Instagram connect flow.');
 }
 
-export async function getContacts(page: number = 1): Promise<{ contacts: any[]; total: number }> {
-  try {
-    const res = await authFetch(`/dashboard/contacts?page=${page}&limit=20`);
-    if (res.status === 401) { window.location.href = '/login'; return { contacts: [], total: 0 }; }
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'Failed to get contacts');
-    return {
-      contacts: Array.isArray(data?.contacts) ? data.contacts : [],
-      total: data.total ?? 0,
-    };
-  } catch {
-    return { contacts: [], total: 0 };
-  }
+export async function getContacts(page: number = 1): Promise<{ contacts: Contact[]; total: number }> {
+  const res = await authFetch(`/dashboard/contacts?page=${page}&limit=20`);
+  if (res.status === 401) { window.location.href = '/login'; return { contacts: [], total: 0 }; }
+  const data = await readJson(res);
+  if (!res.ok) throw createApiRequestError(res.status, rateLimitAwareMessage(res, data, 'Failed to load contacts'), 'Failed to load contacts');
+  return {
+    contacts: Array.isArray(data?.contacts) ? (data.contacts as Contact[]) : [],
+    total: typeof data?.total === 'number' ? data.total : 0,
+  };
 }
 
 export async function getContactStats(): Promise<{ total: number; limit: number | null }> {

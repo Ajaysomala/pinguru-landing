@@ -19,7 +19,7 @@ const faqs = [
   { q: 'Can you help with DM automation setup?',
     a: 'Yes! We can guide you through rule setup, trigger mapping, and response templates while staying within Meta policy limits.' },
   { q: 'How do I request data deletion?',
-    a: 'Follow the steps on our Data Deletion page (pinguru.me/data-deletion): disconnect Instagram from the Connect page, then email support from your account address to delete your account and data.' },
+    a: 'Open Settings → Data & Privacy and use Delete my data. If you cannot sign in, email support from your account address. Full details are on our Data Deletion page (pinguru.me/data-deletion).' },
   { q: 'Why are my automations not triggering?',
     a: 'Check that your Instagram account is connected and your token is valid (Dashboard → Instagram card). Also verify your rule is set to Active.' },
   { q: 'Is PinGuru compliant with Meta policies?',

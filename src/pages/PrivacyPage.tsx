@@ -91,7 +91,7 @@ const PrivacyPage: React.FC = () => (
       <ul>
         <li><strong>Access</strong> a summary of the personal data we hold about you and how we use it.</li>
         <li><strong>Correct</strong> inaccurate or incomplete data. Most profile fields can be edited in Settings.</li>
-        <li><strong>Erase</strong> your data. See <Link to="/data-deletion">Data Deletion</Link> for the steps.</li>
+        <li><strong>Erase</strong> your data from <strong>Settings → Data &amp; Privacy → Delete my data</strong>. See <Link to="/data-deletion">Data Deletion</Link> for details.</li>
         <li><strong>Withdraw consent</strong> at any time, for example by disconnecting Instagram or deleting your account. Withdrawal does not affect processing that already happened.</li>
         <li><strong>Raise a grievance</strong> with our grievance officer (section 9) and, if unresolved, with the Data Protection Board of India.</li>
       </ul>
@@ -100,7 +100,7 @@ const PrivacyPage: React.FC = () => (
 
     <section className="legal-section">
       <h2>8. Data deletion</h2>
-      <p>You can delete your account and data, and remove PinGuru's access to Instagram, at any time. The <Link to="/data-deletion">Data Deletion</Link> page explains each step and what happens when Instagram tells us you removed the app.</p>
+      <p>You can delete your account and data at any time from <strong>Settings → Data &amp; Privacy → Delete my data</strong>. Deletion happens immediately and signs you out. If you cannot sign in, email <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> instead. The <Link to="/data-deletion">Data Deletion</Link> page explains each step, how to remove PinGuru's access from Instagram, and what happens when Instagram tells us you removed the app.</p>
     </section>
 
     <section className="legal-section">

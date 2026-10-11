@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Check, Zap, Users, CreditCard, ExternalLink, AlertCircle, MessageSquare, Sparkles } from 'lucide-react';
+import { Check, Zap, Users, CreditCard, ExternalLink, AlertCircle, MessageSquare, Sparkles, RefreshCw } from 'lucide-react';
 import { cancelPendingCheckout, createPlanCheckout, getCustomerPortalUrl, getPlanStatus } from '../lib/api';
 import type { PlanStatus } from '../lib/types';
 import { sanitizeApiError } from '../lib/utils';
@@ -96,6 +96,39 @@ function formatProvider(provider: string | null | undefined): string {
 }
 
 const BILLING_POLL_SUPPRESS_KEY = 'pg_billing_poll_suppressed_until';
+const PENDING_SEEN_KEY = 'pg_pending_upgrade_seen';
+const POLL_INTERVAL_MS = 4000;
+const POLL_TIMEOUT_MS = 10 * 60 * 1000;
+/** The backend expires pending upgrades after 60 minutes. */
+const PENDING_EXPIRY_MS = 60 * 60 * 1000;
+
+/** The plan an upgrade is waiting on, or null. Works for free and paid users. */
+function getPendingUpgradePlan(status: PlanStatus | null): PlanStatus['pending_plan'] {
+  if (!status?.pending_plan || status.pending_plan === status.current_plan) return null;
+  // Older backends report is_checkout_pending only for free users, so a paid user's
+  // pending upgrade shows up as pending_plan alone.
+  return status.is_checkout_pending || status.is_active_paid ? status.pending_plan : null;
+}
+
+/** When this browser first saw the pending upgrade (the API sends no start time). */
+function getPendingFirstSeen(plan: string): number {
+  try {
+    const raw = sessionStorage.getItem(PENDING_SEEN_KEY);
+    const parsed = raw ? (JSON.parse(raw) as { plan?: string; at?: number }) : null;
+    if (parsed?.plan === plan && typeof parsed.at === 'number') return parsed.at;
+    const at = Date.now();
+    sessionStorage.setItem(PENDING_SEEN_KEY, JSON.stringify({ plan, at }));
+    return at;
+  } catch {
+    return Date.now();
+  }
+}
+
+function clearPendingFirstSeen() {
+  try { sessionStorage.removeItem(PENDING_SEEN_KEY); } catch { /* storage unavailable */ }
+}
+
+const PLAN_LABEL: Record<string, string> = { free: 'Free', starter: 'Starter', pro: 'Pro' };
 
 function getBillingPollSuppressedUntil(): number {
   const value = sessionStorage.getItem(BILLING_POLL_SUPPRESS_KEY);
@@ -129,6 +162,7 @@ const BillingPage: React.FC = () => {
   const [banner, setBanner] = useState<StatusBanner | null>(null);
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
   const [pollingSuppressedUntil, setPollingSuppressedUntil] = useState<number>(() => getBillingPollSuppressedUntil());
+  const [pendingExpired, setPendingExpired] = useState(false);
 
   const hasProcessingParam = searchParams.get('payment') === 'processing';
   const isPollingSuppressed = pollingSuppressedUntil > Date.now();
@@ -217,8 +251,8 @@ const BillingPage: React.FC = () => {
 
     let active = true;
     const startedAt = Date.now();
-    const intervalMs = 4000;
-    const timeoutMs = 90000;
+    const intervalMs = POLL_INTERVAL_MS;
+    const timeoutMs = POLL_TIMEOUT_MS;
 
     setBanner({ kind: 'processing', message: 'Processing payment. Waiting for Razorpay confirmation...' });
 
@@ -228,7 +262,10 @@ const BillingPage: React.FC = () => {
 
       try {
         const latest = await fetchStatus();
-        const paidActivated = latest.is_active_paid && (latest.current_plan === 'starter' || latest.current_plan === 'pro');
+        const paidActivated = latest.is_active_paid
+          && (latest.current_plan === 'starter' || latest.current_plan === 'pro')
+          && !getPendingUpgradePlan(latest)
+          && !latest.is_checkout_pending;
 
         if (paidActivated) {
           setBanner({ kind: 'success', message: `Payment confirmed. Your ${latest.current_plan} plan is now active.` });
@@ -239,14 +276,14 @@ const BillingPage: React.FC = () => {
         }
 
         if (elapsedMs >= timeoutMs) {
-          setBanner({ kind: 'timeout', message: 'Payment is still processing. Please refresh again in a few minutes.' });
+          setBanner({ kind: 'timeout', message: 'Payment is still processing. We stopped checking automatically after 10 minutes.' });
           clearPaymentParams();
           suppressPolling(10 * 60 * 1000);
           active = false;
         }
       } catch {
         if (elapsedMs >= timeoutMs) {
-          setBanner({ kind: 'timeout', message: 'Payment status check timed out. Please refresh again in a few minutes.' });
+          setBanner({ kind: 'timeout', message: 'We could not confirm the payment status in 10 minutes.' });
           clearPaymentParams();
           suppressPolling(10 * 60 * 1000);
           active = false;
@@ -268,6 +305,38 @@ const BillingPage: React.FC = () => {
 
   const currentPlan = planStatus?.current_plan ?? 'free';
   const pendingPlan = planStatus?.pending_plan;
+  const pendingUpgradePlan = getPendingUpgradePlan(planStatus);
+  const upgradeNotice = typeof planStatus?.upgrade_notice === 'string' ? planStatus.upgrade_notice.trim() : '';
+
+  // A pending upgrade older than 60 minutes has expired on the backend: refetch and drop the banner.
+  const statusLoaded = planStatus !== null;
+  useEffect(() => {
+    if (!statusLoaded) return; // not loaded yet: keep the stored first-seen time
+    if (!pendingUpgradePlan) {
+      clearPendingFirstSeen();
+      setPendingExpired(false);
+      return;
+    }
+    const remaining = getPendingFirstSeen(pendingUpgradePlan) + PENDING_EXPIRY_MS - Date.now();
+    const expire = () => {
+      setPendingExpired(true);
+      setBanner(null);
+      suppressPolling(PENDING_EXPIRY_MS);
+      void fetchStatus().catch(() => undefined);
+    };
+    if (remaining <= 0) {
+      expire();
+      return;
+    }
+    const id = window.setTimeout(expire, remaining);
+    return () => window.clearTimeout(id);
+  }, [fetchStatus, statusLoaded, pendingUpgradePlan, suppressPolling]);
+
+  const handleRetryStatus = () => {
+    setBanner(null);
+    clearPollingSuppression();
+    void syncStatusAfterReturn();
+  };
 
   const isCurrent = (planId: PlanDef['id']) => planId === currentPlan;
 
@@ -283,8 +352,8 @@ const BillingPage: React.FC = () => {
       setError('Cannot checkout free plan. Only upgrades are allowed.');
       return;
     }
-    if (planStatus?.is_checkout_pending) {
-      setError('A checkout is already pending confirmation. Please wait for it to complete.');
+    if (planStatus?.is_checkout_pending || pendingUpgradePlan) {
+      setError('An upgrade is already pending. Cancel it first to choose a different plan.');
       return;
     }
 
@@ -358,11 +427,12 @@ const BillingPage: React.FC = () => {
     setError('');
     try {
       await cancelPendingCheckout();
+      clearPendingFirstSeen();
       const latest = await fetchStatus();
       setPlanStatus(latest);
       clearPaymentParams();
       clearPollingSuppression();
-      setBanner({ kind: 'timeout', message: 'Pending checkout was cancelled. You can start a new upgrade anytime.' });
+      setBanner({ kind: 'success', message: 'Pending upgrade cancelled. Your current plan is unchanged.' });
     } catch (err: any) {
       setError(sanitizeApiError(err, 'Failed to cancel pending checkout.'));
     } finally {
@@ -395,9 +465,50 @@ const BillingPage: React.FC = () => {
       )}
 
       {banner && (
-        <div className={bannerClass}>
+        <div className={bannerClass} role="status" aria-live="polite">
           {banner.kind === 'success' ? <Check size={15} /> : <AlertCircle size={15} />}
           <span>{banner.message}</span>
+          {banner.kind === 'timeout' && isPollingSuppressed && (
+            <button type="button" onClick={handleRetryStatus} className="billing-v6-info-btn">
+              <RefreshCw size={12} aria-hidden="true" /> Check again
+            </button>
+          )}
+        </div>
+      )}
+
+      {loading && (
+        <div className="billing-info-card billing-v6-info-card" aria-busy="true">
+          <p className="meta">Loading your plan…</p>
+        </div>
+      )}
+
+      {!loading && !planStatus && (
+        <div className="billing-info-card billing-v6-info-card">
+          <p className="meta">We could not load your current plan.</p>
+          <button type="button" onClick={() => { setLoading(true); setError(''); void fetchStatus().catch((err: unknown) => setError(sanitizeApiError(err))).finally(() => setLoading(false)); }} className="billing-v6-info-btn">
+            <RefreshCw size={12} aria-hidden="true" /> Retry
+          </button>
+        </div>
+      )}
+
+      {!loading && pendingUpgradePlan && (
+        <div className="billing-info-card billing-v6-info-card billing-v6-pending" role="status">
+          <div className="billing-v6-info-copy">
+            <p className="headline">Upgrade to {PLAN_LABEL[pendingUpgradePlan] ?? pendingUpgradePlan} pending</p>
+            <p className="meta">
+              {pendingExpired
+                ? 'This upgrade request is more than 60 minutes old and has expired. Cancel it to start a new one.'
+                : `Your ${PLAN_LABEL[currentPlan] ?? currentPlan} plan stays active until the payment is confirmed.`}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleCancelPending}
+            disabled={cancelLoading}
+            className="billing-v6-info-btn danger"
+          >
+            {cancelLoading ? 'Cancelling…' : 'Cancel upgrade'}
+          </button>
         </div>
       )}
 
@@ -429,18 +540,13 @@ const BillingPage: React.FC = () => {
             ) : <ExternalLink size={12} />}
             Manage
           </button>
-          {planStatus.is_checkout_pending && (
-            <button
-              onClick={handleCancelPending}
-              disabled={cancelLoading}
-              className="billing-v6-info-btn danger"
-            >
-              {cancelLoading ? (
-                <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-              ) : null}
-              Cancel Pending
-            </button>
-          )}
+        </div>
+      )}
+
+      {upgradeNotice && (
+        <div className="billing-v6-banner processing" role="note">
+          <AlertCircle size={15} />
+          <span>{upgradeNotice}</span>
         </div>
       )}
 
@@ -526,12 +632,12 @@ const BillingPage: React.FC = () => {
               ) : isUpgrade(plan.id) ? (
                 <button
                   onClick={() => handleUpgrade(plan)}
-                  disabled={!!upgrading || planStatus?.is_checkout_pending}
+                  disabled={!!upgrading || planStatus?.is_checkout_pending || Boolean(pendingUpgradePlan)}
                   className="billing-v6-plan-btn primary"
                 >
                   {upgrading === plan.id ? (
                     <><svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Redirecting...</>
-                  ) : planStatus?.is_checkout_pending ? 'Checkout Pending' : `Upgrade to ${plan.name} (${cycleMeta.label})`}
+                  ) : planStatus?.is_checkout_pending || pendingUpgradePlan ? 'Upgrade pending' : `Upgrade to ${plan.name} (${cycleMeta.label})`}
                 </button>
               ) : (
                 <button

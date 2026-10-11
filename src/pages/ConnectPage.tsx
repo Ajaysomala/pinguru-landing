@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { 
   Instagram, 
   Share2, 
@@ -12,17 +13,16 @@ import {
 import { Card3D } from '../components/ui/Card3D';
 import { getInstagramStatus, getInstagramAuthUrl, disconnectInstagram, refreshInstagramToken } from '../lib/api';
 import { useToast } from '../context/ToastContext';
+import type { InstagramStatus } from '../lib/types';
+import { InstagramAccountSummary, ReconnectBanner, WebhookWarning } from '../components/instagram/InstagramHealth';
+import { describeInstagramOAuthError, needsReconnect } from '../lib/instagram';
 
 export const ConnectPage: React.FC = () => {
   const { showToast } = useToast();
 
-  const [status, setStatus] = useState<{
-    connected: boolean;
-    username?: string;
-    user_id?: string;
-    profile_picture?: string;
-    token_expires_at?: string;
-  } | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [status, setStatus] = useState<InstagramStatus | null>(null);
+  const [oauthError, setOauthError] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,8 +45,22 @@ export const ConnectPage: React.FC = () => {
     fetchStatus();
   }, [fetchStatus]);
 
+  // The backend's OAuth callback redirects here with ?ig_error=<message> or ?ig_connected=true.
+  useEffect(() => {
+    const igError = searchParams.get('ig_error');
+    const igConnected = searchParams.get('ig_connected');
+    if (!igError && !igConnected) return;
+    if (igError) setOauthError(describeInstagramOAuthError(igError));
+    else if (igConnected === 'true') showToast('Instagram account connected.');
+    const next = new URLSearchParams(searchParams);
+    next.delete('ig_error');
+    next.delete('ig_connected');
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams, showToast]);
+
   const handleConnect = async () => {
     setIsActionLoading(true);
+    setOauthError(null);
     try {
       const url = await getInstagramAuthUrl();
       if (url) {
@@ -150,12 +164,24 @@ export const ConnectPage: React.FC = () => {
         </div>
       </div>
 
-      {error && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-xs text-rose-400 flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
-          <span>{error}</span>
+      {oauthError && (
+        <div role="alert" className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-xs text-rose-600 dark:text-rose-400 flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
+          <span className="flex-1">{oauthError}</span>
+          <button type="button" onClick={() => setOauthError(null)} className="font-semibold underline cursor-pointer">Dismiss</button>
         </div>
       )}
+
+      {error && (
+        <div role="alert" className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-xs text-rose-400 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+          <span className="flex-1">{error}</span>
+          <button type="button" onClick={fetchStatus} className="font-semibold underline cursor-pointer">Retry</button>
+        </div>
+      )}
+
+      <ReconnectBanner status={status} onReconnect={handleConnect} busy={isActionLoading} />
+      <WebhookWarning status={status} />
 
       {/* Main Connection Status 3D Card */}
       <Card3D intensity={4} glowColor="rgba(99, 102, 241, 0.12)">
@@ -187,6 +213,11 @@ export const ConnectPage: React.FC = () => {
                     ? `Account ID: ${status.user_id || 'Meta Verified'}`
                     : 'Click "Connect Instagram Account" to authorize PinGuru via Meta OAuth.'}
                 </p>
+                {status?.connected && (status.profile_picture_url || status.account_type || typeof status.followers_count === 'number') && (
+                  <div className="pt-2">
+                    <InstagramAccountSummary status={status} />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -196,7 +227,7 @@ export const ConnectPage: React.FC = () => {
                 <span className="text-[10px] text-slate-500 dark:text-zinc-400 uppercase block font-sans font-bold">API State</span>
                 <span className="text-cyan-600 dark:text-cyan-400 font-semibold flex items-center gap-1.5 mt-1 text-[11px]">
                   <Radio className="w-3 h-3 animate-pulse text-cyan-500 dark:text-cyan-400" />
-                  {status?.connected ? 'Active & Live' : 'Standby'}
+                  {status?.connected ? (needsReconnect(status) ? 'Paused · reconnect needed' : 'Active & Live') : 'Standby'}
                 </span>
               </div>
               <div className="bg-slate-50 dark:bg-[#181822] p-3.5 rounded-xl border border-slate-200 dark:border-white/10">

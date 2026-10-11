@@ -39,5 +39,6 @@ Disallow: /onboarding
 Disallow: /verify
 Disallow: /auth
 Disallow: /forgot-password
+Disallow: /account-deleted
 
 Sitemap: https://pinguru.me/sitemap.xml
