@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Sparkles, 
   ArrowRight, 
@@ -22,8 +22,10 @@ interface AuthPageProps {
 
 export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { refresh } = useAuth();
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
+  const successMessage = typeof location.state?.message === 'string' ? location.state.message : null;
 
   // Login form state - clean defaults
   const [loginEmail, setLoginEmail] = useState(() => {
@@ -177,6 +179,13 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login' }) => 
                 <div>
                   <div className="font-semibold">{errorMsg}</div>
                 </div>
+              </div>
+            )}
+
+            {successMessage && !errorMsg && (
+              <div className="p-3.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl text-xs text-emerald-700 dark:text-emerald-300 flex items-start gap-2.5">
+                <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5" />
+                <div className="font-semibold">{successMessage}</div>
               </div>
             )}
 
