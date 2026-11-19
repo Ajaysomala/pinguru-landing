@@ -20,8 +20,11 @@ npm run dev
 
 Environment:
 
-- `VITE_API_BASE_URL=/api` (proxied in Vite; the old name `VITE_API_URL` is still read as a fallback, then `https://api.pinguru.me` in production builds)
-- `VITE_API_TARGET=https://api.pinguru.me`
+- `VITE_API_URL=https://api.pinguru.me` (the production API base URL)
+
+For the Cloudflare Pages admin deployment, backend CORS must allow the exact origin
+`https://admin-pinguru.pages.dev` and allow credentials. In FastAPI, set
+`allow_origins=["https://admin-pinguru.pages.dev"]` and `allow_credentials=True`.
 
 ## Scripts
 

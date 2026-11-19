@@ -1,73 +1,82 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { AlertCircle, CheckCircle, ArrowLeft, KeyRound, Mail } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AlertCircle, ArrowLeft, KeyRound, Mail } from 'lucide-react';
 import { requestPasswordReset, resetPassword } from '../lib/api';
 import '../styles/auth.css';
 
+type ApiError = Error & { status?: number };
+
+function getRequestError(error: unknown): string {
+  if (error instanceof Error) {
+    const status = (error as ApiError).status;
+    if (status === 429) return 'Too many attempts. Please wait before trying again.';
+    if (status === 503) return 'Password recovery is unavailable because the recovery email is not configured.';
+    if (status === 400 || status === 401) return 'The code is invalid or expired.';
+    if (error instanceof TypeError) return 'Network error. Check your connection and try again.';
+  }
+  return 'Unable to complete the request. Please try again.';
+}
+
 const ForgotPasswordPage: React.FC = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const emailParam = useMemo(() => searchParams.get('email') || '', [searchParams]);
-
-  const [email, setEmail] = useState(emailParam);
-  // Read the emailed reset token once; it is removed from the URL below so it
-  // doesn't linger in history, screenshots or Referer headers.
-  const [resetToken] = useState(() => searchParams.get('token') || '');
+  const [step, setStep] = useState<1 | 2>(1);
+  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [requested, setRequested] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
 
   useEffect(() => {
-    if (emailParam) setEmail(emailParam);
-  }, [emailParam]);
+    if (cooldown <= 0) return;
+    const timer = window.setTimeout(() => setCooldown((seconds) => seconds - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [cooldown]);
 
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    if (!url.searchParams.has('token')) return;
-    url.searchParams.delete('token');
-    window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
-  }, []);
+  const sendCode = async (event?: React.FormEvent) => {
+    event?.preventDefault();
+    if (loading || cooldown > 0) return;
 
-  const isResetMode = Boolean(resetToken);
-
-  const handleRequest = async (e: React.FormEvent) => {
-    e.preventDefault();
     setLoading(true);
     setError('');
-    setMessage('');
-
     try {
-      const response = await requestPasswordReset(email.trim());
-      setRequested(true);
-      setMessage(response.message);
-      // Token arrives only via the email link — never extract from response body
-    } catch (err: any) {
-      setError(err.message || 'Failed to request password reset');
+      await requestPasswordReset(email.trim());
+      setStep(2);
+      setCooldown(60);
+    } catch (requestError) {
+      setError(getRequestError(requestError));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleReset = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleReset = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setError('');
+
+    if (!/^\d{6}$/.test(otp)) {
+      setError('Enter the 6-digit code.');
+      return;
+    }
+    if (newPassword.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
     if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('Passwords do not match.');
       return;
     }
 
     setLoading(true);
-    setError('');
-    setMessage('');
-
     try {
-      const response = await resetPassword(email.trim(), resetToken.trim(), newPassword);
-      setMessage(response.message);
-      setTimeout(() => navigate('/login', { replace: true }), 1800);
-    } catch (err: any) {
-      setError(err.message || 'Failed to reset password');
+      await resetPassword(email.trim(), otp, newPassword);
+      navigate('/login', {
+        replace: true,
+        state: { message: 'Password updated, sign in' },
+      });
+    } catch (resetError) {
+      setError(getRequestError(resetError));
     } finally {
       setLoading(false);
     }
@@ -86,10 +95,13 @@ const ForgotPasswordPage: React.FC = () => {
         <div className="auth-icon-tile">
           <KeyRound size={22} />
         </div>
-
-        <h1 className="auth-panel-title auth-centered-title">{isResetMode ? 'Set a new password' : 'Reset your password'}</h1>
+        <h1 className="auth-panel-title auth-centered-title">
+          {step === 1 ? 'Reset your password' : 'Enter recovery code'}
+        </h1>
         <p className="auth-panel-subtitle auth-centered-subtitle">
-          {isResetMode ? 'Choose a new password to regain access to your PinGuru workspace.' : 'Enter your account email and we will send a secure reset link.'}
+          {step === 1
+            ? 'Enter the admin email to request a password reset code.'
+            : 'If this is the admin account, a code was sent to the recovery email.'}
         </p>
 
         {error && (
@@ -99,17 +111,10 @@ const ForgotPasswordPage: React.FC = () => {
           </div>
         )}
 
-        {message && !error && (
-          <div className="auth-alert success auth-alert-spaced">
-            <CheckCircle size={15} className="flex-shrink-0" />
-            <span>{message}</span>
-          </div>
-        )}
-
-        {isResetMode ? (
-          <form className="auth-panel-form" onSubmit={handleReset}>
+        {step === 1 ? (
+          <form className="auth-panel-form" onSubmit={sendCode}>
             <div className="form-group">
-              <label className="form-label" htmlFor="email">Email</label>
+              <label className="form-label" htmlFor="email">Admin email</label>
               <div className="auth-input-wrap">
                 <Mail size={16} className="auth-input-icon" />
                 <input
@@ -117,85 +122,79 @@ const ForgotPasswordPage: React.FC = () => {
                   className="form-input"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(event) => setEmail(event.target.value)}
                   required
                   autoComplete="email"
+                  placeholder="admin@example.com"
                 />
               </div>
+            </div>
+
+            <button type="submit" disabled={loading || cooldown > 0} className="auth-gradient-btn">
+              {loading ? 'Sending...' : cooldown > 0 ? `Resend in ${cooldown}s` : 'Send reset code'}
+            </button>
+          </form>
+        ) : (
+          <form className="auth-panel-form" onSubmit={handleReset}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="otp">6-digit code</label>
+              <input
+                id="otp"
+                className="form-input"
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                pattern="[0-9]{6}"
+                maxLength={6}
+                value={otp}
+                onChange={(event) => setOtp(event.target.value.replace(/\D/g, '').slice(0, 6))}
+                required
+                placeholder="000000"
+              />
             </div>
 
             <div className="form-group">
               <label className="form-label" htmlFor="newPassword">New password</label>
-              <div className="auth-input-wrap">
-                <KeyRound size={16} className="auth-input-icon" />
-                <input
-                  id="newPassword"
-                  className="form-input"
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                  autoComplete="new-password"
-                  placeholder="At least 8 characters"
-                />
-              </div>
+              <input
+                id="newPassword"
+                className="form-input"
+                type="password"
+                value={newPassword}
+                onChange={(event) => setNewPassword(event.target.value)}
+                required
+                minLength={8}
+                autoComplete="new-password"
+                placeholder="At least 8 characters"
+              />
             </div>
 
             <div className="form-group">
               <label className="form-label" htmlFor="confirmPassword">Confirm new password</label>
-              <div className="auth-input-wrap">
-                <KeyRound size={16} className="auth-input-icon" />
-                <input
-                  id="confirmPassword"
-                  className="form-input"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  autoComplete="new-password"
-                  placeholder="Repeat your new password"
-                />
-              </div>
+              <input
+                id="confirmPassword"
+                className="form-input"
+                type="password"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                required
+                minLength={8}
+                autoComplete="new-password"
+                placeholder="Repeat your new password"
+              />
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="auth-gradient-btn"
-            >
-              {loading ? 'Updating...' : 'Reset password'}
-            </button>
-          </form>
-        ) : (
-          <form className="auth-panel-form" onSubmit={handleRequest}>
-            <div className="form-group">
-              <label className="form-label" htmlFor="email">Email</label>
-              <div className="auth-input-wrap">
-                <Mail size={16} className="auth-input-icon" />
-                <input
-                  id="email"
-                  className="form-input"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
-                  placeholder="you@example.com"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="auth-gradient-btn"
-            >
-              {loading ? 'Sending reset link...' : 'Send reset link'}
+            <button type="submit" disabled={loading} className="auth-gradient-btn">
+              {loading ? 'Updating...' : 'Update password'}
             </button>
 
-            {requested && (
-              <p className="auth-request-note">If the email exists, you will receive a reset link shortly.</p>
-            )}
+            <button
+              type="button"
+              onClick={() => sendCode()}
+              disabled={loading || cooldown > 0}
+              className="auth-gradient-btn"
+            >
+              {cooldown > 0 ? `Resend code in ${cooldown}s` : 'Resend code'}
+            </button>
           </form>
         )}
 

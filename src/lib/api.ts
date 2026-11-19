@@ -1,11 +1,6 @@
 import type { User, DashboardStats, Rule, RuleCreatePayload, AnalyticsData, PlanStatus, InstagramMediaResponse, RuleButton } from './types';
 
-// VITE_API_BASE_URL is the current name; VITE_API_URL is still read for older .env files.
-const API = (
-  import.meta.env.VITE_API_BASE_URL
-  || import.meta.env.VITE_API_URL
-  || (import.meta.env.PROD ? 'https://api.pinguru.me' : '/api')
-).replace(/\/$/, '');
+const API = (import.meta.env.VITE_API_URL || 'https://api.pinguru.me').replace(/\/$/, '');
 
 type BackendRule = {
   _id?: string;
@@ -239,7 +234,7 @@ export async function submitRefundRequest(formData: FormData): Promise<{ message
 }
 
 export async function loginUser(email: string, password: string) {
-  const res = await authFetch('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+  const res = await authFetch('/admin/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
   const data = await readJson(res);
   if (!res.ok) throw createApiRequestError(res.status, rateLimitAwareMessage(res, data, 'Login failed'), 'Login failed');
   captureCsrfToken(data);
@@ -279,20 +274,20 @@ export async function resendEmailOtp(email: string) {
 }
 
 export async function requestPasswordReset(email: string): Promise<{ message: string }> {
-  const res = await authFetch('/auth/forgot-password/request', { method: 'POST', body: JSON.stringify({ email }) });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.detail || 'Failed to request password reset');
-  return data;
+  const res = await authFetch('/admin/auth/forgot-password/request', { method: 'POST', body: JSON.stringify({ email }) });
+  const data = await readJson(res);
+  if (!res.ok) throw createApiRequestError(res.status, data, 'Failed to request password reset');
+  return { message: typeof data?.message === 'string' ? data.message : '' };
 }
 
 export async function resetPassword(email: string, resetToken: string, newPassword: string): Promise<{ message: string }> {
-  const res = await authFetch('/auth/forgot-password/reset', {
+  const res = await authFetch('/admin/auth/forgot-password/reset', {
     method: 'POST',
     body: JSON.stringify({ email, reset_token: resetToken, new_password: newPassword }),
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.detail || 'Failed to reset password');
-  return data;
+  const data = await readJson(res);
+  if (!res.ok) throw createApiRequestError(res.status, data, 'Failed to reset password');
+  return { message: typeof data?.message === 'string' ? data.message : '' };
 }
 
 export async function logout() {
